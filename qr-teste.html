@@ -161,8 +161,8 @@
                 <h6 class="mt-3 text-primary">Opção 1 - Link Encurtado (Mais Fácil):</h6>
                 <ol>
                     <li>Acesse: <a href="https://tinyurl.com" target="_blank">https://tinyurl.com</a></li>
-                    <li>Cole este link na caixa: <br>
-                        <code>https://jacktatakae.github.io/SO-oficina-mecanica/cadastro-cliente.html</code>
+                    <li>Link encurtado configurado: <br>
+                        <code>https://qrco.de/bgBsmb</code>
                     </li>
                     <li>Personalize o nome: <strong>cadastro-vrs</strong></li>
                     <li>Clique em "Make TinyURL!"</li>
@@ -197,20 +197,18 @@
     <script>
         function criarLinkEncurtado() {
             const instructions = `
-🔗 CRIAR LINK ENCURTADO:
+🔗 LINK ENCURTADO CONFIGURADO:
+
+✅ Seu link: https://qrco.de/bgBsmb
+✅ Aponta para: https://jacktatakae.github.io/SO-oficina-mecanica/cadastro-cliente.html
+
+🎯 PARA CRIAR BACKUP:
 
 1️⃣ Acesse: https://tinyurl.com
-
 2️⃣ Cole este link:
 https://jacktatakae.github.io/SO-oficina-mecanica/cadastro-cliente.html
-
 3️⃣ Personalize para: cadastro-vrs
-
-4️⃣ Clique em "Make TinyURL!"
-
-5️⃣ Copie o novo link (ex: https://tinyurl.com/cadastro-vrs)
-
-6️⃣ Gere novo QR code com o link encurtado
+4️⃣ Use como backup
 
 ✅ Agora funcionará no celular!
             `;
@@ -229,9 +227,9 @@ https://jacktatakae.github.io/SO-oficina-mecanica/cadastro-cliente.html
         }
 
         function testarCadastro() {
-            // Abrir o cadastro do GitHub Pages
-            const githubUrl = 'https://jacktatakae.github.io/SO-oficina-mecanica/cadastro-cliente.html?source=teste';
-            window.open(githubUrl, '_blank');
+            // Abrir o link encurtado
+            const encurtadoUrl = 'https://qrco.de/bgBsmb';
+            window.open(encurtadoUrl, '_blank');
         }
 
         function mostrarInstrucoes() {
@@ -248,17 +246,17 @@ https://jacktatakae.github.io/SO-oficina-mecanica/cadastro-cliente.html
 
         // Gerar QR code dinâmico baseado na URL atual
         document.addEventListener('DOMContentLoaded', function() {
-            // Usar o link real do GitHub Pages
-            const githubUrl = 'https://jacktatakae.github.io/SO-oficina-mecanica/cadastro-cliente.html?source=qr';
+            // Usar o link encurtado real
+            const encurtadoUrl = 'https://qrco.de/bgBsmb';
             
-            // Atualizar QR code para apontar para o GitHub Pages
+            // Atualizar QR code para apontar para o link encurtado
             const qrImage = document.getElementById('qrCodeImage');
-            qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(githubUrl)}`;
+            qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(encurtadoUrl)}`;
             
             // Mostrar status
             document.getElementById('statusTeste').style.display = 'block';
             document.getElementById('statusTexto').textContent = 
-                'QR Code gerado para: ' + githubUrl.substring(0, 50) + '...';
+                'QR Code configurado: ' + encurtadoUrl;
         });
 
         // Testar se o arquivo existe
