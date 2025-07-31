@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔧 Oficina VRS - Central de Sistemas</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 1rem;
+        }
+
+        .central-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            max-width: 1200px;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        .header-section {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+
+        .header-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            color: #3498db;
+        }
+
+        .systems-grid {
+            padding: 3rem 2rem;
+        }
+
+        .system-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+            cursor: pointer;
+            height: 100%;
+        }
+
+        .system-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            border-color: #007bff;
+        }
+
+        .system-card.primary {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+        }
+
+        .system-card.success {
+            background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+            color: white;
+        }
+
+        .system-card.warning {
+            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+            color: #212529;
+        }
+
+        .system-card.info {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+            color: white;
+        }
+
+        .system-card.secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+            color: white;
+        }
+
+        .system-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .system-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .system-description {
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+            opacity: 0.9;
+        }
+
+        .system-features {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 1.5rem;
+        }
+
+        .system-features li {
+            padding: 0.25rem 0;
+            font-size: 0.9rem;
+        }
+
+        .system-features li i {
+            width: 20px;
+            margin-right: 0.5rem;
+        }
+
+        .btn-system {
+            border-radius: 25px;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+            color: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .btn-system:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+            color: inherit;
+        }
+
+        .status-bar {
+            background: #f8f9fa;
+            padding: 1rem 2rem;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+
+        .status-active { background-color: #28a745; }
+        .status-warning { background-color: #ffc107; }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 0.5rem;
+            }
+            
+            .header-section {
+                padding: 2rem 1rem;
+            }
+            
+            .systems-grid {
+                padding: 2rem 1rem;
+            }
+            
+            .system-card {
+                margin-bottom: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="central-container">
+        <!-- Cabeçalho -->
+        <div class="header-section">
+            <div class="header-icon">
+                <i class="fas fa-tools"></i>
+            </div>
+            <h1>Oficina VRS</h1>
+            <p class="mb-0">Central de Sistemas Integrados</p>
+            <small>Gestão Completa de Clientes e Backup Automático</small>
+        </div>
+
+        <!-- Grid de Sistemas -->
+        <div class="systems-grid">
+            <div class="row">
+                
+                <!-- Sistema Principal: Cadastro -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="system-card primary" onclick="abrirSistema('cadastro-cliente.html')">
+                        <div class="system-icon">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <div class="system-title">Cadastro de Clientes</div>
+                        <div class="system-description">
+                            Sistema principal para cadastro de novos clientes via QR Code
+                        </div>
+                        <ul class="system-features">
+                            <li><i class="fas fa-check"></i> Formulário otimizado mobile</li>
+                            <li><i class="fas fa-check"></i> Backup automático integrado</li>
+                            <li><i class="fas fa-check"></i> Notificação WhatsApp</li>
+                            <li><i class="fas fa-check"></i> Múltiplas camadas de segurança</li>
+                        </ul>
+                        <button class="btn btn-system">
+                            <i class="fas fa-external-link-alt me-1"></i>
+                            Abrir Sistema
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Sistema de Backup -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="system-card success" onclick="abrirSistema('sistema-backup.html')">
+                        <div class="system-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="system-title">Sistema de Backup</div>
+                        <div class="system-description">
+                            Proteção total dos dados com backup automático e manual
+                        </div>
+                        <ul class="system-features">
+                            <li><i class="fas fa-check"></i> Backup automático a cada 5min</li>
+                            <li><i class="fas fa-check"></i> Exportação/importação</li>
+                            <li><i class="fas fa-check"></i> Histórico detalhado</li>
+                            <li><i class="fas fa-check"></i> Recuperação de emergência</li>
+                        </ul>
+                        <button class="btn btn-system">
+                            <i class="fas fa-external-link-alt me-1"></i>
+                            Abrir Sistema
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Gerenciador de Clientes -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="system-card info" onclick="abrirSistema('gerenciador-clientes.html')">
+                        <div class="system-icon">
+                            <i class="fas fa-users-cog"></i>
+                        </div>
+                        <div class="system-title">Gerenciador</div>
+                        <div class="system-description">
+                            Visualização e gerenciamento completo dos clientes cadastrados
+                        </div>
+                        <ul class="system-features">
+                            <li><i class="fas fa-check"></i> Lista completa de clientes</li>
+                            <li><i class="fas fa-check"></i> Busca avançada</li>
+                            <li><i class="fas fa-check"></i> Estatísticas em tempo real</li>
+                            <li><i class="fas fa-check"></i> Contato via WhatsApp</li>
+                        </ul>
+                        <button class="btn btn-system">
+                            <i class="fas fa-external-link-alt me-1"></i>
+                            Abrir Sistema
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Identificação de Peças -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="system-card warning" onclick="abrirSistema('identificacao-pecas.html')">
+                        <div class="system-icon">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div class="system-title">Identificação de Peças</div>
+                        <div class="system-description">
+                            Sistema automático para identificar peças por código
+                        </div>
+                        <ul class="system-features">
+                            <li><i class="fas fa-check"></i> Reconhecimento automático</li>
+                            <li><i class="fas fa-check"></i> Catálogo integrado</li>
+                            <li><i class="fas fa-check"></i> Múltiplos fornecedores</li>
+                            <li><i class="fas fa-check"></i> Busca manual backup</li>
+                        </ul>
+                        <button class="btn btn-system">
+                            <i class="fas fa-external-link-alt me-1"></i>
+                            Abrir Sistema
+                        </button>
+                    </div>
+                </div>
+
+                <!-- QR Code Permanente -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="system-card secondary" onclick="abrirSistema('qr-permanente.html')">
+                        <div class="system-icon">
+                            <i class="fas fa-qrcode"></i>
+                        </div>
+                        <div class="system-title">QR Code Permanente</div>
+                        <div class="system-description">
+                            QR Code para impressão e uso permanente na oficina
+                        </div>
+                        <ul class="system-features">
+                            <li><i class="fas fa-check"></i> QR Code otimizado</li>
+                            <li><i class="fas fa-check"></i> Link encurtado</li>
+                            <li><i class="fas fa-check"></i> Pronto para impressão</li>
+                            <li><i class="fas fa-check"></i> Responsivo mobile</li>
+                        </ul>
+                        <button class="btn btn-system">
+                            <i class="fas fa-external-link-alt me-1"></i>
+                            Abrir Sistema
+                        </button>
+                    </div>
+                </div>
+
+                <!-- QR Code Teste -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="system-card" onclick="abrirSistema('qr-teste.html')">
+                        <div class="system-icon">
+                            <i class="fas fa-flask"></i>
+                        </div>
+                        <div class="system-title">QR Code Teste</div>
+                        <div class="system-description">
+                            Ambiente de teste para configuração do QR Code
+                        </div>
+                        <ul class="system-features">
+                            <li><i class="fas fa-check"></i> Ambiente de testes</li>
+                            <li><i class="fas fa-check"></i> Configuração de links</li>
+                            <li><i class="fas fa-check"></i> Instruções detalhadas</li>
+                            <li><i class="fas fa-check"></i> Debug de problemas</li>
+                        </ul>
+                        <button class="btn btn-system">
+                            <i class="fas fa-external-link-alt me-1"></i>
+                            Abrir Sistema
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Ações Rápidas -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="text-center">
+                        <h4><i class="fas fa-bolt me-2"></i>Ações Rápidas</h4>
+                        <button class="btn btn-primary me-2 mb-2" onclick="backupEmergencia()">
+                            <i class="fas fa-download me-1"></i>Backup de Emergência
+                        </button>
+                        <button class="btn btn-success me-2 mb-2" onclick="abrirDocumentacao()">
+                            <i class="fas fa-book me-1"></i>Documentação
+                        </button>
+                        <button class="btn btn-info me-2 mb-2" onclick="verificarStatus()">
+                            <i class="fas fa-check-circle me-1"></i>Verificar Status
+                        </button>
+                        <button class="btn btn-warning me-2 mb-2" onclick="limparCache()">
+                            <i class="fas fa-broom me-1"></i>Limpar Cache
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Barra de Status -->
+        <div class="status-bar">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="status-item">
+                        <span class="status-indicator status-active"></span>
+                        <span><strong>Sistema de Backup:</strong> <span id="statusBackup">Ativo</span></span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-indicator status-active"></span>
+                        <span><strong>Clientes Cadastrados:</strong> <span id="totalClientes">0</span></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="status-item">
+                        <span class="status-indicator status-active"></span>
+                        <span><strong>Último Backup:</strong> <span id="ultimoBackup">Verificando...</span></span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-indicator status-active"></span>
+                        <span><strong>Espaço Utilizado:</strong> <span id="espacoUtilizado">0 KB</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Inicializar status
+        document.addEventListener('DOMContentLoaded', function() {
+            atualizarStatus();
+            
+            // Atualizar status a cada 30 segundos
+            setInterval(atualizarStatus, 30000);
+        });
+
+        // Abrir sistema específico
+        function abrirSistema(arquivo) {
+            window.open(arquivo, '_blank');
+        }
+
+        // Atualizar status dos sistemas
+        function atualizarStatus() {
+            try {
+                // Total de clientes
+                const clientes = JSON.parse(localStorage.getItem('clientes') || '[]');
+                document.getElementById('totalClientes').textContent = clientes.length;
+                
+                // Último backup
+                const ultimoBackup = localStorage.getItem('ultimo_backup');
+                if (ultimoBackup) {
+                    const data = new Date(ultimoBackup);
+                    document.getElementById('ultimoBackup').textContent = data.toLocaleString('pt-BR');
+                } else {
+                    document.getElementById('ultimoBackup').textContent = 'Nenhum backup encontrado';
+                }
+                
+                // Espaço utilizado
+                let tamanhoTotal = 0;
+                ['clientes', 'backups', 'historico_cadastros'].forEach(chave => {
+                    const dados = localStorage.getItem(chave);
+                    if (dados) tamanhoTotal += dados.length;
+                });
+                document.getElementById('espacoUtilizado').textContent = Math.round(tamanhoTotal / 1024) + ' KB';
+                
+                // Status do backup
+                const backups = JSON.parse(localStorage.getItem('backups') || '[]');
+                document.getElementById('statusBackup').textContent = 
+                    backups.length > 0 ? `Ativo (${backups.length} backups)` : 'Inativo';
+                
+            } catch (error) {
+                console.error('Erro ao atualizar status:', error);
+            }
+        }
+
+        // Backup de emergência
+        function backupEmergencia() {
+            try {
+                const dadosCompletos = {
+                    clientes: JSON.parse(localStorage.getItem('clientes') || '[]'),
+                    backups: JSON.parse(localStorage.getItem('backups') || '[]'),
+                    historico: JSON.parse(localStorage.getItem('historico_cadastros') || '[]'),
+                    timestamp: new Date().toISOString(),
+                    versao: '1.0.0',
+                    tipo: 'Emergencia'
+                };
+                
+                const dataStr = JSON.stringify(dadosCompletos, null, 2);
+                const dataBlob = new Blob([dataStr], {type: 'application/json'});
+                
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(dataBlob);
+                link.download = `backup_emergencia_vrs_${new Date().toISOString().split('T')[0]}.json`;
+                link.click();
+                
+                alert('✅ Backup de emergência criado e baixado com sucesso!');
+                
+            } catch (error) {
+                alert('❌ Erro ao criar backup de emergência: ' + error.message);
+            }
+        }
+
+        // Abrir documentação
+        function abrirDocumentacao() {
+            // Como não podemos abrir .md diretamente, criar uma versão HTML
+            const docWindow = window.open('', '_blank');
+            docWindow.document.write(`
+                <html>
+                <head>
+                    <title>Documentação - Sistema de Backup</title>
+                    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+                </head>
+                <body class="container py-4">
+                    <h1>📚 Documentação do Sistema</h1>
+                    <div class="alert alert-info">
+                        <strong>📁 Arquivo:</strong> SISTEMA-BACKUP-DOCUMENTACAO.md
+                        <br>
+                        <strong>📍 Local:</strong> Mesma pasta dos outros arquivos
+                    </div>
+                    <h3>🚀 Sistemas Disponíveis:</h3>
+                    <ul>
+                        <li><strong>cadastro-cliente.html</strong> - Cadastro principal</li>
+                        <li><strong>sistema-backup.html</strong> - Gerenciamento de backup</li>
+                        <li><strong>gerenciador-clientes.html</strong> - Lista de clientes</li>
+                        <li><strong>identificacao-pecas.html</strong> - Identificação de peças</li>
+                        <li><strong>qr-permanente.html</strong> - QR Code final</li>
+                        <li><strong>qr-teste.html</strong> - Ambiente de teste</li>
+                    </ul>
+                    <h3>⚡ Atalhos Importantes:</h3>
+                    <ul>
+                        <li><code>Ctrl + Shift + B</code> - Backup de emergência</li>
+                        <li><code>Ctrl + Shift + R</code> - Recuperar último cadastro</li>
+                        <li><code>Ctrl + E</code> - Exportar dados</li>
+                    </ul>
+                </body>
+                </html>
+            `);
+        }
+
+        // Verificar status dos sistemas
+        function verificarStatus() {
+            const relatorio = [];
+            
+            // Verificar localStorage
+            try {
+                const clientes = JSON.parse(localStorage.getItem('clientes') || '[]');
+                relatorio.push(`✅ Clientes: ${clientes.length} registros`);
+            } catch (e) {
+                relatorio.push(`❌ Clientes: Erro ao carregar`);
+            }
+            
+            try {
+                const backups = JSON.parse(localStorage.getItem('backups') || '[]');
+                relatorio.push(`✅ Backups: ${backups.length} backups`);
+            } catch (e) {
+                relatorio.push(`❌ Backups: Erro ao carregar`);
+            }
+            
+            try {
+                const historico = JSON.parse(localStorage.getItem('historico_cadastros') || '[]');
+                relatorio.push(`✅ Histórico: ${historico.length} registros`);
+            } catch (e) {
+                relatorio.push(`❌ Histórico: Erro ao carregar`);
+            }
+            
+            // Verificar capacidade do localStorage
+            try {
+                const teste = 'x'.repeat(1024);
+                localStorage.setItem('teste_capacidade', teste);
+                localStorage.removeItem('teste_capacidade');
+                relatorio.push(`✅ LocalStorage: Funcionando`);
+            } catch (e) {
+                relatorio.push(`⚠️ LocalStorage: Pode estar cheio`);
+            }
+            
+            alert('📊 STATUS DOS SISTEMAS:\n\n' + relatorio.join('\n'));
+        }
+
+        // Limpar cache
+        function limparCache() {
+            if (!confirm('⚠️ Isso irá limpar apenas dados de cache, não os clientes. Continuar?')) {
+                return;
+            }
+            
+            try {
+                // Limpar apenas dados temporários, preservar dados importantes
+                const preservar = ['clientes', 'backups', 'historico_cadastros', 'ultimo_backup'];
+                
+                Object.keys(localStorage).forEach(chave => {
+                    if (!preservar.includes(chave) && !chave.startsWith('backup_cliente_')) {
+                        localStorage.removeItem(chave);
+                    }
+                });
+                
+                alert('✅ Cache limpo com sucesso!\n\nDados importantes preservados.');
+                atualizarStatus();
+                
+            } catch (error) {
+                alert('❌ Erro ao limpar cache: ' + error.message);
+            }
+        }
+
+        // Atalhos de teclado globais
+        document.addEventListener('keydown', function(e) {
+            // Ctrl + Shift + B = Backup de emergência
+            if (e.ctrlKey && e.shiftKey && e.key === 'B') {
+                e.preventDefault();
+                backupEmergencia();
+            }
+            
+            // Ctrl + Shift + S = Verificar status
+            if (e.ctrlKey && e.shiftKey && e.key === 'S') {
+                e.preventDefault();
+                verificarStatus();
+            }
+        });
+    </script>
+</body>
+</html>

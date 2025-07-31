@@ -1,0 +1,627 @@
+/* ====================================
+   SISTEMA DE PEÇAS AUTOMOTIVAS
+   Arquivo de Estilo Principal
+   ==================================== */
+
+/* ==========================================
+   VARIÁVEIS CSS PERSONALIZADAS
+   ========================================== */
+:root {
+    /* Cores principais */
+    --primary-color: #007bff;
+    --secondary-color: #6c757d;
+    --success-color: #28a745;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
+    --info-color: #17a2b8;
+    --light-color: #f8f9fa;
+    --dark-color: #343a40;
+    
+    /* Gradientes */
+    --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --gradient-success: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+    --gradient-warning: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+    --gradient-danger: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+    
+    /* Sombras */
+    --shadow-light: 0 2px 4px rgba(0,0,0,0.1);
+    --shadow-medium: 0 4px 6px rgba(0,0,0,0.1);
+    --shadow-heavy: 0 10px 25px rgba(0,0,0,0.15);
+    --shadow-card: 0 8px 30px rgba(0,0,0,0.12);
+    
+    /* Bordas */
+    --border-radius: 8px;
+    --border-radius-lg: 12px;
+    --border-radius-xl: 16px;
+    
+    /* Transições */
+    --transition-base: all 0.3s ease;
+    --transition-fast: all 0.2s ease;
+    --transition-slow: all 0.5s ease;
+    
+    /* Espaçamentos */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-xxl: 3rem;
+}
+
+/* ==========================================
+   RESET E CONFIGURAÇÕES BÁSICAS
+   ========================================== */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
+    line-height: 1.6;
+    color: var(--dark-color);
+    background-color: #f5f7fa;
+}
+
+/* ==========================================
+   COMPONENTES REUTILIZÁVEIS
+   ========================================== */
+
+/* Cartões melhorados */
+.card-modern {
+    border: none;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-card);
+    transition: var(--transition-base);
+    background: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.card-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-heavy);
+}
+
+.card-modern::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--gradient-primary);
+}
+
+/* Botões melhorados */
+.btn-modern {
+    border-radius: var(--border-radius);
+    font-weight: 500;
+    padding: 0.75rem 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.875rem;
+    transition: var(--transition-base);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-modern::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: var(--transition-fast);
+}
+
+.btn-modern:hover::before {
+    left: 100%;
+}
+
+.btn-gradient-primary {
+    background: var(--gradient-primary);
+    border: none;
+    color: white;
+}
+
+.btn-gradient-success {
+    background: var(--gradient-success);
+    border: none;
+    color: white;
+}
+
+.btn-gradient-warning {
+    background: var(--gradient-warning);
+    border: none;
+    color: var(--dark-color);
+}
+
+.btn-gradient-danger {
+    background: var(--gradient-danger);
+    border: none;
+    color: white;
+}
+
+/* Formulários melhorados */
+.form-floating-modern {
+    position: relative;
+    margin-bottom: var(--spacing-lg);
+}
+
+.form-control-modern {
+    background: rgba(255,255,255,0.9);
+    border: 2px solid #e9ecef;
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    font-size: 1rem;
+    transition: var(--transition-base);
+    width: 100%;
+}
+
+.form-control-modern:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+    background: white;
+}
+
+.form-label-modern {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    background: white;
+    padding: 0 0.5rem;
+    color: var(--secondary-color);
+    font-size: 0.875rem;
+    transition: var(--transition-base);
+    pointer-events: none;
+}
+
+.form-control-modern:focus + .form-label-modern,
+.form-control-modern:not(:placeholder-shown) + .form-label-modern {
+    top: -0.5rem;
+    left: 0.75rem;
+    font-size: 0.75rem;
+    color: var(--primary-color);
+}
+
+/* ==========================================
+   GRID DE PRODUTOS/PEÇAS
+   ========================================== */
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: var(--spacing-lg);
+    margin-top: var(--spacing-xl);
+}
+
+.product-card {
+    background: white;
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-card);
+    transition: var(--transition-base);
+    position: relative;
+}
+
+.product-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-heavy);
+}
+
+.product-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--secondary-color);
+    font-size: 3rem;
+}
+
+.product-info {
+    padding: var(--spacing-lg);
+}
+
+.product-code {
+    background: var(--primary-color);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--border-radius);
+    font-size: 0.75rem;
+    font-weight: 500;
+    display: inline-block;
+    margin-bottom: var(--spacing-sm);
+}
+
+.product-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--dark-color);
+    margin-bottom: var(--spacing-sm);
+    line-height: 1.4;
+}
+
+.product-price {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--success-color);
+    margin-bottom: var(--spacing-sm);
+}
+
+.product-category {
+    background: var(--light-color);
+    color: var(--secondary-color);
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--border-radius);
+    font-size: 0.75rem;
+    display: inline-block;
+}
+
+/* ==========================================
+   SISTEMA DE FILTROS
+   ========================================== */
+.filters-container {
+    background: white;
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-xl);
+    box-shadow: var(--shadow-card);
+    margin-bottom: var(--spacing-xl);
+}
+
+.filter-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+    align-items: end;
+}
+
+.filter-item {
+    flex: 1;
+    min-width: 200px;
+}
+
+.filter-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-md);
+    justify-content: flex-end;
+}
+
+/* ==========================================
+   MODAL E OVERLAYS
+   ========================================== */
+.modal-modern .modal-dialog {
+    max-width: 600px;
+}
+
+.modal-modern .modal-content {
+    border: none;
+    border-radius: var(--border-radius-xl);
+    box-shadow: var(--shadow-heavy);
+}
+
+.modal-modern .modal-header {
+    background: var(--gradient-primary);
+    color: white;
+    border-radius: var(--border-radius-xl) var(--border-radius-xl) 0 0;
+    padding: var(--spacing-lg) var(--spacing-xl);
+}
+
+.modal-modern .modal-body {
+    padding: var(--spacing-xl);
+}
+
+.modal-modern .modal-footer {
+    padding: var(--spacing-lg) var(--spacing-xl);
+    border-top: 1px solid #e9ecef;
+}
+
+/* ==========================================
+   LOADING E ESTADOS
+   ========================================== */
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.state-empty {
+    text-align: center;
+    padding: var(--spacing-xxl);
+    color: var(--secondary-color);
+}
+
+.state-empty-icon {
+    font-size: 4rem;
+    color: var(--light-color);
+    margin-bottom: var(--spacing-lg);
+}
+
+/* ==========================================
+   ALERTAS E NOTIFICAÇÕES
+   ========================================== */
+.alert-modern {
+    border: none;
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-lg) var(--spacing-xl);
+    border-left: 4px solid;
+    position: relative;
+    overflow: hidden;
+}
+
+.alert-modern::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: currentColor;
+    opacity: 0.3;
+}
+
+.notification-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1060;
+    min-width: 300px;
+    background: white;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-heavy);
+    opacity: 0;
+    transform: translateX(100%);
+    transition: var(--transition-base);
+}
+
+.notification-toast.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* ==========================================
+   TABELAS MODERNAS
+   ========================================== */
+.table-modern {
+    background: white;
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-card);
+}
+
+.table-modern thead {
+    background: var(--gradient-primary);
+    color: white;
+}
+
+.table-modern th {
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.875rem;
+    padding: var(--spacing-lg);
+    border: none;
+}
+
+.table-modern td {
+    padding: var(--spacing-lg);
+    border-bottom: 1px solid #f8f9fa;
+    vertical-align: middle;
+}
+
+.table-modern tbody tr:hover {
+    background: #f8f9fa;
+}
+
+/* ==========================================
+   NAVEGAÇÃO E BREADCRUMBS
+   ========================================== */
+.breadcrumb-modern {
+    background: rgba(255,255,255,0.9);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-sm) var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+    backdrop-filter: blur(10px);
+}
+
+.breadcrumb-modern .breadcrumb-item + .breadcrumb-item::before {
+    content: '›';
+    color: var(--primary-color);
+}
+
+/* ==========================================
+   UTILITÁRIOS
+   ========================================== */
+.text-gradient-primary {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.bg-pattern {
+    background-image: 
+        radial-gradient(circle at 25px 25px, rgba(255,255,255,0.2) 2px, transparent 0),
+        radial-gradient(circle at 75px 75px, rgba(255,255,255,0.1) 2px, transparent 0);
+    background-size: 100px 100px;
+}
+
+.hover-scale {
+    transition: var(--transition-base);
+}
+
+.hover-scale:hover {
+    transform: scale(1.05);
+}
+
+.glass-effect {
+    backdrop-filter: blur(10px);
+    background: rgba(255,255,255,0.25);
+    border: 1px solid rgba(255,255,255,0.18);
+}
+
+/* ==========================================
+   ANIMAÇÕES
+   ========================================== */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInRight {
+    from { opacity: 0; transform: translateX(30px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.6s ease-out;
+}
+
+.animate-slide-in-right {
+    animation: slideInRight 0.6s ease-out;
+}
+
+.animate-pulse {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+/* ==========================================
+   DARK MODE
+   ========================================== */
+.theme-dark {
+    --primary-color: #4dabf7;
+    --secondary-color: #adb5bd;
+    --success-color: #51cf66;
+    --warning-color: #ffd43b;
+    --danger-color: #ff6b6b;
+    --info-color: #74c0fc;
+    --light-color: #343a40;
+    --dark-color: #f8f9fa;
+}
+
+.theme-dark body {
+    background: #1a1a1a;
+    color: #f8f9fa;
+}
+
+.theme-dark .card-modern,
+.theme-dark .filters-container,
+.theme-dark .table-modern {
+    background: #2d3748;
+    color: #f8f9fa;
+}
+
+.theme-dark .form-control-modern {
+    background: #374151;
+    border-color: #4b5563;
+    color: #f8f9fa;
+}
+
+/* ==========================================
+   PRINT STYLES
+   ========================================== */
+@media print {
+    .btn, .filter-actions, .modal, .notification-toast {
+        display: none !important;
+    }
+    
+    .card-modern, .table-modern {
+        box-shadow: none !important;
+        border: 1px solid #ddd;
+    }
+    
+    .products-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+}
+
+/* ==========================================
+   ACESSIBILIDADE
+   ========================================== */
+.sr-only {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0,0,0,0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+.focus-visible {
+    outline: 2px solid var(--primary-color) !important;
+    outline-offset: 2px !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ==========================================
+   RESPONSIVIDADE ESPECÍFICA
+   ========================================== */
+@media (max-width: 768px) {
+    .products-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: var(--spacing-md);
+    }
+    
+    .filter-group {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+    
+    .filter-item {
+        min-width: auto;
+    }
+    
+    .modal-modern .modal-dialog {
+        margin: var(--spacing-sm);
+    }
+    
+    .notification-toast {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        min-width: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .products-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: var(--spacing-sm);
+    }
+    
+    .product-info {
+        padding: var(--spacing-md);
+    }
+    
+    .filters-container {
+        padding: var(--spacing-lg);
+    }
+}

@@ -148,6 +148,10 @@
                 <i class="fas fa-user-plus me-1"></i> Testar Cadastro Direto
             </button>
             
+            <button class="btn btn-warning btn-custom" onclick="abrirSistemaBackup()">
+                <i class="fas fa-shield-alt me-1"></i> Sistema Backup
+            </button>
+            
             <button class="btn btn-info btn-custom" onclick="mostrarInstrucoes()">
                 <i class="fas fa-question-circle me-1"></i> Ver Instruções
             </button>
@@ -230,6 +234,11 @@ https://jacktatakae.github.io/SO-oficina-mecanica/cadastro-cliente.html
             // Abrir o link encurtado
             const encurtadoUrl = 'https://qrco.de/bgBsmb';
             window.open(encurtadoUrl, '_blank');
+        }
+
+        function abrirSistemaBackup() {
+            // Abrir sistema de backup em nova aba
+            window.open('sistema-backup.html', '_blank');
         }
 
         function mostrarInstrucoes() {

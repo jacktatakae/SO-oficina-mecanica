@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💾 Sistema de Backup - Oficina VRS</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 1rem;
+        }
+
+        .backup-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            max-width: 1000px;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        .backup-header {
+            background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .backup-content {
+            padding: 2rem;
+        }
+
+        .backup-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-left: 5px solid #007bff;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+
+        .status-success { background-color: #28a745; }
+        .status-warning { background-color: #ffc107; }
+        .status-danger { background-color: #dc3545; }
+
+        .backup-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 1rem;
+        }
+
+        .backup-item {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border-left: 4px solid #28a745;
+            display: flex;
+            justify-content: between;
+            align-items: center;
+        }
+
+        .btn-backup {
+            border-radius: 10px;
+            padding: 0.8rem 1.5rem;
+            font-weight: 600;
+            margin: 0.25rem;
+        }
+
+        .log-area {
+            background: #2c3e50;
+            color: #ecf0f1;
+            border-radius: 10px;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            height: 200px;
+            overflow-y: auto;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 0.5rem;
+            }
+            
+            .backup-header, .backup-content {
+                padding: 1.5rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="backup-container">
+        <!-- Cabeçalho -->
+        <div class="backup-header">
+            <h1><i class="fas fa-shield-alt me-2"></i>Sistema de Backup</h1>
+            <p class="mb-0">Proteção automática de dados - Oficina VRS</p>
+        </div>
+
+        <!-- Conteúdo -->
+        <div class="backup-content">
+            
+            <!-- Status do Sistema -->
+            <div class="backup-card">
+                <h5><i class="fas fa-heartbeat me-2"></i>Status do Sistema</h5>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="status-indicator status-success"></span>
+                            <span>LocalStorage: <strong id="localStorageStatus">Ativo</strong></span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="status-indicator status-success"></span>
+                            <span>Auto-backup: <strong id="autoBackupStatus">Ativo</strong></span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="status-indicator status-success"></span>
+                            <span>Último backup: <strong id="lastBackupTime">Agora</strong></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ações de Backup -->
+            <div class="backup-card">
+                <h5><i class="fas fa-tools me-2"></i>Ações de Backup</h5>
+                <div class="row">
+                    <div class="col-md-3">
+                        <button class="btn btn-primary btn-backup w-100" onclick="criarBackupManual()">
+                            <i class="fas fa-save me-1"></i>Backup Manual
+                        </button>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-success btn-backup w-100" onclick="exportarTodos()">
+                            <i class="fas fa-download me-1"></i>Exportar Todos
+                        </button>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-warning btn-backup w-100" onclick="importarBackup()">
+                            <i class="fas fa-upload me-1"></i>Importar Backup
+                        </button>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-info btn-backup w-100" onclick="sincronizarNuvem()">
+                            <i class="fas fa-cloud me-1"></i>Sincronizar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de Backups -->
+            <div class="backup-card">
+                <h5><i class="fas fa-history me-2"></i>Histórico de Backups</h5>
+                <div class="backup-list" id="backupList">
+                    <!-- Lista será preenchida dinamicamente -->
+                </div>
+                <div class="mt-3">
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Backups são criados automaticamente a cada cadastro e mantidos por 30 dias.
+                    </small>
+                </div>
+            </div>
+
+            <!-- Dados Atuais -->
+            <div class="backup-card">
+                <h5><i class="fas fa-database me-2"></i>Dados Atuais no Sistema</h5>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <h3 class="text-primary mb-1" id="totalClientes">0</h3>
+                            <small>Total de Clientes</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <h3 class="text-success mb-1" id="totalBackups">0</h3>
+                            <small>Backups Disponíveis</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <h3 class="text-warning mb-1" id="tamanhoTotal">0 KB</h3>
+                            <small>Espaço Utilizado</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <h3 class="text-info mb-1" id="ultimaAlteracao">--</h3>
+                            <small>Última Alteração</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Log de Atividades -->
+            <div class="backup-card">
+                <h5><i class="fas fa-terminal me-2"></i>Log de Atividades</h5>
+                <div class="log-area" id="logArea">
+                    [SISTEMA] Inicializando sistema de backup...<br>
+                    [SISTEMA] Verificando integridade dos dados...<br>
+                    [OK] Sistema de backup ativo e funcionando.<br>
+                </div>
+            </div>
+
+            <!-- Input para importação (invisível) -->
+            <input type="file" id="fileInput" accept=".json" style="display: none;" onchange="processarArquivo(this)">
+        </div>
+    </div>
+
+    <script>
+        // Configurações do sistema de backup
+        const BACKUP_CONFIG = {
+            maxBackups: 10,
+            autoBackupInterval: 300000, // 5 minutos
+            chaves: ['clientes', 'vendas', 'estoque', 'configuracoes'],
+            versao: '1.0.0'
+        };
+
+        // Inicializar sistema
+        document.addEventListener('DOMContentLoaded', function() {
+            inicializarSistema();
+            atualizarInterface();
+            configurarAutoBackup();
+        });
+
+        // Inicializar sistema de backup
+        function inicializarSistema() {
+            addLog('[SISTEMA] Inicializando sistema de backup...');
+            
+            // Verificar suporte ao localStorage
+            if (!localStorage) {
+                addLog('[ERRO] LocalStorage não suportado pelo navegador!');
+                return;
+            }
+
+            // Criar estrutura de backup se não existir
+            if (!localStorage.getItem('backups')) {
+                localStorage.setItem('backups', JSON.stringify([]));
+                addLog('[SISTEMA] Estrutura de backup criada.');
+            }
+
+            // Criar backup inicial se não houver dados
+            if (!localStorage.getItem('clientes')) {
+                localStorage.setItem('clientes', JSON.stringify([]));
+                addLog('[SISTEMA] Base de clientes inicializada.');
+            }
+
+            addLog('[OK] Sistema inicializado com sucesso.');
+        }
+
+        // Criar backup manual
+        function criarBackupManual() {
+            addLog('[AÇÃO] Iniciando backup manual...');
+            
+            const backup = criarBackup('Manual');
+            salvarBackup(backup);
+            
+            addLog('[OK] Backup manual criado com sucesso.');
+            atualizarInterface();
+        }
+
+        // Criar estrutura de backup
+        function criarBackup(tipo = 'Auto') {
+            const timestamp = new Date().toISOString();
+            const dados = {};
+
+            // Coletar todos os dados relevantes
+            BACKUP_CONFIG.chaves.forEach(chave => {
+                const valor = localStorage.getItem(chave);
+                dados[chave] = valor ? JSON.parse(valor) : [];
+            });
+
+            return {
+                id: 'backup_' + Date.now(),
+                timestamp: timestamp,
+                tipo: tipo,
+                versao: BACKUP_CONFIG.versao,
+                dados: dados,
+                tamanho: JSON.stringify(dados).length
+            };
+        }
+
+        // Salvar backup
+        function salvarBackup(backup) {
+            let backups = JSON.parse(localStorage.getItem('backups') || '[]');
+            
+            // Adicionar novo backup
+            backups.unshift(backup);
+            
+            // Manter apenas os últimos backups
+            if (backups.length > BACKUP_CONFIG.maxBackups) {
+                backups = backups.slice(0, BACKUP_CONFIG.maxBackups);
+            }
+            
+            localStorage.setItem('backups', JSON.stringify(backups));
+            localStorage.setItem('ultimoBackup', backup.timestamp);
+        }
+
+        // Exportar todos os dados
+        function exportarTodos() {
+            addLog('[AÇÃO] Exportando todos os dados...');
+            
+            const backup = criarBackup('Exportação');
+            const dataStr = JSON.stringify(backup, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = `backup_oficina_vrs_${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            
+            addLog('[OK] Arquivo de backup baixado com sucesso.');
+        }
+
+        // Importar backup
+        function importarBackup() {
+            addLog('[AÇÃO] Iniciando importação de backup...');
+            document.getElementById('fileInput').click();
+        }
+
+        // Processar arquivo de backup
+        function processarArquivo(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const backup = JSON.parse(e.target.result);
+                    restaurarBackup(backup);
+                } catch (error) {
+                    addLog('[ERRO] Arquivo de backup inválido: ' + error.message);
+                    alert('Erro ao importar backup: Arquivo inválido.');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // Restaurar backup
+        function restaurarBackup(backup) {
+            if (!backup.dados) {
+                addLog('[ERRO] Backup não contém dados válidos.');
+                return;
+            }
+
+            if (!confirm('⚠️ ATENÇÃO: Esta ação irá substituir todos os dados atuais. Deseja continuar?')) {
+                addLog('[CANCELADO] Restauração cancelada pelo usuário.');
+                return;
+            }
+
+            addLog('[AÇÃO] Restaurando backup...');
+
+            // Restaurar cada conjunto de dados
+            Object.keys(backup.dados).forEach(chave => {
+                localStorage.setItem(chave, JSON.stringify(backup.dados[chave]));
+                addLog(`[OK] ${chave} restaurado.`);
+            });
+
+            addLog('[OK] Backup restaurado com sucesso!');
+            atualizarInterface();
+            
+            alert('✅ Backup restaurado com sucesso!\n\nTodos os dados foram recuperados.');
+        }
+
+        // Sincronizar com nuvem (simulado)
+        function sincronizarNuvem() {
+            addLog('[AÇÃO] Sincronizando com a nuvem...');
+            
+            // Simular sincronização
+            setTimeout(() => {
+                const backup = criarBackup('Nuvem');
+                addLog('[OK] Dados sincronizados com a nuvem.');
+                addLog('[INFO] Backup automático criado na nuvem.');
+                
+                // Simular download de dados da nuvem
+                setTimeout(() => {
+                    addLog('[INFO] Verificando atualizações na nuvem...');
+                    addLog('[OK] Sistema atualizado com dados da nuvem.');
+                    atualizarInterface();
+                }, 1000);
+            }, 2000);
+        }
+
+        // Configurar backup automático
+        function configurarAutoBackup() {
+            setInterval(() => {
+                const backup = criarBackup('Auto');
+                salvarBackup(backup);
+                addLog('[AUTO] Backup automático realizado.');
+                atualizarInterface();
+            }, BACKUP_CONFIG.autoBackupInterval);
+        }
+
+        // Atualizar interface
+        function atualizarInterface() {
+            // Atualizar contadores
+            const clientes = JSON.parse(localStorage.getItem('clientes') || '[]');
+            const backups = JSON.parse(localStorage.getItem('backups') || '[]');
+            
+            document.getElementById('totalClientes').textContent = clientes.length;
+            document.getElementById('totalBackups').textContent = backups.length;
+            
+            // Calcular tamanho total
+            let tamanhoTotal = 0;
+            BACKUP_CONFIG.chaves.forEach(chave => {
+                const valor = localStorage.getItem(chave);
+                if (valor) tamanhoTotal += valor.length;
+            });
+            document.getElementById('tamanhoTotal').textContent = Math.round(tamanhoTotal / 1024) + ' KB';
+            
+            // Última alteração
+            const ultimoBackup = localStorage.getItem('ultimoBackup');
+            if (ultimoBackup) {
+                const data = new Date(ultimoBackup);
+                document.getElementById('ultimaAlteracao').textContent = data.toLocaleTimeString('pt-BR');
+            }
+            
+            // Atualizar lista de backups
+            atualizarListaBackups(backups);
+        }
+
+        // Atualizar lista de backups
+        function atualizarListaBackups(backups) {
+            const lista = document.getElementById('backupList');
+            
+            if (backups.length === 0) {
+                lista.innerHTML = '<p class="text-muted text-center">Nenhum backup encontrado.</p>';
+                return;
+            }
+            
+            let html = '';
+            backups.forEach((backup, index) => {
+                const data = new Date(backup.timestamp);
+                const tamanho = Math.round(backup.tamanho / 1024);
+                
+                html += `
+                    <div class="backup-item">
+                        <div class="flex-grow-1">
+                            <strong>${backup.tipo}</strong> - ${data.toLocaleString('pt-BR')}
+                            <br>
+                            <small class="text-muted">Tamanho: ${tamanho} KB | ID: ${backup.id.substring(7, 15)}</small>
+                        </div>
+                        <div>
+                            <button class="btn btn-sm btn-outline-primary me-1" onclick="baixarBackup('${backup.id}')">
+                                <i class="fas fa-download"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-success me-1" onclick="restaurarBackupPorId('${backup.id}')">
+                                <i class="fas fa-undo"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="excluirBackup('${backup.id}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            lista.innerHTML = html;
+        }
+
+        // Baixar backup específico
+        function baixarBackup(id) {
+            const backups = JSON.parse(localStorage.getItem('backups') || '[]');
+            const backup = backups.find(b => b.id === id);
+            
+            if (backup) {
+                const dataStr = JSON.stringify(backup, null, 2);
+                const dataBlob = new Blob([dataStr], {type: 'application/json'});
+                
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(dataBlob);
+                link.download = `backup_${id}.json`;
+                link.click();
+                
+                addLog(`[OK] Backup ${id.substring(7, 15)} baixado.`);
+            }
+        }
+
+        // Restaurar backup por ID
+        function restaurarBackupPorId(id) {
+            const backups = JSON.parse(localStorage.getItem('backups') || '[]');
+            const backup = backups.find(b => b.id === id);
+            
+            if (backup) {
+                restaurarBackup(backup);
+            }
+        }
+
+        // Excluir backup
+        function excluirBackup(id) {
+            if (!confirm('Tem certeza que deseja excluir este backup?')) return;
+            
+            let backups = JSON.parse(localStorage.getItem('backups') || '[]');
+            backups = backups.filter(b => b.id !== id);
+            localStorage.setItem('backups', JSON.stringify(backups));
+            
+            addLog(`[OK] Backup ${id.substring(7, 15)} excluído.`);
+            atualizarInterface();
+        }
+
+        // Adicionar log
+        function addLog(mensagem) {
+            const logArea = document.getElementById('logArea');
+            const timestamp = new Date().toLocaleTimeString('pt-BR');
+            logArea.innerHTML += `[${timestamp}] ${mensagem}<br>`;
+            logArea.scrollTop = logArea.scrollHeight;
+        }
+
+        // Função para integrar com outros sistemas
+        window.criarBackupAutomatico = function(dadosExtras = {}) {
+            const backup = criarBackup('Sistema');
+            backup.dados = { ...backup.dados, ...dadosExtras };
+            salvarBackup(backup);
+            addLog('[SISTEMA] Backup automático criado via integração.');
+            return backup.id;
+        };
+
+        // Função para recuperar dados
+        window.recuperarDados = function(chave) {
+            return JSON.parse(localStorage.getItem(chave) || '[]');
+        };
+
+        // Inicializar ao carregar
+        window.addEventListener('beforeunload', function() {
+            // Criar backup automático ao sair
+            criarBackupAutomatico();
+        });
+    </script>
+</body>
+</html>

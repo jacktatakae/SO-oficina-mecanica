@@ -920,15 +920,54 @@
             
             const formData = collectFormData();
             
-            // Simular salvamento (aqui você conectaria com seu backend)
-            console.log('Dados do cliente:', formData);
-            
-            // Salvar localmente para demonstração
-            localStorage.setItem('novoCliente', JSON.stringify({
+            // Criar cliente com dados completos
+            const clienteCompleto = {
+                id: 'cliente_' + Date.now(),
                 ...formData,
                 dataCadastro: new Date().toISOString(),
-                status: 'ativo'
-            }));
+                status: 'ativo',
+                backupVersion: '1.0.0'
+            };
+            
+            // SISTEMA DE BACKUP INTEGRADO
+            try {
+                // 1. Salvar no localStorage principal
+                let clientes = JSON.parse(localStorage.getItem('clientes') || '[]');
+                clientes.push(clienteCompleto);
+                localStorage.setItem('clientes', JSON.stringify(clientes));
+                
+                // 2. Criar backup automático
+                criarBackupAutomatico(clienteCompleto);
+                
+                // 3. Salvar backup em múltiplas chaves (redundância)
+                localStorage.setItem('backup_' + clienteCompleto.id, JSON.stringify(clienteCompleto));
+                localStorage.setItem('ultimo_cliente', JSON.stringify(clienteCompleto));
+                
+                // 4. Salvar histórico para recuperação
+                let historico = JSON.parse(localStorage.getItem('historico_cadastros') || '[]');
+                historico.unshift({
+                    timestamp: new Date().toISOString(),
+                    cliente: clienteCompleto,
+                    origem: 'QR_CODE'
+                });
+                // Manter apenas os últimos 50 cadastros
+                if (historico.length > 50) historico = historico.slice(0, 50);
+                localStorage.setItem('historico_cadastros', JSON.stringify(historico));
+                
+                console.log('✅ Cliente salvo com backup automático:', clienteCompleto);
+                
+            } catch (error) {
+                console.error('❌ Erro ao salvar cliente:', error);
+                alert('⚠️ Erro ao salvar dados. Tentando backup de emergência...');
+                
+                // Backup de emergência em caso de erro
+                try {
+                    localStorage.setItem('emergencia_' + Date.now(), JSON.stringify(clienteCompleto));
+                    alert('✅ Backup de emergência criado com sucesso!');
+                } catch (emergencyError) {
+                    alert('❌ Falha crítica no backup. Por favor, anote os dados manualmente.');
+                }
+            }
             
             // Mostrar tela de sucesso
             document.getElementById('step5').classList.remove('active');
@@ -936,8 +975,164 @@
             document.getElementById('progressFill').style.width = '100%';
             
             // Enviar notificação para WhatsApp da oficina (simulado)
-            sendNotificationToWorkshop(formData);
+            sendNotificationToWorkshop(clienteCompleto);
         });
+
+        // ========== SISTEMA DE BACKUP INTEGRADO ==========
+        
+        function criarBackupAutomatico(clienteData) {
+            try {
+                const timestamp = new Date().toISOString();
+                const backup = {
+                    id: 'backup_' + Date.now(),
+                    timestamp: timestamp,
+                    tipo: 'Auto-Cadastro',
+                    cliente: clienteData,
+                    versao: '1.0.0'
+                };
+                
+                // Salvar na lista de backups
+                let backups = JSON.parse(localStorage.getItem('backups') || '[]');
+                backups.unshift(backup);
+                
+                // Manter apenas os últimos 20 backups
+                if (backups.length > 20) {
+                    backups = backups.slice(0, 20);
+                }
+                
+                localStorage.setItem('backups', JSON.stringify(backups));
+                localStorage.setItem('ultimo_backup', timestamp);
+                
+                console.log('📦 Backup automático criado:', backup.id);
+                return backup.id;
+                
+            } catch (error) {
+                console.error('❌ Erro ao criar backup:', error);
+            }
+        }
+        
+        // Função para recuperar dados em caso de perda
+        function recuperarUltimoCadastro() {
+            try {
+                const ultimoCliente = localStorage.getItem('ultimo_cliente');
+                if (ultimoCliente) {
+                    const cliente = JSON.parse(ultimoCliente);
+                    console.log('🔄 Último cliente recuperado:', cliente);
+                    return cliente;
+                }
+                
+                // Tentar recuperar do histórico
+                const historico = JSON.parse(localStorage.getItem('historico_cadastros') || '[]');
+                if (historico.length > 0) {
+                    const ultimoCadastro = historico[0];
+                    console.log('🔄 Recuperado do histórico:', ultimoCadastro);
+                    return ultimoCadastro.cliente;
+                }
+                
+                return null;
+            } catch (error) {
+                console.error('❌ Erro ao recuperar dados:', error);
+                return null;
+            }
+        }
+        
+        // Função para exportar todos os dados
+        function exportarTodosOsDados() {
+            try {
+                const dadosCompletos = {
+                    clientes: JSON.parse(localStorage.getItem('clientes') || '[]'),
+                    backups: JSON.parse(localStorage.getItem('backups') || '[]'),
+                    historico: JSON.parse(localStorage.getItem('historico_cadastros') || '[]'),
+                    timestamp: new Date().toISOString(),
+                    versao: '1.0.0'
+                };
+                
+                const dataStr = JSON.stringify(dadosCompletos, null, 2);
+                const dataBlob = new Blob([dataStr], {type: 'application/json'});
+                
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(dataBlob);
+                link.download = `backup_completo_vrs_${new Date().toISOString().split('T')[0]}.json`;
+                link.click();
+                
+                console.log('📥 Backup completo exportado');
+                
+            } catch (error) {
+                console.error('❌ Erro ao exportar dados:', error);
+                alert('Erro ao exportar dados. Verifique o console para mais detalhes.');
+            }
+        }
+        
+        // Função para importar dados
+        function importarDados(arquivoJSON) {
+            try {
+                const dados = JSON.parse(arquivoJSON);
+                
+                if (dados.clientes) {
+                    localStorage.setItem('clientes', JSON.stringify(dados.clientes));
+                }
+                if (dados.backups) {
+                    localStorage.setItem('backups', JSON.stringify(dados.backups));
+                }
+                if (dados.historico) {
+                    localStorage.setItem('historico_cadastros', JSON.stringify(dados.historico));
+                }
+                
+                console.log('📤 Dados importados com sucesso');
+                alert('✅ Dados importados com sucesso!');
+                
+            } catch (error) {
+                console.error('❌ Erro ao importar dados:', error);
+                alert('❌ Erro ao importar dados. Verifique se o arquivo é válido.');
+            }
+        }
+        
+        // Adicionar botão de emergência para exportar dados
+        window.addEventListener('load', function() {
+            // Adicionar botão de backup de emergência (invisível, ativado por combinação de teclas)
+            document.addEventListener('keydown', function(e) {
+                // Ctrl + Shift + B = Backup de emergência
+                if (e.ctrlKey && e.shiftKey && e.key === 'B') {
+                    e.preventDefault();
+                    if (confirm('🚨 Exportar backup de emergência?')) {
+                        exportarTodosOsDados();
+                    }
+                }
+                
+                // Ctrl + Shift + R = Recuperar último cadastro
+                if (e.ctrlKey && e.shiftKey && e.key === 'R') {
+                    e.preventDefault();
+                    const ultimoCliente = recuperarUltimoCadastro();
+                    if (ultimoCliente) {
+                        alert('🔄 Último cliente: ' + ultimoCliente.nomeCompleto + 
+                              '\nData: ' + new Date(ultimoCliente.dataCadastro).toLocaleString('pt-BR'));
+                    } else {
+                        alert('❌ Nenhum cliente encontrado para recuperar.');
+                    }
+                }
+            });
+        });
+        
+        // Backup automático a cada 5 minutos
+        setInterval(() => {
+            const clientes = localStorage.getItem('clientes');
+            if (clientes) {
+                const backup = {
+                    id: 'auto_' + Date.now(),
+                    timestamp: new Date().toISOString(),
+                    tipo: 'Auto-Sistema',
+                    dados: JSON.parse(clientes),
+                    versao: '1.0.0'
+                };
+                
+                let backups = JSON.parse(localStorage.getItem('backups') || '[]');
+                backups.unshift(backup);
+                if (backups.length > 30) backups = backups.slice(0, 30);
+                localStorage.setItem('backups', JSON.stringify(backups));
+                
+                console.log('🔄 Backup automático realizado:', backup.id);
+            }
+        }, 300000); // 5 minutos
 
         function sendNotificationToWorkshop(clientData) {
             const message = `🔔 *NOVO CLIENTE CADASTRADO*\n\n` +
