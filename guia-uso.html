@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Peças Automotivas - Guia de Uso</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="mobile-responsive.css" rel="stylesheet">
+    <style>
+        .guide-section {
+            margin-bottom: 3rem;
+            padding: 2rem;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-left: 5px solid #007bff;
+        }
+        
+        .guide-icon {
+            font-size: 3rem;
+            color: #007bff;
+            margin-bottom: 1rem;
+        }
+        
+        .feature-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 1rem;
+            transition: transform 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .step-number {
+            background: #007bff;
+            color: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 1rem;
+        }
+        
+        .credential-card {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .credential-item {
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 0.8rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .demo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .device-preview {
+            border: 3px solid #dee2e6;
+            border-radius: 20px;
+            padding: 1rem;
+            background: #f8f9fa;
+            text-align: center;
+        }
+        
+        .mobile-preview {
+            border-radius: 25px;
+            max-width: 250px;
+            margin: 0 auto;
+        }
+        
+        .tablet-preview {
+            border-radius: 15px;
+            max-width: 350px;
+            margin: 0 auto;
+        }
+        
+        .desktop-preview {
+            border-radius: 10px;
+            max-width: 100%;
+        }
+        
+        @media (max-width: 768px) {
+            .guide-section {
+                padding: 1rem;
+                margin-bottom: 2rem;
+            }
+            
+            .guide-icon {
+                font-size: 2rem;
+            }
+            
+            .feature-card {
+                padding: 1rem;
+            }
+            
+            .demo-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-car me-2"></i>
+                Sistema de Peças Automotivas
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="login.html">
+                    <i class="fas fa-sign-in-alt me-1"></i>
+                    Acessar Sistema
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container my-5">
+        <!-- Introdução -->
+        <div class="text-center mb-5">
+            <h1 class="display-4 mb-3">
+                <i class="fas fa-tools text-primary me-3"></i>
+                Guia do Sistema
+            </h1>
+            <p class="lead text-muted">
+                Aprenda a usar o sistema completo de gerenciamento de peças automotivas,
+                otimizado para todos os dispositivos e níveis de acesso.
+            </p>
+        </div>
+
+        <!-- Primeiros Passos -->
+        <div class="guide-section">
+            <div class="text-center">
+                <i class="fas fa-rocket guide-icon"></i>
+                <h2>Primeiros Passos</h2>
+                <p class="lead">Como começar a usar o sistema</p>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="feature-card">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="step-number">1</div>
+                            <h5 class="mb-0">Fazer Login</h5>
+                        </div>
+                        <p>Acesse o sistema através da página de login com suas credenciais de funcionário.</p>
+                        <a href="login.html" class="btn btn-primary btn-sm">
+                            <i class="fas fa-sign-in-alt me-1"></i>
+                            Ir para Login
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="feature-card">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="step-number">2</div>
+                            <h5 class="mb-0">Escolher Função</h5>
+                        </div>
+                        <p>No launcher, selecione a função desejada: Gerenciar, Vender, Catálogo ou Relatórios.</p>
+                        <small class="text-muted">Suas opções dependem do seu nível de acesso</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Credenciais de Demo -->
+        <div class="guide-section">
+            <div class="text-center mb-4">
+                <i class="fas fa-key guide-icon"></i>
+                <h2>Credenciais de Demonstração</h2>
+                <p class="lead">Use estas contas para testar o sistema</p>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-3 col-md-6">
+                    <div class="credential-card">
+                        <h5><i class="fas fa-crown me-2"></i>Administrador</h5>
+                        <div class="credential-item">
+                            <strong>Usuário:</strong> VRS<br>
+                            <strong>Senha:</strong> 654321
+                        </div>
+                        <small>Acesso completo a todas as funções</small>
+                    </div>
+                </div>
+                
+                <div class="col-lg-3 col-md-6">
+                    <div class="credential-card">
+                        <h5><i class="fas fa-wrench me-2"></i>Mecânico</h5>
+                        <div class="credential-item">
+                            <strong>Usuário:</strong> mecanico<br>
+                            <strong>Senha:</strong> aditivo
+                        </div>
+                        <small>Acesso a gerenciamento e vendas</small>
+                    </div>
+                </div>
+                
+                <div class="col-lg-3 col-md-6">
+                    <div class="credential-card">
+                        <h5><i class="fas fa-handshake me-2"></i>Vendedor</h5>
+                        <div class="credential-item">
+                            <strong>Usuário:</strong> vendedorradiadores<br>
+                            <strong>Senha:</strong> radiadores
+                        </div>
+                        <small>Acesso apenas a vendas e catálogo</small>
+                    </div>
+                </div>
+                
+                <div class="col-lg-3 col-md-6">
+                    <div class="credential-card">
+                        <h5><i class="fas fa-eye me-2"></i>Visitante</h5>
+                        <div class="credential-item">
+                            <strong>Usuário:</strong> visitante<br>
+                            <strong>Senha:</strong> visit123
+                        </div>
+                        <small>Acesso apenas ao catálogo público</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Funcionalidades Principais -->
+        <div class="guide-section">
+            <div class="text-center mb-4">
+                <i class="fas fa-cogs guide-icon"></i>
+                <h2>Funcionalidades Principais</h2>
+                <p class="lead">Tudo que você pode fazer no sistema</p>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-card">
+                        <div class="text-center mb-3">
+                            <i class="fas fa-tools text-primary" style="font-size: 2rem;"></i>
+                        </div>
+                        <h5>Gerenciar Peças</h5>
+                        <p>Adicione, edite e remova peças do estoque. Controle preços, categorias e fornecedores.</p>
+                        <ul class="list-unstyled small">
+                            <li><i class="fas fa-check text-success me-1"></i> Cadastro completo</li>
+                            <li><i class="fas fa-check text-success me-1"></i> Controle de estoque</li>
+                            <li><i class="fas fa-check text-success me-1"></i> Gestão de preços</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-card">
+                        <div class="text-center mb-3">
+                            <i class="fas fa-car text-primary" style="font-size: 2rem;"></i>
+                        </div>
+                        <h5>Gerenciar Veículos</h5>
+                        <p>Mantenha um registro de veículos e modelos compatíveis com as peças.</p>
+                        <ul class="list-unstyled small">
+                            <li><i class="fas fa-check text-success me-1"></i> Cadastro de marcas</li>
+                            <li><i class="fas fa-check text-success me-1"></i> Modelos e anos</li>
+                            <li><i class="fas fa-check text-success me-1"></i> Compatibilidade</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-card">
+                        <div class="text-center mb-3">
+                            <i class="fas fa-search text-primary" style="font-size: 2rem;"></i>
+                        </div>
+                        <h5>Busca Inteligente</h5>
+                        <p>Encontre peças usando busca inteligente que reconhece marcas, modelos e categorias.</p>
+                        <ul class="list-unstyled small">
+                            <li><i class="fas fa-check text-success me-1"></i> Busca por modelo</li>
+                            <li><i class="fas fa-check text-success me-1"></i> Filtros avançados</li>
+                            <li><i class="fas fa-check text-success me-1"></i> Sugestões automáticas</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-card">
+                        <div class="text-center mb-3">
+                            <i class="fas fa-images text-primary" style="font-size: 2rem;"></i>
+                        </div>
+                        <h5>Catálogo Visual</h5>
+                        <p>Visualize peças com imagens, códigos e informações detalhadas em um catálogo moderno.</p>
+                        <ul class="list-unstyled small">
+                            <li><i class="fas fa-check text-success me-1"></i> Imagens de produtos</li>
+                            <li><i class="fas fa-check text-success me-1"></i> Grid responsivo</li>
+                            <li><i class="fas fa-check text-success me-1"></i> Filtros visuais</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-card">
+                        <div class="text-center mb-3">
+                            <i class="fas fa-cash-register text-primary" style="font-size: 2rem;"></i>
+                        </div>
+                        <h5>Controle de Vendas</h5>
+                        <p>Registre vendas, controle clientes e acompanhe o faturamento da empresa.</p>
+                        <ul class="list-unstyled small">
+                            <li><i class="fas fa-check text-success me-1"></i> Registro de vendas</li>
+                            <li><i class="fas fa-check text-success me-1"></i> Gestão de clientes</li>
+                            <li><i class="fas fa-check text-success me-1"></i> Histórico completo</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-card">
+                        <div class="text-center mb-3">
+                            <i class="fas fa-chart-bar text-primary" style="font-size: 2rem;"></i>
+                        </div>
+                        <h5>Relatórios</h5>
+                        <p>Gere relatórios detalhados de vendas, estoque e performance do negócio.</p>
+                        <ul class="list-unstyled small">
+                            <li><i class="fas fa-check text-success me-1"></i> Relatórios de venda</li>
+                            <li><i class="fas fa-check text-success me-1"></i> Controle de estoque</li>
+                            <li><i class="fas fa-check text-success me-1"></i> Gráficos interativos</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Responsividade e Dispositivos -->
+        <div class="guide-section">
+            <div class="text-center mb-4">
+                <i class="fas fa-mobile-alt guide-icon"></i>
+                <h2>Acesso Móvel e Multiplataforma</h2>
+                <p class="lead">O sistema funciona perfeitamente em qualquer dispositivo</p>
+            </div>
+
+            <div class="demo-grid">
+                <div class="device-preview">
+                    <h5><i class="fas fa-mobile-alt text-primary me-2"></i>Smartphone</h5>
+                    <div class="mobile-preview bg-dark text-white p-3">
+                        <div class="small">📱 Interface otimizada</div>
+                        <div class="small">👆 Touch-friendly</div>
+                        <div class="small">⚡ Carregamento rápido</div>
+                    </div>
+                    <p class="mt-2 small">Interface compacta e otimizada para uso com uma mão</p>
+                </div>
+
+                <div class="device-preview">
+                    <h5><i class="fas fa-tablet-alt text-primary me-2"></i>Tablet</h5>
+                    <div class="tablet-preview bg-primary text-white p-3">
+                        <div class="small">📱 Aproveitamento total da tela</div>
+                        <div class="small">🔄 Suporte a rotação</div>
+                        <div class="small">👥 Ideal para apresentações</div>
+                    </div>
+                    <p class="mt-2 small">Layout adaptado para telas médias e apresentações</p>
+                </div>
+
+                <div class="device-preview">
+                    <h5><i class="fas fa-desktop text-primary me-2"></i>Desktop</h5>
+                    <div class="desktop-preview bg-success text-white p-3">
+                        <div class="small">🖥️ Interface completa</div>
+                        <div class="small">⚡ Performance máxima</div>
+                        <div class="small">📊 Visualização avançada</div>
+                    </div>
+                    <p class="mt-2 small">Experiência completa com todos os recursos disponíveis</p>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="feature-card">
+                        <h5><i class="fas fa-wifi text-primary me-2"></i>Funciona Offline</h5>
+                        <p>Dados básicos ficam salvos localmente para consulta mesmo sem internet.</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="feature-card">
+                        <h5><i class="fas fa-sync text-primary me-2"></i>Sincronização Automática</h5>
+                        <p>Dados são sincronizados automaticamente quando a conexão é restabelecida.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Segurança e Controle de Acesso -->
+        <div class="guide-section">
+            <div class="text-center mb-4">
+                <i class="fas fa-shield-alt guide-icon"></i>
+                <h2>Segurança e Controle de Acesso</h2>
+                <p class="lead">Sistema seguro com diferentes níveis de permissão</p>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="feature-card">
+                        <h5><i class="fas fa-users-cog text-primary me-2"></i>Níveis de Acesso</h5>
+                        <div class="mb-3">
+                            <div class="d-flex align-items-center mb-2">
+                                <span class="badge bg-danger me-2">Admin</span>
+                                <small>Acesso completo ao sistema</small>
+                            </div>
+                            <div class="d-flex align-items-center mb-2">
+                                <span class="badge bg-warning me-2">Funcionário</span>
+                                <small>Gerenciamento e vendas</small>
+                            </div>
+                            <div class="d-flex align-items-center mb-2">
+                                <span class="badge bg-info me-2">Vendedor</span>
+                                <small>Apenas vendas e catálogo</small>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <span class="badge bg-secondary me-2">Visitante</span>
+                                <small>Somente catálogo público</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="feature-card">
+                        <h5><i class="fas fa-lock text-primary me-2"></i>Recursos de Segurança</h5>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check text-success me-2"></i>Autenticação obrigatória</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Sessões com timeout</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Controle granular de permissões</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Logout automático de segurança</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Dados criptografados localmente</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Suporte e Contato -->
+        <div class="guide-section">
+            <div class="text-center mb-4">
+                <i class="fas fa-headset guide-icon"></i>
+                <h2>Suporte e Ajuda</h2>
+                <p class="lead">Precisa de ajuda? Estamos aqui para você</p>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="feature-card text-center">
+                        <i class="fas fa-question-circle text-primary mb-3" style="font-size: 2rem;"></i>
+                        <h5>FAQ</h5>
+                        <p>Perguntas frequentes e soluções rápidas para problemas comuns.</p>
+                        <button class="btn btn-outline-primary btn-sm">Ver FAQ</button>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="feature-card text-center">
+                        <i class="fas fa-video text-primary mb-3" style="font-size: 2rem;"></i>
+                        <h5>Tutoriais</h5>
+                        <p>Vídeos explicativos mostrando como usar cada funcionalidade.</p>
+                        <button class="btn btn-outline-primary btn-sm">Ver Tutoriais</button>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="feature-card text-center">
+                        <i class="fas fa-envelope text-primary mb-3" style="font-size: 2rem;"></i>
+                        <h5>Contato</h5>
+                        <p>Entre em contato com nossa equipe de suporte técnico.</p>
+                        <button class="btn btn-outline-primary btn-sm">Fale Conosco</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rodapé -->
+    <footer class="bg-dark text-white text-center py-4">
+        <div class="container">
+            <p class="mb-2">
+                <i class="fas fa-car me-2"></i>
+                Sistema de Peças Automotivas - Desenvolvido com ❤️ para sua empresa
+            </p>
+            <p class="small text-muted mb-0">
+                Sistema completo, responsivo e seguro para gerenciamento de peças automotivas
+            </p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Animações suaves ao carregar
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.feature-card, .guide-section');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'all 0.6s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+
+        // Copiar credenciais ao clicar
+        document.querySelectorAll('.credential-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const text = this.innerText;
+                navigator.clipboard.writeText(text).then(() => {
+                    // Feedback visual
+                    const original = this.style.background;
+                    this.style.background = 'rgba(255,255,255,0.3)';
+                    setTimeout(() => {
+                        this.style.background = original;
+                    }, 200);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

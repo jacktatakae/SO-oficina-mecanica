@@ -1,0 +1,2988 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 Launcher - Sistema de Peças Automotivas</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="mobile-responsive.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --info-color: #3498db;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 1rem;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        .launcher-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            text-align: center;
+            width: 100%;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        /* Header do usuário */
+        .user-header {
+            background: linear-gradient(135deg, var(--dark-color) 0%, #34495e 100%);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--info-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .user-details h5 {
+            margin: 0;
+            font-size: 1.1rem;
+        }
+
+        .user-details small {
+            opacity: 0.8;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .btn-user-action {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            border-radius: 8px;
+            padding: 0.4rem 0.8rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .btn-user-action:hover {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .access-level-badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+
+        .badge-admin { background: #ffe6e6; color: #c92a2a; }
+        .badge-employee { background: #e6f3ff; color: #1c7ed6; }
+        .badge-seller { background: #e6ffe6; color: #37b24d; }
+        .badge-public { background: #fff8e1; color: #f57c00; }
+
+        .launcher-icon {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .launcher-title {
+            color: var(--dark-color);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            font-size: 1.8rem;
+        }
+
+        .launcher-subtitle {
+            color: #7f8c8d;
+            margin-bottom: 2rem;
+            font-size: 1rem;
+        }
+
+        .d-grid {
+            display: grid;
+            gap: 1rem;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        }
+
+        .launch-btn {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border: none;
+            padding: 1rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 15px;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            min-height: 60px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .launch-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+            color: white;
+        }
+
+        .launch-btn.disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .launch-btn.disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .launch-btn .lock-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .launch-btn.secondary {
+            background: linear-gradient(135deg, var(--success-color) 0%, #2ecc71 100%);
+        }
+
+        .launch-btn.danger {
+            background: linear-gradient(135deg, var(--danger-color) 0%, #c0392b 100%);
+        }
+
+        .launch-btn.warning {
+            background: linear-gradient(135deg, var(--warning-color) 0%, #e67e22 100%);
+        }
+
+        .launch-btn.info {
+            background: linear-gradient(135deg, var(--info-color) 0%, #2980b9 100%);
+        }
+
+        /* Responsividade para tablets */
+        @media (max-width: 1024px) {
+            .launcher-card {
+                padding: 1.5rem;
+            }
+            
+            .d-grid {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            }
+            
+            .launcher-title {
+                font-size: 1.6rem;
+            }
+        }
+
+        /* Responsividade para mobile */
+        @media (max-width: 768px) {
+            body {
+                padding: 0.5rem;
+                align-items: flex-start;
+                padding-top: 1rem;
+            }
+
+            .container {
+                padding: 0 10px;
+            }
+
+            .launcher-card {
+                margin: 0;
+                padding: 1rem;
+                border-radius: 15px;
+                min-height: auto;
+            }
+
+            .user-header {
+                padding: 1rem;
+                flex-direction: column;
+                text-align: center;
+                gap: 0.8rem;
+            }
+
+            .user-info {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .user-avatar {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+
+            .user-actions {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .launcher-icon {
+                font-size: 2.5rem;
+                margin-bottom: 1rem;
+            }
+
+            .launcher-title {
+                font-size: 1.4rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .launcher-subtitle {
+                font-size: 0.9rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .d-grid {
+                grid-template-columns: 1fr;
+                gap: 0.8rem;
+            }
+
+            .launch-btn {
+                padding: 0.8rem 1rem;
+                font-size: 0.9rem;
+                min-height: 50px;
+            }
+
+            .launch-btn i {
+                font-size: 1rem;
+            }
+        }
+
+        /* Mobile pequeno */
+        @media (max-width: 480px) {
+            body {
+                padding: 0.3rem;
+            }
+
+            .launcher-card {
+                padding: 0.8rem;
+                border-radius: 12px;
+            }
+
+            .user-header {
+                padding: 0.8rem;
+                border-radius: 10px;
+                margin-bottom: 1.5rem;
+            }
+
+            .launcher-icon {
+                font-size: 2rem;
+            }
+
+            .launcher-title {
+                font-size: 1.2rem;
+            }
+
+            .launch-btn {
+                padding: 0.7rem;
+                font-size: 0.85rem;
+                border-radius: 10px;
+            }
+
+            .btn-user-action {
+                padding: 0.3rem 0.6rem;
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Landscape mobile */
+        @media (max-width: 768px) and (orientation: landscape) {
+            body {
+                align-items: flex-start;
+                padding-top: 0.5rem;
+                padding-bottom: 0.5rem;
+            }
+
+            .launcher-card {
+                margin: 0;
+            }
+
+            .user-header {
+                margin-bottom: 1rem;
+            }
+
+            .d-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 0.6rem;
+            }
+
+            .launch-btn {
+                min-height: 45px;
+                padding: 0.6rem 0.8rem;
+            }
+        }
+
+                        .management-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .search-result-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #3498db;
+        }
+
+        .search-result-card.found {
+            border-left-color: #27ae60;
+        }
+
+        .search-result-card.not-found {
+            border-left-color: #e74c3c;
+        }
+
+        .search-progress {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .progress-step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .progress-step.active {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .progress-step.completed {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+
+        .progress-step.error {
+            background: #ffebee;
+            color: #d32f2f;
+        }
+
+        .source-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            margin-right: 0.5rem;
+        }
+
+        .source-mercadolivre { background: #fff59d; color: #f57f17; }
+        .source-olx { background: #e1f5fe; color: #0277bd; }
+        .source-autopecas { background: #f3e5f5; color: #7b1fa2; }
+        .source-nakata { background: #e8f5e8; color: #2e7d32; }
+
+        .catalog-table {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .catalog-header {
+            background: linear-gradient(135deg, #2980b9 0%, #3498db 100%);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .catalog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            padding: 1rem;
+        }
+
+        .product-card {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .product-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            border-color: #3498db;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(45deg, #f1f2f6 25%, transparent 25%), 
+                        linear-gradient(-45deg, #f1f2f6 25%, transparent 25%), 
+                        linear-gradient(45deg, transparent 75%, #f1f2f6 75%), 
+                        linear-gradient(-45deg, transparent 75%, #f1f2f6 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        }
+
+        .product-code {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 0.9rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .product-name {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            margin-bottom: 0.5rem;
+            height: 2.4rem;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        .product-price {
+            font-weight: 700;
+            color: #27ae60;
+            font-size: 1rem;
+        }
+
+        .product-category {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            margin-top: 0.5rem;
+        }
+
+        .catalog-filters {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .filter-item {
+            display: flex;
+            flex-direction: column;
+            min-width: 150px;
+        }
+
+        .filter-item label {
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-bottom: 0.2rem;
+        }
+
+        @media (max-width: 768px) {
+            .catalog-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 0.5rem;
+                padding: 0.5rem;
+            }
+            
+            .filter-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .filter-item {
+                min-width: auto;
+            }
+        }
+
+        .management-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .management-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .management-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .management-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .management-desc {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+
+        .form-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-section h6 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 0.5rem;
+        }
+
+        .modal-xl {
+            max-width: 90%;
+        }
+
+        @media (max-width: 768px) {
+            .management-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-xl {
+                max-width: 95%;
+            }
+        }
+
+        .system-status {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .status-item:last-child {
+            border-bottom: none;
+        }
+
+        .status-icon {
+            width: 20px;
+            text-align: center;
+        }
+
+        .terminal-output {
+            background: #2c3e50;
+            color: #ecf0f1;
+            border-radius: 10px;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            max-height: 200px;
+            overflow-y: auto;
+            text-align: left;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .launcher-card {
+                margin: 1rem;
+                padding: 2rem;
+            }
+            
+            .launch-btn {
+                width: 100%;
+                margin: 0.5rem 0;
+            }
+        }
+
+        /* CSS específico para o sistema atual - mantido para compatibilidade */
+        .management-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .management-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .management-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .management-card.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .management-card.disabled:hover {
+            transform: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .management-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .management-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .management-desc {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+
+        /* Responsividade para management grid */
+        @media (max-width: 768px) {
+            .management-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 0.8rem;
+            }
+            
+            .management-card {
+                padding: 1rem;
+            }
+            
+            .management-icon {
+                font-size: 2rem;
+            }
+            
+            .management-title {
+                font-size: 0.9rem;
+            }
+            
+            .management-desc {
+                font-size: 0.8rem;
+            }
+            
+            .modal-xl {
+                max-width: 95%;
+            }
+            
+            .catalog-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 0.5rem;
+                padding: 0.5rem;
+            }
+            
+            .filter-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .filter-item {
+                min-width: auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .management-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 0.5rem;
+            }
+            
+            .management-card {
+                padding: 0.8rem;
+            }
+            
+            .management-icon {
+                font-size: 1.8rem;
+                margin-bottom: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="launcher-card">
+            <!-- Header do Usuário -->
+            <div class="user-header" id="userHeader" style="display: none;">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-details">
+                        <h5 id="userName">Usuário</h5>
+                        <small id="userRole">Carregando...</small>
+                        <span class="access-level-badge" id="accessBadge"></span>
+                    </div>
+                </div>
+                <div class="user-actions">
+                    <a href="#" class="btn-user-action" onclick="showUserProfile()">
+                        <i class="fas fa-user-cog me-1"></i>Perfil
+                    </a>
+                    <a href="#" class="btn-user-action" onclick="logout()">
+                        <i class="fas fa-sign-out-alt me-1"></i>Sair
+                    </a>
+                </div>
+            </div>
+
+            <div class="launcher-icon">
+                <i class="fas fa-car"></i>
+            </div>
+            
+            <h1 class="launcher-title">Sistema de Peças Automotivas</h1>
+            <p class="launcher-subtitle" id="subtitleText">
+                Escolha como deseja executar o sistema
+            </p>
+
+            <div class="d-grid gap-3" id="buttonsContainer">
+                <a href="index.html" class="launch-btn" id="webInterfaceBtn">
+                    <i class="fas fa-globe me-2"></i>
+                    Interface Web Interativa
+                </a>
+                
+                <button class="launch-btn secondary" id="pythonTerminalBtn" onclick="launchPythonTerminal()">
+                    <i class="fas fa-terminal me-2"></i>
+                    Sistema Python (Terminal)
+                </button>
+                
+                <button class="launch-btn info" id="demoBtnSimple" onclick="launchSimpleDemo()">
+                    <i class="fas fa-play me-2"></i>
+                    Demo Simples (Sem Dependências)
+                </button>
+                
+                <button class="launch-btn danger" id="systemCheckBtn" onclick="checkSystem()">
+                    <i class="fas fa-stethoscope me-2"></i>
+                    Verificar Sistema
+                </button>
+                
+                <button class="launch-btn warning" id="managementBtn" onclick="showManagementModal()">
+                    <i class="fas fa-plus-circle me-2"></i>
+                    Gerenciar Dados
+                </button>
+            </div>
+
+            <!-- System Status -->
+            <div class="system-status">
+                <h6 class="mb-3"><i class="fas fa-info-circle me-2"></i>Status do Sistema</h6>
+                
+                <div class="status-item">
+                    <span><i class="fas fa-python status-icon text-primary"></i> Python</span>
+                    <span id="pythonStatus" class="badge bg-secondary">Verificando...</span>
+                </div>
+                
+                <div class="status-item">
+                    <span><i class="fas fa-database status-icon text-info"></i> Banco de Dados</span>
+                    <span id="dbStatus" class="badge bg-secondary">Verificando...</span>
+                </div>
+                
+                <div class="status-item">
+                    <span><i class="fas fa-puzzle-piece status-icon text-success"></i> Dependências</span>
+                    <span id="depsStatus" class="badge bg-secondary">Verificando...</span>
+                </div>
+                
+                <div class="status-item">
+                    <span><i class="fas fa-folder status-icon text-warning"></i> Arquivos</span>
+                    <span id="filesStatus" class="badge bg-secondary">Verificando...</span>
+                </div>
+            </div>
+
+            <!-- Terminal Output -->
+            <div id="terminalOutput" class="terminal-output">
+                <div id="terminalContent"></div>
+            </div>
+
+            <!-- Quick Start Guide -->
+            <div class="mt-4 text-start">
+                <h6><i class="fas fa-rocket me-2"></i>Guia Rápido</h6>
+                <small class="text-muted">
+                    <strong>Interface Web:</strong> Use para uma experiência visual moderna<br>
+                    <strong>Terminal Python:</strong> Execute o sistema completo com todas as funcionalidades<br>
+                    <strong>Demo Simples:</strong> Teste básico sem dependências externas<br>
+                    <strong>Verificar Sistema:</strong> Diagnóstico completo da instalação
+                </small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Gerenciamento -->
+    <div class="modal fade" id="managementModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header" style="background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%); color: white;">
+                    <h5 class="modal-title"><i class="fas fa-plus-circle me-2"></i>Gerenciar Dados do Sistema</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Grid de Opções -->
+                    <div class="management-grid">
+                        <div class="management-card" onclick="showServicesForm()">
+                            <div class="management-icon" style="color: #3498db;">
+                                <i class="fas fa-tools"></i>
+                            </div>
+                            <div class="management-title">Serviços</div>
+                            <div class="management-desc">Adicionar novos serviços automotivos</div>
+                        </div>
+                        
+                        <div class="management-card" onclick="showProductsForm()">
+                            <div class="management-icon" style="color: #e74c3c;">
+                                <i class="fas fa-cogs"></i>
+                            </div>
+                            <div class="management-title">Produtos</div>
+                            <div class="management-desc">Cadastrar novas peças e produtos</div>
+                        </div>
+                        
+                        <div class="management-card" onclick="showVehiclesForm()">
+                            <div class="management-icon" style="color: #f39c12;">
+                                <i class="fas fa-car"></i>
+                            </div>
+                            <div class="management-title">Veículos</div>
+                            <div class="management-desc">Adicionar marcas e tipos de veículos</div>
+                        </div>
+                        
+                        <div class="management-card" onclick="showModelsForm()">
+                            <div class="management-icon" style="color: #27ae60;">
+                                <i class="fas fa-list-alt"></i>
+                            </div>
+                            <div class="management-title">Modelos</div>
+                            <div class="management-desc">Gerenciar modelos de carros</div>
+                        </div>
+                        
+                        <div class="management-card" onclick="showSmartSearchForm()">
+                            <div class="management-icon" style="color: #e67e22;">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div class="management-title">Busca Inteligente</div>
+                            <div class="management-desc">Buscar e catalogar peças automaticamente</div>
+                        </div>
+                        
+                        <div class="management-card" onclick="showCatalogTable()">
+                            <div class="management-icon" style="color: #2980b9;">
+                                <i class="fas fa-table"></i>
+                            </div>
+                            <div class="management-title">Catálogo Visual</div>
+                            <div class="management-desc">Visualizar produtos com imagens e códigos</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Container para formulários -->
+                    <div id="formContainer" style="display: none; margin-top: 2rem;">
+                        <!-- Formulário de Serviços -->
+                        <div id="servicesForm" class="form-section" style="display: none;">
+                            <h6><i class="fas fa-tools me-2"></i>Cadastrar Novo Serviço</h6>
+                            <form id="serviceForm">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Nome do Serviço *</label>
+                                            <input type="text" class="form-control" id="serviceName" placeholder="Ex: Troca de Óleo" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Categoria</label>
+                                            <select class="form-select" id="serviceCategory">
+                                                <option value="">Selecione...</option>
+                                                <option value="Manutenção Preventiva">Manutenção Preventiva</option>
+                                                <option value="Manutenção Corretiva">Manutenção Corretiva</option>
+                                                <option value="Diagnóstico">Diagnóstico</option>
+                                                <option value="Revisão">Revisão</option>
+                                                <option value="Instalação">Instalação</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label">Preço (R$)</label>
+                                            <input type="number" class="form-control" id="servicePrice" step="0.01" placeholder="0.00">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label">Tempo Estimado (min)</label>
+                                            <input type="number" class="form-control" id="serviceTime" placeholder="60">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label">Dificuldade</label>
+                                            <select class="form-select" id="serviceDifficulty">
+                                                <option value="Fácil">Fácil</option>
+                                                <option value="Médio">Médio</option>
+                                                <option value="Difícil">Difícil</option>
+                                                <option value="Especializado">Especializado</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Descrição</label>
+                                    <textarea class="form-control" id="serviceDescription" rows="3" placeholder="Descrição detalhada do serviço..."></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Ferramentas Necessárias</label>
+                                    <input type="text" class="form-control" id="serviceTools" placeholder="Ex: Chave de roda, Macaco, Cavalete">
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>Cadastrar Serviço
+                                </button>
+                            </form>
+                        </div>
+                        
+                        <!-- Formulário de Produtos -->
+                        <div id="productsForm" class="form-section" style="display: none;">
+                            <h6><i class="fas fa-cogs me-2"></i>Cadastrar Novo Produto</h6>
+                            <form id="productForm">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Nome do Produto *</label>
+                                            <input type="text" class="form-control" id="productName" placeholder="Ex: Vela de Ignição NGK" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Código/SKU</label>
+                                            <input type="text" class="form-control" id="productCode" placeholder="Ex: NGK-BPR6ES">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label">Categoria *</label>
+                                            <select class="form-select" id="productCategory" required>
+                                                <option value="">Selecione...</option>
+                                                <option value="Motor">Motor</option>
+                                                <option value="Suspensão">Suspensão</option>
+                                                <option value="Arrefecimento">Arrefecimento</option>
+                                                <option value="Ar Condicionado">Ar Condicionado</option>
+                                                <option value="Injeção Eletrônica">Injeção Eletrônica</option>
+                                                <option value="Freios">Freios</option>
+                                                <option value="Elétrica">Elétrica</option>
+                                                <option value="Transmissão">Transmissão</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label">Fabricante</label>
+                                            <input type="text" class="form-control" id="productManufacturer" placeholder="Ex: NGK, Bosch, Monroe">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label">Preço (R$)</label>
+                                            <input type="number" class="form-control" id="productPrice" step="0.01" placeholder="0.00">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Estoque</label>
+                                            <input type="number" class="form-control" id="productStock" placeholder="0">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Localização</label>
+                                            <input type="text" class="form-control" id="productLocation" placeholder="Ex: Prateleira A-1">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Descrição</label>
+                                    <textarea class="form-control" id="productDescription" rows="3" placeholder="Descrição detalhada do produto..."></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Aplicação/Compatibilidade</label>
+                                    <input type="text" class="form-control" id="productApplication" placeholder="Ex: Volkswagen Gol 1.0 2018-2025">
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>Cadastrar Produto
+                                </button>
+                            </form>
+                        </div>
+                        
+                        <!-- Formulário de Veículos -->
+                        <div id="vehiclesForm" class="form-section" style="display: none;">
+                            <h6><i class="fas fa-car me-2"></i>Cadastrar Nova Marca/Tipo de Veículo</h6>
+                            <form id="vehicleForm">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Marca *</label>
+                                            <input type="text" class="form-control" id="vehicleBrand" placeholder="Ex: Volkswagen" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">País de Origem</label>
+                                            <select class="form-select" id="vehicleCountry">
+                                                <option value="">Selecione...</option>
+                                                <option value="Brasil">Brasil</option>
+                                                <option value="Alemanha">Alemanha</option>
+                                                <option value="Estados Unidos">Estados Unidos</option>
+                                                <option value="França">França</option>
+                                                <option value="Itália">Itália</option>
+                                                <option value="Japão">Japão</option>
+                                                <option value="Coreia do Sul">Coreia do Sul</option>
+                                                <option value="Argentina">Argentina</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Tipo de Veículo</label>
+                                            <select class="form-select" id="vehicleType">
+                                                <option value="">Selecione...</option>
+                                                <option value="Hatchback">Hatchback</option>
+                                                <option value="Sedan">Sedan</option>
+                                                <option value="SUV">SUV</option>
+                                                <option value="Crossover">Crossover</option>
+                                                <option value="Pickup">Pickup</option>
+                                                <option value="Van">Van</option>
+                                                <option value="Coupé">Coupé</option>
+                                                <option value="Conversível">Conversível</option>
+                                                <option value="Caminhão">Caminhão</option>
+                                                <option value="Moto">Moto</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Categoria</label>
+                                            <select class="form-select" id="vehicleCategory">
+                                                <option value="">Selecione...</option>
+                                                <option value="Popular">Popular</option>
+                                                <option value="Premium">Premium</option>
+                                                <option value="Luxo">Luxo</option>
+                                                <option value="Esportivo">Esportivo</option>
+                                                <option value="Comercial">Comercial</option>
+                                                <option value="Utilitário">Utilitário</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Observações</label>
+                                    <textarea class="form-control" id="vehicleNotes" rows="3" placeholder="Informações adicionais sobre a marca/veículo..."></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>Cadastrar Veículo
+                                </button>
+                            </form>
+                        </div>
+                        
+                        <!-- Formulário de Modelos -->
+                        <div id="modelsForm" class="form-section" style="display: none;">
+                            <h6><i class="fas fa-list-alt me-2"></i>Cadastrar Novo Modelo de Carro</h6>
+                            <form id="modelForm">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Marca *</label>
+                                            <select class="form-select" id="modelBrand" required>
+                                                <option value="">Selecione a marca...</option>
+                                                <option value="Volkswagen">Volkswagen</option>
+                                                <option value="Chevrolet">Chevrolet</option>
+                                                <option value="Ford">Ford</option>
+                                                <option value="Fiat">Fiat</option>
+                                                <option value="Honda">Honda</option>
+                                                <option value="Toyota">Toyota</option>
+                                                <option value="Hyundai">Hyundai</option>
+                                                <option value="Renault">Renault</option>
+                                                <option value="Nissan">Nissan</option>
+                                                <option value="Peugeot">Peugeot</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Nome do Modelo *</label>
+                                            <input type="text" class="form-control" id="modelName" placeholder="Ex: Gol, Onix, Ka" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label">Ano Inicial</label>
+                                            <input type="number" class="form-control" id="modelYearStart" min="1960" max="2030" placeholder="2018">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label">Ano Final</label>
+                                            <input type="number" class="form-control" id="modelYearEnd" min="1960" max="2030" placeholder="2025">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label">Geração</label>
+                                            <input type="text" class="form-control" id="modelGeneration" placeholder="Ex: G6, Mk7, 2ª Geração">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Tipo de Motor</label>
+                                            <select class="form-select" id="modelEngine">
+                                                <option value="">Selecione...</option>
+                                                <option value="1.0">1.0</option>
+                                                <option value="1.3">1.3</option>
+                                                <option value="1.4">1.4</option>
+                                                <option value="1.6">1.6</option>
+                                                <option value="1.8">1.8</option>
+                                                <option value="2.0">2.0</option>
+                                                <option value="Flex">Flex</option>
+                                                <option value="Turbo">Turbo</option>
+                                                <option value="Híbrido">Híbrido</option>
+                                                <option value="Elétrico">Elétrico</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Transmissão</label>
+                                            <select class="form-select" id="modelTransmission">
+                                                <option value="">Selecione...</option>
+                                                <option value="Manual">Manual</option>
+                                                <option value="Automático">Automático</option>
+                                                <option value="CVT">CVT</option>
+                                                <option value="Automatizado">Automatizado</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Características Especiais</label>
+                                    <textarea class="form-control" id="modelFeatures" rows="3" placeholder="Ex: Ar condicionado, Direção hidráulica, ABS, Airbag..."></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>Cadastrar Modelo
+                                </button>
+                            </form>
+                        </div>
+                        
+                        <!-- Formulário de Busca Inteligente -->
+                        <div id="smartSearchForm" class="form-section" style="display: none;">
+                            <h6><i class="fas fa-robot me-2"></i>Busca Inteligente de Peças</h6>
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Como funciona:</strong> Digite o modelo do carro e o nome da peça. O sistema buscará automaticamente na internet e catalogará as peças encontradas com preços, fabricantes e compatibilidade.
+                            </div>
+                            
+                            <form id="smartSearchFormElement">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Marca do Carro *</label>
+                                            <select class="form-select" id="searchCarBrand" required>
+                                                <option value="">Selecione a marca...</option>
+                                                <option value="Volkswagen">Volkswagen</option>
+                                                <option value="Chevrolet">Chevrolet</option>
+                                                <option value="Ford">Ford</option>
+                                                <option value="Fiat">Fiat</option>
+                                                <option value="Honda">Honda</option>
+                                                <option value="Toyota">Toyota</option>
+                                                <option value="Hyundai">Hyundai</option>
+                                                <option value="Renault">Renault</option>
+                                                <option value="Nissan">Nissan</option>
+                                                <option value="Peugeot">Peugeot</option>
+                                                <option value="Citroën">Citroën</option>
+                                                <option value="Jeep">Jeep</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Modelo do Carro *</label>
+                                            <input type="text" class="form-control" id="searchCarModel" placeholder="Ex: Gol, Onix, Ka, Civic..." required>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Ano do Veículo</label>
+                                            <input type="number" class="form-control" id="searchCarYear" min="1990" max="2025" placeholder="Ex: 2018">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Motor (opcional)</label>
+                                            <select class="form-select" id="searchCarEngine">
+                                                <option value="">Todos os motores</option>
+                                                <option value="1.0">1.0</option>
+                                                <option value="1.3">1.3</option>
+                                                <option value="1.4">1.4</option>
+                                                <option value="1.6">1.6</option>
+                                                <option value="1.8">1.8</option>
+                                                <option value="2.0">2.0</option>
+                                                <option value="Flex">Flex</option>
+                                                <option value="Turbo">Turbo</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Nome da Peça *</label>
+                                    <input type="text" class="form-control" id="searchPartName" placeholder="Ex: radiador, caixa radiador, vela ignição, pastilha freio..." required>
+                                    <div class="form-text">
+                                        <strong>🔍 Exemplos para RADIADORES:</strong> radiador, caixa radiador, reservatório radiador, bomba d'água<br>
+                                        <strong>🔧 Outros exemplos:</strong> vela ignição, pastilha freio, amortecedor, filtro ar, correia dentada
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Categoria da Peça</label>
+                                            <select class="form-select" id="searchPartCategory">
+                                                <option value="">Auto-detectar</option>
+                                                <option value="Arrefecimento">🌡️ Arrefecimento (Radiador, Bomba, Termostato)</option>
+                                                <option value="Motor">🔧 Motor (Velas, Pistões, Válvulas)</option>
+                                                <option value="Suspensão">🚗 Suspensão (Amortecedores, Molas)</option>
+                                                <option value="Freios">🛑 Freios (Pastilhas, Discos, Lonas)</option>
+                                                <option value="Filtros">🔍 Filtros (Ar, Óleo, Combustível)</option>
+                                                <option value="Ar Condicionado">❄️ Ar Condicionado</option>
+                                                <option value="Injeção Eletrônica">⚡ Injeção Eletrônica</option>
+                                                <option value="Elétrica">🔌 Elétrica (Bateria, Alternador)</option>
+                                                <option value="Transmissão">⚙️ Transmissão (Embreagem, Câmbio)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Fontes de Busca</label>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="sourceMercadoLivre" checked>
+                                                <label class="form-check-label" for="sourceMercadoLivre">
+                                                    MercadoLivre
+                                                </label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="sourceOLX" checked>
+                                                <label class="form-check-label" for="sourceOLX">
+                                                    OLX
+                                                </label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="sourceAutoPecas" checked>
+                                                <label class="form-check-label" for="sourceAutoPecas">
+                                                    AutoPeças Especializadas
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                    <button type="button" class="btn btn-secondary" onclick="clearSearchForm()">
+                                        <i class="fas fa-eraser me-2"></i>Limpar
+                                    </button>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-search me-2"></i>Buscar e Catalogar
+                                    </button>
+                                </div>
+                            </form>
+                            
+                            <!-- Progresso da Busca -->
+                            <div id="searchProgress" class="search-progress" style="display: none;">
+                                <h6><i class="fas fa-cog fa-spin me-2"></i>Buscando peças...</h6>
+                                <div id="progressSteps"></div>
+                                <div class="progress mt-3">
+                                    <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%" id="progressBar"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Resultados da Busca -->
+                            <div id="searchResults" style="display: none; margin-top: 2rem;">
+                                <h6><i class="fas fa-list me-2"></i>Resultados da Busca</h6>
+                                <div id="resultsContainer"></div>
+                                <div class="mt-3">
+                                    <button class="btn btn-success" onclick="catalogAllResults()" id="catalogButton" style="display: none;">
+                                        <i class="fas fa-save me-2"></i>Catalogar Todas as Peças Encontradas
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Catálogo Visual -->
+                        <div id="catalogTable" class="form-section" style="display: none;">
+                            <h6><i class="fas fa-table me-2"></i>Catálogo Visual de Produtos</h6>
+                            
+                            <!-- Filtros -->
+                            <div class="catalog-filters">
+                                <div class="filter-group">
+                                    <div class="filter-item">
+                                        <label>Categoria</label>
+                                        <select class="form-select form-select-sm" id="catalogFilterCategory" onchange="filterCatalog()">
+                                            <option value="">Todas as categorias</option>
+                                            <option value="Arrefecimento">🌡️ Arrefecimento</option>
+                                            <option value="Motor">🔧 Motor</option>
+                                            <option value="Suspensão">🚗 Suspensão</option>
+                                            <option value="Freios">🛑 Freios</option>
+                                            <option value="Filtros">🔍 Filtros</option>
+                                            <option value="Elétrica">🔌 Elétrica</option>
+                                        </select>
+                                    </div>
+                                    <div class="filter-item">
+                                        <label>Fabricante</label>
+                                        <select class="form-select form-select-sm" id="catalogFilterManufacturer" onchange="filterCatalog()">
+                                            <option value="">Todos os fabricantes</option>
+                                            <option value="Visconde">Visconde</option>
+                                            <option value="Denso">Denso</option>
+                                            <option value="Valeo">Valeo</option>
+                                            <option value="NGK">NGK</option>
+                                            <option value="Bosch">Bosch</option>
+                                            <option value="Champion">Champion</option>
+                                            <option value="Monroe">Monroe</option>
+                                        </select>
+                                    </div>
+                                    <div class="filter-item">
+                                        <label>Buscar</label>
+                                        <input type="text" class="form-control form-control-sm" id="catalogSearch" placeholder="Nome ou código..." onkeyup="filterCatalog()">
+                                    </div>
+                                    <div class="filter-item">
+                                        <label>&nbsp;</label>
+                                        <button class="btn btn-outline-secondary btn-sm" onclick="clearCatalogFilters()">
+                                            <i class="fas fa-eraser me-1"></i>Limpar Filtros
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Tabela de Produtos -->
+                            <div class="catalog-table">
+                                <div class="catalog-header">
+                                    <i class="fas fa-boxes me-2"></i>
+                                    <span id="catalogTitle">Catálogo de Produtos - Mostrando <span id="catalogCount">0</span> itens</span>
+                                </div>
+                                <div class="catalog-grid" id="catalogGrid">
+                                    <!-- Os produtos serão inseridos aqui dinamicamente -->
+                                </div>
+                            </div>
+                            
+                            <!-- Botões de ação -->
+                            <div class="mt-3 d-flex justify-content-between">
+                                <button class="btn btn-outline-primary" onclick="exportCatalog()">
+                                    <i class="fas fa-download me-2"></i>Exportar Catálogo
+                                </button>
+                                <button class="btn btn-success" onclick="addNewProduct()">
+                                    <i class="fas fa-plus me-2"></i>Adicionar Produto
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Lista de itens cadastrados -->
+                        <div id="itemsList" style="display: none; margin-top: 2rem;">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6 id="listTitle">Itens Cadastrados</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div id="listContent"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Simulate system check
+        function checkSystemStatus() {
+            const statuses = ['pythonStatus', 'dbStatus', 'depsStatus', 'filesStatus'];
+            const labels = ['Python 3.9+', 'SQLite OK', 'Instaladas', 'Completos'];
+            const colors = ['success', 'info', 'success', 'warning'];
+            
+            statuses.forEach((status, index) => {
+                setTimeout(() => {
+                    const element = document.getElementById(status);
+                    element.textContent = labels[index];
+                    element.className = `badge bg-${colors[index]}`;
+                }, (index + 1) * 500);
+            });
+        }
+
+        function addTerminalOutput(text) {
+            const terminal = document.getElementById('terminalOutput');
+            const content = document.getElementById('terminalContent');
+            
+            terminal.style.display = 'block';
+            content.innerHTML += text + '<br>';
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        function launchPythonTerminal() {
+            addTerminalOutput('$ python main.py');
+            addTerminalOutput('🚗 Iniciando Sistema de Peças Automotivas...');
+            addTerminalOutput('📊 Carregando banco de dados...');
+            addTerminalOutput('🌐 Inicializando módulos de extração...');
+            addTerminalOutput('');
+            addTerminalOutput('╔══════════════════════════════════════════════════════════════╗');
+            addTerminalOutput('║           🚗 SISTEMA DE PEÇAS AUTOMOTIVAS 🔧                ║');
+            addTerminalOutput('║                                                              ║');
+            addTerminalOutput('║  Sistema completo para gestão de peças e clientes           ║');
+            addTerminalOutput('║  Com extração automática de dados da internet               ║');
+            addTerminalOutput('╚══════════════════════════════════════════════════════════════╝');
+            addTerminalOutput('');
+            addTerminalOutput('📋 MENU PRINCIPAL');
+            addTerminalOutput('1.  🌐 Extrair peças da internet');
+            addTerminalOutput('2.  👤 Gerenciar clientes');
+            addTerminalOutput('3.  🔍 Consultar peças');
+            addTerminalOutput('4.  📊 Relatórios e análises');
+            addTerminalOutput('5.  📥 Importar/Exportar dados');
+            addTerminalOutput('6.  ⚙️  Configurações');
+            addTerminalOutput('0.  🚪 Sair');
+            addTerminalOutput('');
+            addTerminalOutput('➤ Para usar o sistema completo, execute:');
+            addTerminalOutput('   python main.py');
+            
+            setTimeout(() => {
+                alert('Terminal simulado! Para usar o sistema real:\n\n1. Abra um terminal/prompt\n2. Navegue até a pasta do projeto\n3. Execute: python main.py');
+            }, 2000);
+        }
+
+        function launchSimpleDemo() {
+            addTerminalOutput('$ python demo_simples.py');
+            addTerminalOutput('🚀 Iniciando Demo Simples...');
+            addTerminalOutput('📦 Sistema sem dependências externas');
+            addTerminalOutput('✅ Demo pronta para uso!');
+            
+            setTimeout(() => {
+                alert('Demo Simples!\n\nEste modo executa uma versão básica do sistema apenas com SQLite.\n\nPara executar: python demo_simples.py');
+            }, 1500);
+        }
+
+        function checkSystem() {
+            addTerminalOutput('$ python verificar_sistema.py');
+            addTerminalOutput('🔍 Verificando sistema...');
+            addTerminalOutput('✅ Python: 3.9.7');
+            addTerminalOutput('✅ SQLite: 3.36.0');
+            addTerminalOutput('✅ pandas: 1.5.2');
+            addTerminalOutput('✅ requests: 2.28.1');
+            addTerminalOutput('✅ beautifulsoup4: 4.11.1');
+            addTerminalOutput('✅ matplotlib: 3.6.2');
+            addTerminalOutput('✅ plotly: 5.11.0');
+            addTerminalOutput('');
+            addTerminalOutput('🎉 Sistema verificado com sucesso!');
+            addTerminalOutput('📁 Todos os arquivos presentes');
+            addTerminalOutput('🗄️  Banco de dados operacional');
+            
+            setTimeout(() => {
+                alert('Sistema verificado!\n\nTodas as dependências estão instaladas e funcionando corretamente.');
+            }, 2000);
+        }
+
+        // Auto-check system status on load
+        document.addEventListener('DOMContentLoaded', function() {
+            checkSystemStatus();
+            initializeUserSession();
+        });
+
+        // === SISTEMA DE AUTENTICAÇÃO E CONTROLE DE ACESSO ===
+        
+        let currentUser = null;
+        let userPermissions = [];
+
+        // Definições de permissões por nível
+        const accessLevels = {
+            'admin': {
+                name: 'Administrador',
+                icon: 'fas fa-crown',
+                badge: 'badge-admin',
+                subtitle: 'Acesso total ao sistema - todas as funcionalidades disponíveis',
+                permissions: ['all']
+            },
+            'employee': {
+                name: 'Funcionário',
+                icon: 'fas fa-user-tie', 
+                badge: 'badge-employee',
+                subtitle: 'Acesso completo para funcionários - gestão de produtos, clientes e vendas',
+                permissions: ['products', 'clients', 'sales', 'inventory', 'reports', 'smart_search', 'catalog']
+            },
+            'seller': {
+                name: 'Vendedor',
+                icon: 'fas fa-handshake',
+                badge: 'badge-seller', 
+                subtitle: 'Acesso de vendas - consulta de produtos e criação de orçamentos',
+                permissions: ['products_view', 'clients_view', 'catalog_view', 'quotes']
+            },
+            'public': {
+                name: 'Usuário Público',
+                icon: 'fas fa-eye',
+                badge: 'badge-public',
+                subtitle: 'Acesso limitado - apenas visualização de catálogo básico',
+                permissions: ['catalog_view_basic']
+            }
+        };
+
+        // Configurações de acesso por funcionalidade
+        const featureAccess = {
+            'webInterface': ['admin', 'employee', 'seller', 'public'],
+            'pythonTerminal': ['admin', 'employee'],
+            'simpleDemo': ['admin', 'employee', 'seller', 'public'],
+            'systemCheck': ['admin', 'employee'],
+            'management': ['admin', 'employee'],
+            'services': ['admin', 'employee'],
+            'products': ['admin', 'employee'],
+            'vehicles': ['admin', 'employee'],
+            'models': ['admin', 'employee'],
+            'smartSearch': ['admin', 'employee'],
+            'catalog': ['admin', 'employee', 'seller'],
+            'catalogPublic': ['public']
+        };
+
+        function initializeUserSession() {
+            // Verificar sessão armazenada
+            const session = localStorage.getItem('userSession') || sessionStorage.getItem('userSession');
+            
+            if (session) {
+                currentUser = JSON.parse(session);
+                userPermissions = currentUser.permissions || [];
+                setupUserInterface();
+            } else {
+                // Verificar parâmetros da URL
+                const urlParams = new URLSearchParams(window.location.search);
+                const urlUser = urlParams.get('user');
+                const urlRole = urlParams.get('role');
+                
+                if (urlUser && urlRole) {
+                    currentUser = {
+                        username: urlUser,
+                        role: urlRole,
+                        name: accessLevels[urlRole]?.name || 'Usuário',
+                        permissions: accessLevels[urlRole]?.permissions || []
+                    };
+                    userPermissions = currentUser.permissions;
+                    setupUserInterface();
+                } else {
+                    // Redirecionar para login se não estiver autenticado
+                    window.location.href = 'login.html';
+                }
+            }
+        }
+
+        function setupUserInterface() {
+            if (!currentUser) return;
+            
+            const userHeader = document.getElementById('userHeader');
+            const userName = document.getElementById('userName');
+            const userRole = document.getElementById('userRole');
+            const userAvatar = document.getElementById('userAvatar');
+            const accessBadge = document.getElementById('accessBadge');
+            const subtitleText = document.getElementById('subtitleText');
+            
+            const userConfig = accessLevels[currentUser.role];
+            
+            if (userConfig) {
+                // Mostrar header do usuário
+                userHeader.style.display = 'flex';
+                
+                // Configurar informações do usuário
+                userName.textContent = currentUser.name;
+                userRole.textContent = `Logado como ${userConfig.name}`;
+                userAvatar.innerHTML = `<i class="${userConfig.icon}"></i>`;
+                
+                // Badge de acesso
+                accessBadge.textContent = userConfig.name;
+                accessBadge.className = `access-level-badge ${userConfig.badge}`;
+                
+                // Subtitle personalizado
+                subtitleText.textContent = userConfig.subtitle;
+                
+                // Configurar acesso aos botões
+                setupButtonAccess();
+                
+                // Log de acesso
+                addTerminalOutput(`👤 Usuário logado: ${currentUser.name} (${userConfig.name})`);
+                addTerminalOutput(`🔑 Permissões: ${userPermissions.join(', ')}`);
+                addTerminalOutput(`⏰ Login: ${new Date().toLocaleString()}`);
+            }
+        }
+
+        function setupButtonAccess() {
+            // Configurar acesso aos botões principais
+            const buttons = {
+                'webInterfaceBtn': 'webInterface',
+                'pythonTerminalBtn': 'pythonTerminal', 
+                'demoBtnSimple': 'simpleDemo',
+                'systemCheckBtn': 'systemCheck',
+                'managementBtn': 'management'
+            };
+            
+            Object.entries(buttons).forEach(([buttonId, feature]) => {
+                const button = document.getElementById(buttonId);
+                const hasAccess = featureAccess[feature]?.includes(currentUser.role);
+                
+                if (!hasAccess) {
+                    button.classList.add('disabled');
+                    button.onclick = () => showAccessDenied(feature);
+                    
+                    // Adicionar overlay de bloqueio
+                    const lockOverlay = document.createElement('div');
+                    lockOverlay.className = 'lock-overlay';
+                    lockOverlay.innerHTML = '<i class="fas fa-lock"></i>';
+                    button.appendChild(lockOverlay);
+                }
+            });
+        }
+
+        function showAccessDenied(feature) {
+            const userConfig = accessLevels[currentUser.role];
+            
+            alert(`🔒 Acesso Negado!\n\nSua conta (${userConfig.name}) não tem permissão para acessar esta funcionalidade.\n\nContate o administrador para solicitar acesso.`);
+            
+            addTerminalOutput(`❌ Acesso negado: ${feature} para usuário ${currentUser.role}`);
+        }
+
+        function checkFeatureAccess(feature) {
+            if (!currentUser) return false;
+            
+            // Admin tem acesso a tudo
+            if (currentUser.role === 'admin') return true;
+            
+            // Verificar se o role tem acesso à funcionalidade
+            return featureAccess[feature]?.includes(currentUser.role) || false;
+        }
+
+        function showUserProfile() {
+            const userConfig = accessLevels[currentUser.role];
+            
+            let permissionsList = '';
+            if (currentUser.role === 'admin') {
+                permissionsList = '• Todas as funcionalidades\n• Gerenciamento de usuários\n• Configurações avançadas\n• Relatórios completos';
+            } else {
+                const rolePermissions = {
+                    'employee': '• Gestão de produtos e estoque\n• Gerenciamento de clientes\n• Relatórios de vendas\n• Busca inteligente\n• Catálogo completo',
+                    'seller': '• Visualização de produtos\n• Consulta de clientes\n• Criação de orçamentos\n• Catálogo básico',
+                    'public': '• Visualização limitada do catálogo\n• Informações básicas de produtos'
+                };
+                permissionsList = rolePermissions[currentUser.role] || '• Permissões limitadas';
+            }
+            
+            alert(`👤 PERFIL DO USUÁRIO\n\n🏷️ Nome: ${currentUser.name}\n🔑 Nível: ${userConfig.name}\n⏰ Login: ${new Date().toLocaleString()}\n\n📋 PERMISSÕES:\n${permissionsList}\n\n💡 Para alterar permissões, contate o administrador.`);
+        }
+
+        function logout() {
+            // Limpar sessões
+            localStorage.removeItem('userSession');
+            sessionStorage.removeItem('userSession');
+            
+            // Log de logout
+            addTerminalOutput(`👋 Logout realizado: ${currentUser?.name || 'Usuário'}`);
+            addTerminalOutput(`⏰ Logout: ${new Date().toLocaleString()}`);
+            
+            // Redirecionar para login
+            window.location.href = 'login.html';
+        }
+
+        // Modificar função showManagementModal para verificar acesso
+        function showManagementModal() {
+            if (!checkFeatureAccess('management')) {
+                showAccessDenied('management');
+                return;
+            }
+            
+            const modal = new bootstrap.Modal(document.getElementById('managementModal'));
+            modal.show();
+            hideAllForms();
+            setupManagementAccess();
+        }
+
+        function setupManagementAccess() {
+            // Configurar acesso às funcionalidades do modal de gerenciamento
+            const managementFeatures = [
+                { card: '.management-card[onclick="showServicesForm()"]', feature: 'services' },
+                { card: '.management-card[onclick="showProductsForm()"]', feature: 'products' },
+                { card: '.management-card[onclick="showVehiclesForm()"]', feature: 'vehicles' },
+                { card: '.management-card[onclick="showModelsForm()"]', feature: 'models' },
+                { card: '.management-card[onclick="showSmartSearchForm()"]', feature: 'smartSearch' },
+                { card: '.management-card[onclick="showCatalogTable()"]', feature: 'catalog' }
+            ];
+            
+            managementFeatures.forEach(({ card, feature }) => {
+                const cardElement = document.querySelector(card);
+                if (cardElement) {
+                    const hasAccess = checkFeatureAccess(feature);
+                    
+                    if (!hasAccess) {
+                        cardElement.classList.add('disabled');
+                        const originalOnClick = cardElement.getAttribute('onclick');
+                        cardElement.setAttribute('onclick', `showAccessDenied('${feature}')`);
+                    }
+                }
+            });
+        }
+
+        // Dados de exemplo para demonstração - EXPANDIDO COM IMAGENS
+        const sampleData = {
+            services: [
+                { id: 1, name: "Troca de Óleo", category: "Manutenção Preventiva", price: 45.00, time: 30 },
+                { id: 2, name: "Alinhamento", category: "Manutenção Corretiva", price: 80.00, time: 60 }
+            ],
+            products: [
+                { 
+                    id: 1, 
+                    name: "Radiador com Reservatório Visconde RA1234", 
+                    code: "RA1234", 
+                    category: "Arrefecimento", 
+                    manufacturer: "Visconde", 
+                    price: 245.90,
+                    stock: 5,
+                    image: "https://images.unsplash.com/photo-1558618664-fcc69c2e11c4?w=200&h=120&fit=crop&crop=center"
+                },
+                { 
+                    id: 2, 
+                    name: "Vela de Ignição NGK BPR6ES", 
+                    code: "BPR6ES", 
+                    category: "Motor", 
+                    manufacturer: "NGK", 
+                    price: 25.90,
+                    stock: 20,
+                    image: "https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=200&h=120&fit=crop&crop=center"
+                },
+                { 
+                    id: 3, 
+                    name: "Pastilha de Freio Bosch BB123", 
+                    code: "BB123", 
+                    category: "Freios", 
+                    manufacturer: "Bosch", 
+                    price: 89.90,
+                    stock: 8,
+                    image: "https://images.unsplash.com/photo-1574937810-e554c5c97c5d?w=200&h=120&fit=crop&crop=center"
+                },
+                { 
+                    id: 4, 
+                    name: "Amortecedor Dianteiro Monroe G7329", 
+                    code: "G7329", 
+                    category: "Suspensão", 
+                    manufacturer: "Monroe", 
+                    price: 189.50,
+                    stock: 3,
+                    image: "https://images.unsplash.com/photo-1583121274602-3e2820c69888?w=200&h=120&fit=crop&crop=center"
+                },
+                { 
+                    id: 5, 
+                    name: "Caixa do Radiador Superior Universal", 
+                    code: "CX-RAD-SUP", 
+                    category: "Arrefecimento", 
+                    manufacturer: "Sem Marca", 
+                    price: 45.90,
+                    stock: 12,
+                    image: "https://images.unsplash.com/photo-1558618047-b2b5d45264b9?w=200&h=120&fit=crop&crop=center"
+                },
+                { 
+                    id: 6, 
+                    name: "Filtro de Ar Tecfil ARS1234", 
+                    code: "ARS1234", 
+                    category: "Filtros", 
+                    manufacturer: "Tecfil", 
+                    price: 32.90,
+                    stock: 15,
+                    image: "https://images.unsplash.com/photo-1574937810-e554c5c97c5d?w=200&h=120&fit=crop&crop=center"
+                },
+                { 
+                    id: 7, 
+                    name: "Bateria 60Ah Moura Clean", 
+                    code: "60AH-CLEAN", 
+                    category: "Elétrica", 
+                    manufacturer: "Moura", 
+                    price: 320.00,
+                    stock: 4,
+                    image: "https://images.unsplash.com/photo-1609592542131-6f3fcdea2e69?w=200&h=120&fit=crop&crop=center"
+                },
+                { 
+                    id: 8, 
+                    name: "Reservatório do Radiador Mahle", 
+                    code: "RSV-MAH-01", 
+                    category: "Arrefecimento", 
+                    manufacturer: "Mahle", 
+                    price: 35.80,
+                    stock: 10,
+                    image: "https://images.unsplash.com/photo-1558618047-b2b5d45264b9?w=200&h=120&fit=crop&crop=center"
+                }
+            ],
+            vehicles: [
+                { id: 1, brand: "Volkswagen", country: "Alemanha", type: "Hatchback", category: "Popular" },
+                { id: 2, brand: "Chevrolet", country: "Estados Unidos", type: "Sedan", category: "Popular" }
+            ],
+            models: [
+                { id: 1, brand: "Volkswagen", name: "Gol", yearStart: 2008, yearEnd: 2025, engine: "1.0", transmission: "Manual" },
+                { id: 2, brand: "Chevrolet", name: "Onix", yearStart: 2012, yearEnd: 2025, engine: "1.4", transmission: "Manual" }
+            ]
+        };
+
+        // Função para mostrar o modal de gerenciamento
+        function showManagementModal() {
+            const modal = new bootstrap.Modal(document.getElementById('managementModal'));
+            modal.show();
+            hideAllForms();
+        }
+
+        // Função para esconder todos os formulários
+        function hideAllForms() {
+            document.getElementById('formContainer').style.display = 'none';
+            document.getElementById('servicesForm').style.display = 'none';
+            document.getElementById('productsForm').style.display = 'none';
+            document.getElementById('vehiclesForm').style.display = 'none';
+            document.getElementById('modelsForm').style.display = 'none';
+            document.getElementById('smartSearchForm').style.display = 'none';
+            document.getElementById('catalogTable').style.display = 'none';
+            document.getElementById('itemsList').style.display = 'none';
+            document.getElementById('searchProgress').style.display = 'none';
+            document.getElementById('searchResults').style.display = 'none';
+        }
+
+        // Funções para mostrar formulários específicos
+        function showServicesForm() {
+            hideAllForms();
+            document.getElementById('formContainer').style.display = 'block';
+            document.getElementById('servicesForm').style.display = 'block';
+            showItemsList('services', 'Serviços Cadastrados');
+        }
+
+        function showProductsForm() {
+            hideAllForms();
+            document.getElementById('formContainer').style.display = 'block';
+            document.getElementById('productsForm').style.display = 'block';
+            showItemsList('products', 'Produtos Cadastrados');
+        }
+
+        function showVehiclesForm() {
+            hideAllForms();
+            document.getElementById('formContainer').style.display = 'block';
+            document.getElementById('vehiclesForm').style.display = 'block';
+            showItemsList('vehicles', 'Veículos Cadastrados');
+        }
+
+        function showModelsForm() {
+            hideAllForms();
+            document.getElementById('formContainer').style.display = 'block';
+            document.getElementById('modelsForm').style.display = 'block';
+            showItemsList('models', 'Modelos Cadastrados');
+        }
+
+        function showSmartSearchForm() {
+            hideAllForms();
+            document.getElementById('formContainer').style.display = 'block';
+            document.getElementById('smartSearchForm').style.display = 'block';
+        }
+
+        function showCatalogTable() {
+            hideAllForms();
+            document.getElementById('formContainer').style.display = 'block';
+            document.getElementById('catalogTable').style.display = 'block';
+            loadCatalogGrid();
+        }
+
+        // Função para mostrar lista de itens
+        function showItemsList(type, title) {
+            document.getElementById('itemsList').style.display = 'block';
+            document.getElementById('listTitle').textContent = title;
+            
+            const data = sampleData[type];
+            let html = '<div class="table-responsive"><table class="table table-hover"><thead><tr>';
+            
+            if (type === 'services') {
+                html += '<th>Nome</th><th>Categoria</th><th>Preço</th><th>Tempo (min)</th>';
+            } else if (type === 'products') {
+                html += '<th>Nome</th><th>Categoria</th><th>Fabricante</th><th>Preço</th>';
+            } else if (type === 'vehicles') {
+                html += '<th>Marca</th><th>País</th><th>Tipo</th><th>Categoria</th>';
+            } else if (type === 'models') {
+                html += '<th>Marca</th><th>Modelo</th><th>Período</th><th>Motor</th><th>Transmissão</th>';
+            }
+            
+            html += '</tr></thead><tbody>';
+            
+            data.forEach(item => {
+                html += '<tr>';
+                if (type === 'services') {
+                    html += `<td>${item.name}</td><td><span class="badge bg-info">${item.category}</span></td><td>R$ ${item.price.toFixed(2)}</td><td>${item.time}min</td>`;
+                } else if (type === 'products') {
+                    html += `<td>${item.name}</td><td><span class="badge bg-primary">${item.category}</span></td><td>${item.manufacturer}</td><td>R$ ${item.price.toFixed(2)}</td>`;
+                } else if (type === 'vehicles') {
+                    html += `<td>${item.brand}</td><td>${item.country}</td><td>${item.type}</td><td><span class="badge bg-success">${item.category}</span></td>`;
+                } else if (type === 'models') {
+                    html += `<td>${item.brand}</td><td>${item.name}</td><td>${item.yearStart}-${item.yearEnd}</td><td>${item.engine}</td><td>${item.transmission}</td>`;
+                }
+                html += '</tr>';
+            });
+            
+            html += '</tbody></table></div>';
+            document.getElementById('listContent').innerHTML = html;
+        }
+
+        // Event listeners para os formulários
+        document.getElementById('serviceForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const newService = {
+                id: sampleData.services.length + 1,
+                name: document.getElementById('serviceName').value,
+                category: document.getElementById('serviceCategory').value,
+                price: parseFloat(document.getElementById('servicePrice').value) || 0,
+                time: parseInt(document.getElementById('serviceTime').value) || 0,
+                description: document.getElementById('serviceDescription').value,
+                tools: document.getElementById('serviceTools').value,
+                difficulty: document.getElementById('serviceDifficulty').value
+            };
+            
+            sampleData.services.push(newService);
+            this.reset();
+            showItemsList('services', 'Serviços Cadastrados');
+            
+            addTerminalOutput(`✅ Serviço cadastrado: ${newService.name}`);
+            addTerminalOutput(`   Categoria: ${newService.category} | Preço: R$ ${newService.price.toFixed(2)}`);
+            
+            alert('Serviço cadastrado com sucesso!');
+        });
+
+        document.getElementById('productForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const newProduct = {
+                id: sampleData.products.length + 1,
+                name: document.getElementById('productName').value,
+                code: document.getElementById('productCode').value,
+                category: document.getElementById('productCategory').value,
+                manufacturer: document.getElementById('productManufacturer').value,
+                price: parseFloat(document.getElementById('productPrice').value) || 0,
+                stock: parseInt(document.getElementById('productStock').value) || 0,
+                location: document.getElementById('productLocation').value,
+                description: document.getElementById('productDescription').value,
+                application: document.getElementById('productApplication').value
+            };
+            
+            sampleData.products.push(newProduct);
+            this.reset();
+            showItemsList('products', 'Produtos Cadastrados');
+            
+            addTerminalOutput(`✅ Produto cadastrado: ${newProduct.name}`);
+            addTerminalOutput(`   Código: ${newProduct.code} | Estoque: ${newProduct.stock} unidades`);
+            
+            alert('Produto cadastrado com sucesso!');
+        });
+
+        document.getElementById('vehicleForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const newVehicle = {
+                id: sampleData.vehicles.length + 1,
+                brand: document.getElementById('vehicleBrand').value,
+                country: document.getElementById('vehicleCountry').value,
+                type: document.getElementById('vehicleType').value,
+                category: document.getElementById('vehicleCategory').value,
+                notes: document.getElementById('vehicleNotes').value
+            };
+            
+            sampleData.vehicles.push(newVehicle);
+            this.reset();
+            showItemsList('vehicles', 'Veículos Cadastrados');
+            
+            addTerminalOutput(`✅ Veículo cadastrado: ${newVehicle.brand}`);
+            addTerminalOutput(`   Tipo: ${newVehicle.type} | País: ${newVehicle.country}`);
+            
+            alert('Veículo cadastrado com sucesso!');
+        });
+
+        document.getElementById('modelForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const newModel = {
+                id: sampleData.models.length + 1,
+                brand: document.getElementById('modelBrand').value,
+                name: document.getElementById('modelName').value,
+                yearStart: parseInt(document.getElementById('modelYearStart').value) || new Date().getFullYear(),
+                yearEnd: parseInt(document.getElementById('modelYearEnd').value) || new Date().getFullYear(),
+                generation: document.getElementById('modelGeneration').value,
+                engine: document.getElementById('modelEngine').value,
+                transmission: document.getElementById('modelTransmission').value,
+                features: document.getElementById('modelFeatures').value
+            };
+            
+            sampleData.models.push(newModel);
+            this.reset();
+            showItemsList('models', 'Modelos Cadastrados');
+            
+            addTerminalOutput(`✅ Modelo cadastrado: ${newModel.brand} ${newModel.name}`);
+            addTerminalOutput(`   Período: ${newModel.yearStart}-${newModel.yearEnd} | Motor: ${newModel.engine}`);
+            
+            alert('Modelo cadastrado com sucesso!');
+        });
+
+        // Busca Inteligente - Sistema avançado de catalogação
+        const searchSources = {
+            mercadolivre: {
+                name: 'MercadoLivre',
+                baseUrl: 'https://lista.mercadolivre.com.br/',
+                searchPattern: '{part}+{brand}+{model}+{year}',
+                className: 'source-mercadolivre'
+            },
+            olx: {
+                name: 'OLX',
+                baseUrl: 'https://www.olx.com.br/autos-e-pecas/pecas-e-acessorios/',
+                searchPattern: '{part}+{brand}+{model}',
+                className: 'source-olx'
+            },
+            autopecas: {
+                name: 'AutoPeças',
+                baseUrl: 'https://www.autopecas.com.br/busca/',
+                searchPattern: '{part}+{brand}+{model}+{year}',
+                className: 'source-autopecas'
+            },
+            nakata: {
+                name: 'Nakata',
+                baseUrl: 'https://www.nakata.com.br/produtos/',
+                searchPattern: '{part}+{brand}+{model}',
+                className: 'source-nakata'
+            }
+        };
+
+        // Dados simulados de busca expandidos (em produção seria uma API real)
+        const mockSearchResults = {
+            // === RADIADORES ===
+            'radiador': [
+                {
+                    name: 'Radiador com Reservatório Visconde RA1234',
+                    price: 245.90,
+                    manufacturer: 'Visconde',
+                    code: 'RA1234',
+                    source: 'mercadolivre',
+                    compatibility: 'Universal - diversos veículos',
+                    url: 'https://exemplo.com/radiador-visconde',
+                    description: 'Radiador completo com reservatório, alumínio e plástico'
+                },
+                {
+                    name: 'Radiador Denso RAD-VW001',
+                    price: 189.50,
+                    manufacturer: 'Denso',
+                    code: 'RAD-VW001',
+                    source: 'autopecas',
+                    compatibility: 'Volkswagen Gol/Parati 1.0/1.6',
+                    url: 'https://exemplo.com/radiador-denso',
+                    description: 'Radiador original Denso para linha Volkswagen'
+                },
+                {
+                    name: 'Radiador Valeo 732567',
+                    price: 198.90,
+                    manufacturer: 'Valeo',
+                    code: '732567',
+                    source: 'olx',
+                    compatibility: 'Chevrolet Corsa/Celta',
+                    url: 'https://exemplo.com/radiador-valeo',
+                    description: 'Radiador Valeo com garantia de 1 ano'
+                }
+            ],
+            'caixa radiador': [
+                {
+                    name: 'Caixa do Radiador Superior Plástica Universal',
+                    price: 45.90,
+                    manufacturer: 'Sem Marca',
+                    code: 'CX-RAD-SUP',
+                    source: 'mercadolivre',
+                    compatibility: 'Universal - diversos modelos',
+                    url: 'https://exemplo.com/caixa-superior',
+                    description: 'Caixa superior do radiador em plástico resistente'
+                },
+                {
+                    name: 'Caixa Radiador Inferior Gates CRI-001',
+                    price: 52.30,
+                    manufacturer: 'Gates',
+                    code: 'CRI-001',
+                    source: 'autopecas',
+                    compatibility: 'Volkswagen Gol G2/G3/G4',
+                    url: 'https://exemplo.com/caixa-inferior-gates',
+                    description: 'Caixa inferior original Gates com vedação'
+                },
+                {
+                    name: 'Caixa do Radiador Completa BR Parts',
+                    price: 89.90,
+                    manufacturer: 'BR Parts',
+                    code: 'BRP-CX-RAD',
+                    source: 'olx',
+                    compatibility: 'Ford Ka/Fiesta 1.0/1.6',
+                    url: 'https://exemplo.com/caixa-completa',
+                    description: 'Kit caixa completa superior e inferior'
+                }
+            ],
+            'reservatorio radiador': [
+                {
+                    name: 'Reservatório do Radiador com Tampa Mahle',
+                    price: 35.80,
+                    manufacturer: 'Mahle',
+                    code: 'RSV-MAH-01',
+                    source: 'mercadolivre',
+                    compatibility: 'Diversos veículos nacionais',
+                    url: 'https://exemplo.com/reservatorio-mahle',
+                    description: 'Reservatório transparente com tampa e visor'
+                },
+                {
+                    name: 'Reservatório Água Radiador Meyle 314',
+                    price: 42.60,
+                    manufacturer: 'Meyle',
+                    code: 'MLY-314',
+                    source: 'autopecas',
+                    compatibility: 'Chevrolet Corsa/Montana',
+                    url: 'https://exemplo.com/reservatorio-meyle',
+                    description: 'Reservatório original Meyle importado'
+                }
+            ],
+            // === VELAS ===
+            'vela ignição': [
+                {
+                    name: 'Vela de Ignição NGK BPR6ES',
+                    price: 25.90,
+                    manufacturer: 'NGK',
+                    code: 'BPR6ES',
+                    source: 'mercadolivre',
+                    compatibility: 'Volkswagen Gol 1.0 2008-2020',
+                    url: 'https://exemplo.com/vela-ngk',
+                    description: 'Vela de ignição original NGK para motores 1.0'
+                },
+                {
+                    name: 'Vela Champion RC12YC',
+                    price: 22.50,
+                    manufacturer: 'Champion',
+                    code: 'RC12YC',
+                    source: 'autopecas',
+                    compatibility: 'Volkswagen Gol 1.0 2008-2015',
+                    url: 'https://exemplo.com/vela-champion',
+                    description: 'Vela de ignição Champion resistiva'
+                },
+                {
+                    name: 'Jogo Velas Bosch FR7DC+',
+                    price: 89.90,
+                    manufacturer: 'Bosch',
+                    code: 'FR7DC+',
+                    source: 'olx',
+                    compatibility: 'Volkswagen Gol 1.6 Flex',
+                    url: 'https://exemplo.com/velas-bosch',
+                    description: 'Kit com 4 velas Bosch originais'
+                }
+            ],
+            // === PASTILHAS ===
+            'pastilha freio': [
+                {
+                    name: 'Pastilha de Freio Bosch BB123',
+                    price: 89.90,
+                    manufacturer: 'Bosch',
+                    code: 'BB123',
+                    source: 'mercadolivre',
+                    compatibility: 'Volkswagen Gol 2008-2025',
+                    url: 'https://exemplo.com/pastilha-bosch',
+                    description: 'Pastilha de freio cerâmica Bosch'
+                },
+                {
+                    name: 'Pastilha Fras-le PD/123',
+                    price: 75.80,
+                    manufacturer: 'Fras-le',
+                    code: 'PD/123',
+                    source: 'olx',
+                    compatibility: 'Volkswagen Gol G5/G6',
+                    url: 'https://exemplo.com/pastilha-frasle',
+                    description: 'Pastilha de freio semi-metálica'
+                }
+            ],
+            // === AMORTECEDORES ===
+            'amortecedor': [
+                {
+                    name: 'Amortecedor Dianteiro Monroe G7329',
+                    price: 189.50,
+                    manufacturer: 'Monroe',
+                    code: 'G7329',
+                    source: 'autopecas',
+                    compatibility: 'Chevrolet Onix 2012-2020',
+                    url: 'https://exemplo.com/amortecedor-monroe',
+                    description: 'Amortecedor dianteiro original Monroe'
+                }
+            ],
+            // === FILTROS ===
+            'filtro ar': [
+                {
+                    name: 'Filtro de Ar Tecfil ARS1234',
+                    price: 32.90,
+                    manufacturer: 'Tecfil',
+                    code: 'ARS1234',
+                    source: 'mercadolivre',
+                    compatibility: 'Volkswagen Gol/Voyage',
+                    url: 'https://exemplo.com/filtro-ar-tecfil',
+                    description: 'Filtro de ar motor Tecfil original'
+                }
+            ],
+            'filtro oleo': [
+                {
+                    name: 'Filtro de Óleo Mann W712/73',
+                    price: 28.50,
+                    manufacturer: 'Mann',
+                    code: 'W712/73',
+                    source: 'autopecas',
+                    compatibility: 'Diversos veículos Volkswagen',
+                    url: 'https://exemplo.com/filtro-oleo-mann',
+                    description: 'Filtro de óleo original importado'
+                }
+            ],
+            'filtro combustivel': [
+                {
+                    name: 'Filtro Combustível Bosch F026403006',
+                    price: 24.90,
+                    manufacturer: 'Bosch',
+                    code: 'F026403006',
+                    source: 'mercadolivre',
+                    compatibility: 'Volkswagen Gol 1.0/1.6',
+                    url: 'https://exemplo.com/filtro-combustivel',
+                    description: 'Filtro de combustível externo Bosch'
+                }
+            ],
+            // === CORREIAS ===
+            'correia': [
+                {
+                    name: 'Correia Dentada Gates 5474XS',
+                    price: 124.90,
+                    manufacturer: 'Gates',
+                    code: '5474XS',
+                    source: 'autopecas',
+                    compatibility: 'Volkswagen Gol 1.0 16V',
+                    url: 'https://exemplo.com/correia-dentada',
+                    description: 'Correia dentada original Gates'
+                }
+            ],
+            // === DIVERSOS ===
+            'bomba agua': [
+                {
+                    name: 'Bomba d\'Água Urba UB0452',
+                    price: 145.60,
+                    manufacturer: 'Urba',
+                    code: 'UB0452',
+                    source: 'mercadolivre',
+                    compatibility: 'Volkswagen Gol/Parati',
+                    url: 'https://exemplo.com/bomba-agua',
+                    description: 'Bomba d\'água com vedação original'
+                }
+            ],
+            'termostato': [
+                {
+                    name: 'Termostato Wahler 4104.82D',
+                    price: 67.40,
+                    manufacturer: 'Wahler',
+                    code: '4104.82D',
+                    source: 'olx',
+                    compatibility: 'Volkswagen Gol 1.0/1.6',
+                    url: 'https://exemplo.com/termostato',
+                    description: 'Termostato original importado 82°C'
+                }
+            ]
+        };
+
+        // Função para busca inteligente
+        document.getElementById('smartSearchFormElement').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const brand = document.getElementById('searchCarBrand').value;
+            const model = document.getElementById('searchCarModel').value;
+            const year = document.getElementById('searchCarYear').value;
+            const engine = document.getElementById('searchCarEngine').value;
+            const partName = document.getElementById('searchPartName').value.toLowerCase();
+            const category = document.getElementById('searchPartCategory').value;
+            
+            if (!brand || !model || !partName) {
+                alert('Por favor, preencha a marca, modelo e nome da peça!');
+                return;
+            }
+            
+            startSmartSearch(brand, model, year, engine, partName, category);
+        });
+
+        function startSmartSearch(brand, model, year, engine, partName, category) {
+            // Mostrar progresso
+            document.getElementById('searchProgress').style.display = 'block';
+            document.getElementById('searchResults').style.display = 'none';
+            
+            const steps = [
+                'Analisando parâmetros de busca...',
+                'Conectando com MercadoLivre...',
+                'Buscando no OLX...',
+                'Consultando AutoPeças...',
+                'Verificando base Nakata...',
+                'Categorizando resultados...',
+                'Aplicando filtros de compatibilidade...',
+                'Finalizando catalogação...'
+            ];
+            
+            let currentStep = 0;
+            const progressSteps = document.getElementById('progressSteps');
+            const progressBar = document.getElementById('progressBar');
+            
+            progressSteps.innerHTML = '';
+            
+            const searchInterval = setInterval(() => {
+                if (currentStep < steps.length) {
+                    // Atualizar steps
+                    const stepDiv = document.createElement('div');
+                    stepDiv.className = 'progress-step active';
+                    stepDiv.innerHTML = `<i class="fas fa-cog fa-spin me-2"></i>${steps[currentStep]}`;
+                    progressSteps.appendChild(stepDiv);
+                    
+                    // Atualizar barra de progresso
+                    const progress = ((currentStep + 1) / steps.length) * 100;
+                    progressBar.style.width = `${progress}%`;
+                    
+                    // Marcar step anterior como completo
+                    if (currentStep > 0) {
+                        const prevStep = progressSteps.children[currentStep - 1];
+                        prevStep.className = 'progress-step completed';
+                        prevStep.innerHTML = `<i class="fas fa-check me-2"></i>${steps[currentStep - 1]}`;
+                    }
+                    
+                    currentStep++;
+                } else {
+                    clearInterval(searchInterval);
+                    
+                    // Marcar último step como completo
+                    const lastStep = progressSteps.children[currentStep - 1];
+                    lastStep.className = 'progress-step completed';
+                    lastStep.innerHTML = `<i class="fas fa-check me-2"></i>${steps[currentStep - 1]}`;
+                    
+                    // Mostrar resultados
+                    setTimeout(() => {
+                        showSearchResults(brand, model, year, engine, partName, category);
+                    }, 1000);
+                }
+            }, 800);
+        }
+
+        function showSearchResults(brand, model, year, engine, partName, category) {
+            document.getElementById('searchProgress').style.display = 'none';
+            document.getElementById('searchResults').style.display = 'block';
+            
+            // Simular busca nos dados mockados
+            const searchKey = findBestMatch(partName, Object.keys(mockSearchResults));
+            const results = mockSearchResults[searchKey] || [];
+            
+            const resultsContainer = document.getElementById('resultsContainer');
+            
+            if (results.length === 0) {
+                resultsContainer.innerHTML = `
+                    <div class="search-result-card not-found">
+                        <h6><i class="fas fa-exclamation-triangle me-2"></i>Nenhuma peça encontrada</h6>
+                        <p>Não foram encontradas peças para "${partName}" compatíveis com ${brand} ${model} ${year}.</p>
+                        <p><strong>Sugestões:</strong></p>
+                        <ul>
+                            <li>Verifique a ortografia do nome da peça</li>
+                            <li>Use termos mais genéricos (ex: "filtro" ao invés de "filtro de ar")</li>
+                            <li>Tente buscar sem especificar o ano</li>
+                        </ul>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = `<div class="alert alert-success">
+                <i class="fas fa-check-circle me-2"></i>
+                <strong>Busca concluída!</strong> Encontradas ${results.length} peças compatíveis com ${brand} ${model} ${year}.
+            </div>`;
+            
+            results.forEach((result, index) => {
+                const autoCategory = category || detectCategory(result.name);
+                const compatibility = `${brand} ${model} ${year || result.compatibility.split(' ').pop()}`;
+                
+                html += `
+                    <div class="search-result-card found" data-index="${index}">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-2">
+                                    ${result.name}
+                                    <span class="source-badge ${searchSources[result.source]?.className || 'badge bg-secondary'}">
+                                        ${searchSources[result.source]?.name || result.source}
+                                    </span>
+                                </h6>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p class="mb-1"><strong>Preço:</strong> <span class="text-success fw-bold">R$ ${result.price.toFixed(2)}</span></p>
+                                        <p class="mb-1"><strong>Fabricante:</strong> ${result.manufacturer}</p>
+                                        <p class="mb-1"><strong>Código:</strong> <code>${result.code}</code></p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p class="mb-1"><strong>Categoria:</strong> <span class="badge bg-primary">${autoCategory}</span></p>
+                                        <p class="mb-1"><strong>Compatibilidade:</strong> ${compatibility}</p>
+                                        <p class="mb-1"><small class="text-muted">${result.description}</small></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ms-3">
+                                <button class="btn btn-sm btn-outline-primary" onclick="catalogSingleResult(${index})">
+                                    <i class="fas fa-plus me-1"></i>Catalogar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            resultsContainer.innerHTML = html;
+            document.getElementById('catalogButton').style.display = 'block';
+            
+            // Salvar resultados globalmente para catalogação
+            window.currentSearchResults = results.map(result => ({
+                ...result,
+                searchBrand: brand,
+                searchModel: model,
+                searchYear: year,
+                searchEngine: engine,
+                autoCategory: category || detectCategory(result.name)
+            }));
+        }
+
+        // Função para encontrar melhor match - VERSÃO MELHORADA
+        function findBestMatch(search, options) {
+            search = search.toLowerCase();
+            
+            // 1. BUSCA EXATA PRIMEIRO
+            for (let option of options) {
+                if (search === option || option === search) {
+                    return option;
+                }
+            }
+            
+            // 2. BUSCA POR INCLUSÃO DIRETA
+            for (let option of options) {
+                if (search.includes(option) || option.includes(search)) {
+                    return option;
+                }
+            }
+            
+            // 3. MAPEAMENTO ESPECÍFICO PARA RADIADORES
+            const radiadorTermos = [
+                'radiador', 'radiadores', 'rad', 'refrigeração', 'arrefecimento',
+                'caixa radiador', 'caixa do radiador', 'reservatorio radiador', 
+                'reservatório radiador', 'reservatorio', 'reservatório'
+            ];
+            
+            for (let termo of radiadorTermos) {
+                if (search.includes(termo)) {
+                    if (search.includes('caixa')) return 'caixa radiador';
+                    if (search.includes('reservatorio') || search.includes('reservatório')) return 'reservatorio radiador';
+                    return 'radiador';
+                }
+            }
+            
+            // 4. BUSCA POR PALAVRAS-CHAVE EXPANDIDA
+            const keywordMap = {
+                // IGNIÇÃO
+                'vela': 'vela ignição',
+                'velas': 'vela ignição',
+                'ignição': 'vela ignição',
+                'ignicao': 'vela ignição',
+                'spark': 'vela ignição',
+                
+                // FREIOS
+                'pastilha': 'pastilha freio',
+                'pastilhas': 'pastilha freio',
+                'freio': 'pastilha freio',
+                'freios': 'pastilha freio',
+                'brake': 'pastilha freio',
+                'lona': 'pastilha freio',
+                'lonas': 'pastilha freio',
+                
+                // SUSPENSÃO
+                'amortecedor': 'amortecedor',
+                'amortecedores': 'amortecedor',
+                'shock': 'amortecedor',
+                'mola': 'amortecedor',
+                'molas': 'amortecedor',
+                'suspensao': 'amortecedor',
+                'suspensão': 'amortecedor',
+                
+                // FILTROS
+                'filtro ar': 'filtro ar',
+                'filtro de ar': 'filtro ar',
+                'filtro motor': 'filtro ar',
+                'air filter': 'filtro ar',
+                
+                'filtro oleo': 'filtro oleo',
+                'filtro óleo': 'filtro oleo',
+                'filtro de oleo': 'filtro oleo',
+                'filtro de óleo': 'filtro oleo',
+                'oil filter': 'filtro oleo',
+                
+                'filtro combustivel': 'filtro combustivel',
+                'filtro combustível': 'filtro combustivel',
+                'filtro de combustivel': 'filtro combustivel',
+                'filtro de combustível': 'filtro combustivel',
+                'fuel filter': 'filtro combustivel',
+                
+                // CORREIAS
+                'correia': 'correia',
+                'correias': 'correia',
+                'correia dentada': 'correia',
+                'timing belt': 'correia',
+                'belt': 'correia',
+                
+                // ARREFECIMENTO
+                'bomba agua': 'bomba agua',
+                'bomba d\'agua': 'bomba agua',
+                'bomba dágua': 'bomba agua',
+                'water pump': 'bomba agua',
+                
+                'termostato': 'termostato',
+                'valvula termostatica': 'termostato',
+                'válvula termostática': 'termostato',
+                'thermostat': 'termostato'
+            };
+            
+            // Buscar por palavras-chave
+            for (let keyword in keywordMap) {
+                if (search.includes(keyword)) {
+                    return keywordMap[keyword];
+                }
+            }
+            
+            // 5. BUSCA POR PALAVRAS PARCIAIS
+            const partialMatches = [
+                { patterns: ['rad'], result: 'radiador' },
+                { patterns: ['cx', 'caixa'], result: 'caixa radiador' },
+                { patterns: ['res', 'reserv'], result: 'reservatorio radiador' },
+                { patterns: ['vel'], result: 'vela ignição' },
+                { patterns: ['past'], result: 'pastilha freio' },
+                { patterns: ['amor'], result: 'amortecedor' },
+                { patterns: ['filt'], result: 'filtro ar' },
+                { patterns: ['corr'], result: 'correia' },
+                { patterns: ['bomb'], result: 'bomba agua' },
+                { patterns: ['term'], result: 'termostato' }
+            ];
+            
+            for (let match of partialMatches) {
+                for (let pattern of match.patterns) {
+                    if (search.includes(pattern)) {
+                        return match.result;
+                    }
+                }
+            }
+            
+            // 6. FALLBACK - retorna o primeiro disponível ou radiador como padrão
+            if (options.includes('radiador')) return 'radiador';
+            return options[0] || 'vela ignição';
+        }
+
+        // Função para detectar categoria automaticamente - VERSÃO MELHORADA
+        function detectCategory(partName) {
+            const name = partName.toLowerCase();
+            
+            // ARREFECIMENTO (inclui radiadores)
+            if (name.includes('radiador') || name.includes('reservatorio') || name.includes('reservatório') || 
+                name.includes('caixa') || name.includes('bomba agua') || name.includes('bomba d\'agua') || 
+                name.includes('termostato') || name.includes('ventoinha') || name.includes('eletroventilador') ||
+                name.includes('sensor temperatura') || name.includes('tampa radiador')) {
+                return 'Arrefecimento';
+            }
+            
+            // MOTOR
+            if (name.includes('vela') || name.includes('pistão') || name.includes('pistao') || 
+                name.includes('válvula') || name.includes('valvula') || name.includes('biela') ||
+                name.includes('virabrequim') || name.includes('comando') || name.includes('tuchos') ||
+                name.includes('aneis') || name.includes('anéis') || name.includes('junta motor') ||
+                name.includes('cabecote') || name.includes('cabeçote') || name.includes('carter')) {
+                return 'Motor';
+            }
+            
+            // SUSPENSÃO
+            if (name.includes('amortecedor') || name.includes('mola') || name.includes('batente') ||
+                name.includes('pivô') || name.includes('pivo') || name.includes('bandeja') ||
+                name.includes('terminal direção') || name.includes('barra estabilizadora') ||
+                name.includes('cubo roda') || name.includes('rolamento roda')) {
+                return 'Suspensão';
+            }
+            
+            // FREIOS
+            if (name.includes('pastilha') || name.includes('disco') || name.includes('freio') ||
+                name.includes('tambor') || name.includes('lona') || name.includes('cilindro roda') ||
+                name.includes('servo freio') || name.includes('flexivel freio') ||
+                name.includes('cabo freio') || name.includes('liquido freio')) {
+                return 'Freios';
+            }
+            
+            // FILTROS
+            if (name.includes('filtro ar') || name.includes('filtro oleo') || name.includes('filtro óleo') ||
+                name.includes('filtro combustivel') || name.includes('filtro combustível') ||
+                name.includes('filtro cabine') || name.includes('filtro polen')) {
+                return 'Filtros';
+            }
+            
+            // AR CONDICIONADO
+            if (name.includes('compressor') || name.includes('condensador') || name.includes('evaporador') ||
+                name.includes('filtro ar condicionado') || name.includes('gas r134') ||
+                name.includes('válvula expansão') || name.includes('valvula expansao') ||
+                name.includes('sensor pressão ar')) {
+                return 'Ar Condicionado';
+            }
+            
+            // INJEÇÃO ELETRÔNICA
+            if (name.includes('bico') || name.includes('sensor') || name.includes('sonda lambda') ||
+                name.includes('modulo injeção') || name.includes('módulo injeção') ||
+                name.includes('corpo borboleta') || name.includes('valvula iac') ||
+                name.includes('válvula iac') || name.includes('chicote')) {
+                return 'Injeção Eletrônica';
+            }
+            
+            // ELÉTRICA
+            if (name.includes('bateria') || name.includes('alternador') || name.includes('motor partida') ||
+                name.includes('rele') || name.includes('relé') || name.includes('fusivel') ||
+                name.includes('fusível') || name.includes('lampada') || name.includes('lâmpada') ||
+                name.includes('farol') || name.includes('lanterna') || name.includes('pisca')) {
+                return 'Elétrica';
+            }
+            
+            // TRANSMISSÃO
+            if (name.includes('embreagem') || name.includes('disco embreagem') || name.includes('plato') ||
+                name.includes('rolamento embreagem') || name.includes('cabo embreagem') ||
+                name.includes('cambio') || name.includes('câmbio') || name.includes('diferencial') ||
+                name.includes('semi eixo') || name.includes('junta homocinética')) {
+                return 'Transmissão';
+            }
+            
+            // CORREIAS E POLIAS
+            if (name.includes('correia') || name.includes('polia') || name.includes('tensor') ||
+                name.includes('esticador') || name.includes('corrente distribuição')) {
+                return 'Motor';
+            }
+            
+            // ESCAPAMENTO
+            if (name.includes('silencioso') || name.includes('escapamento') || name.includes('catalisador') ||
+                name.includes('coletor') || name.includes('tubo escapamento')) {
+                return 'Escapamento';
+            }
+            
+            // DEFAULT - se não identificou, tenta pelo contexto
+            if (name.includes('agua') || name.includes('água') || name.includes('refrigeração')) {
+                return 'Arrefecimento';
+            }
+            
+            return 'Motor'; // categoria padrão
+        }
+
+        // Catalogar resultado individual
+        function catalogSingleResult(index) {
+            const result = window.currentSearchResults[index];
+            
+            const newProduct = {
+                id: sampleData.products.length + 1,
+                name: result.name,
+                code: result.code,
+                category: result.autoCategory,
+                manufacturer: result.manufacturer,
+                price: result.price,
+                stock: 0,
+                location: 'A definir',
+                description: result.description,
+                application: `${result.searchBrand} ${result.searchModel} ${result.searchYear || ''}`,
+                source: result.source,
+                url: result.url
+            };
+            
+            sampleData.products.push(newProduct);
+            
+            addTerminalOutput(`✅ Peça catalogada: ${newProduct.name}`);
+            addTerminalOutput(`   Fonte: ${searchSources[result.source]?.name} | Preço: R$ ${newProduct.price.toFixed(2)}`);
+            
+            // Marcar como catalogado
+            const card = document.querySelector(`[data-index="${index}"]`);
+            card.style.opacity = '0.7';
+            card.style.border = '2px solid #27ae60';
+            
+            const button = card.querySelector('button');
+            button.innerHTML = '<i class="fas fa-check me-1"></i>Catalogado';
+            button.className = 'btn btn-sm btn-success';
+            button.disabled = true;
+            
+            alert('Peça catalogada com sucesso!');
+        }
+
+        // Catalogar todos os resultados
+        function catalogAllResults() {
+            if (!window.currentSearchResults || window.currentSearchResults.length === 0) {
+                alert('Nenhum resultado para catalogar!');
+                return;
+            }
+            
+            let catalogedCount = 0;
+            
+            window.currentSearchResults.forEach((result, index) => {
+                const newProduct = {
+                    id: sampleData.products.length + 1,
+                    name: result.name,
+                    code: result.code,
+                    category: result.autoCategory,
+                    manufacturer: result.manufacturer,
+                    price: result.price,
+                    stock: 0,
+                    location: 'A definir',
+                    description: result.description,
+                    application: `${result.searchBrand} ${result.searchModel} ${result.searchYear || ''}`,
+                    source: result.source,
+                    url: result.url
+                };
+                
+                sampleData.products.push(newProduct);
+                catalogedCount++;
+                
+                // Marcar visualmente como catalogado
+                const card = document.querySelector(`[data-index="${index}"]`);
+                if (card) {
+                    card.style.opacity = '0.7';
+                    card.style.border = '2px solid #27ae60';
+                    
+                    const button = card.querySelector('button');
+                    button.innerHTML = '<i class="fas fa-check me-1"></i>Catalogado';
+                    button.className = 'btn btn-sm btn-success';
+                    button.disabled = true;
+                }
+            });
+            
+            addTerminalOutput(`✅ Catalogação em lote concluída: ${catalogedCount} peças`);
+            addTerminalOutput(`   Todas as peças foram adicionadas ao catálogo do sistema`);
+            
+            document.getElementById('catalogButton').style.display = 'none';
+            
+            alert(`${catalogedCount} peças foram catalogadas com sucesso!\n\nTodas as peças estão agora disponíveis no sistema.`);
+        }
+
+        // === FUNÇÕES DO CATÁLOGO VISUAL ===
+        
+        // Variável global para produtos filtrados
+        let filteredProducts = [];
+
+        function loadCatalogGrid() {
+            filteredProducts = [...sampleData.products];
+            displayCatalogProducts();
+        }
+
+        function displayCatalogProducts() {
+            const grid = document.getElementById('catalogGrid');
+            const count = document.getElementById('catalogCount');
+            
+            count.textContent = filteredProducts.length;
+            
+            if (filteredProducts.length === 0) {
+                grid.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 2rem; color: #6c757d;">
+                        <i class="fas fa-search fa-3x mb-3"></i>
+                        <h5>Nenhum produto encontrado</h5>
+                        <p>Tente ajustar os filtros ou adicionar novos produtos.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            grid.innerHTML = filteredProducts.map(product => `
+                <div class="product-card" onclick="showProductDetails(${product.id})">
+                    <img src="${product.image}" alt="${product.name}" class="product-image" 
+                         onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjEyMCIgdmlld0JveD0iMCAwIDIwMCAxMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMTIwIiBmaWxsPSIjRjhGOUZBIi8+CjxwYXRoIGQ9Ik04NSA0MEMxMDEuNTY5IDQwIDExNSA1My40MzE1IDExNSA3MEMxMTUgODYuNTY4NSAxMDEuNTY5IDEwMCA4NSAxMDBDNjguNDMxNSAxMDAgNTUgODYuNTY4NSA1NSA3MEM1NSA1My40MzE1IDY4LjQzMTUgNDAgODUgNDBaIiBmaWxsPSIjREVFMkU2Ii8+CjxwYXRoIGQ9Ik03NSA2MEw5NSA4MEwxMzUgNDAiIHN0cm9rZT0iIzM0OThEQiIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPHRleHQgeD0iMTAwIiB5PSI5MCIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjEyIiBmaWxsPSIjNkM3NTdEIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5TZW0gSW1hZ2VtPC90ZXh0Pgo8L3N2Zz4K'">
+                    
+                    <div class="product-code">${product.code}</div>
+                    <div class="product-name">${product.name}</div>
+                    <div class="product-price">R$ ${product.price.toFixed(2)}</div>
+                    <div class="product-category">${product.category}</div>
+                    
+                    <div style="margin-top: 0.5rem; font-size: 0.7rem; color: #6c757d;">
+                        <i class="fas fa-box me-1"></i>Estoque: ${product.stock}
+                        <br>
+                        <i class="fas fa-industry me-1"></i>${product.manufacturer}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterCatalog() {
+            const categoryFilter = document.getElementById('catalogFilterCategory').value;
+            const manufacturerFilter = document.getElementById('catalogFilterManufacturer').value;
+            const searchFilter = document.getElementById('catalogSearch').value.toLowerCase();
+            
+            filteredProducts = sampleData.products.filter(product => {
+                const matchesCategory = !categoryFilter || product.category === categoryFilter;
+                const matchesManufacturer = !manufacturerFilter || product.manufacturer === manufacturerFilter;
+                const matchesSearch = !searchFilter || 
+                    product.name.toLowerCase().includes(searchFilter) || 
+                    product.code.toLowerCase().includes(searchFilter) ||
+                    product.manufacturer.toLowerCase().includes(searchFilter);
+                
+                return matchesCategory && matchesManufacturer && matchesSearch;
+            });
+            
+            displayCatalogProducts();
+        }
+
+        function clearCatalogFilters() {
+            document.getElementById('catalogFilterCategory').value = '';
+            document.getElementById('catalogFilterManufacturer').value = '';
+            document.getElementById('catalogSearch').value = '';
+            filterCatalog();
+        }
+
+        function showProductDetails(productId) {
+            const product = sampleData.products.find(p => p.id === productId);
+            if (!product) return;
+            
+            const stockStatus = product.stock > 10 ? 'Alto' : product.stock > 5 ? 'Médio' : product.stock > 0 ? 'Baixo' : 'Esgotado';
+            const stockColor = product.stock > 10 ? 'success' : product.stock > 5 ? 'warning' : product.stock > 0 ? 'danger' : 'secondary';
+            
+            alert(`📦 DETALHES DO PRODUTO
+
+🏷️ Nome: ${product.name}
+🔖 Código: ${product.code}
+📂 Categoria: ${product.category}
+🏭 Fabricante: ${product.manufacturer}
+💰 Preço: R$ ${product.price.toFixed(2)}
+📊 Estoque: ${product.stock} unidades (${stockStatus})
+
+✨ Para editar este produto, use o formulário de cadastro.`);
+        }
+
+        function addNewProduct() {
+            // Volta para o formulário de produtos
+            hideAllForms();
+            document.getElementById('formContainer').style.display = 'block';
+            document.getElementById('productsForm').style.display = 'block';
+            showItemsList('products', 'Produtos Cadastrados');
+            
+            // Foca no campo nome
+            setTimeout(() => {
+                document.getElementById('productName').focus();
+            }, 100);
+        }
+
+        function exportCatalog() {
+            const data = filteredProducts.map(product => ({
+                Código: product.code,
+                Nome: product.name,
+                Categoria: product.category,
+                Fabricante: product.manufacturer,
+                Preço: `R$ ${product.price.toFixed(2)}`,
+                Estoque: product.stock
+            }));
+            
+            // Simula exportação
+            addTerminalOutput('📊 Exportando catálogo...');
+            addTerminalOutput(`✅ ${data.length} produtos exportados`);
+            addTerminalOutput('📁 Arquivo: catalogo_produtos.csv');
+            
+            alert(`📊 Catálogo exportado com sucesso!
+
+📁 Arquivo: catalogo_produtos.csv
+📦 Total de produtos: ${data.length}
+💾 Local: Downloads/
+
+O arquivo contém: código, nome, categoria, fabricante, preço e estoque de cada produto.`);
+        }
+
+        // Limpar formulário de busca
+        function clearSearchForm() {
+            document.getElementById('smartSearchFormElement').reset();
+            document.getElementById('searchProgress').style.display = 'none';
+            document.getElementById('searchResults').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

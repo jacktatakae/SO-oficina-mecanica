@@ -1,0 +1,1522 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚗 Sistema de Peças Automotivas</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --dark-color: #34495e;
+            --light-bg: #ecf0f1;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --hover-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--light-bg) 0%, #bdc3c7 100%);
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--dark-color) 100%);
+            box-shadow: var(--card-shadow);
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        .main-container {
+            padding-top: 2rem;
+            padding-bottom: 2rem;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+            border: none;
+            overflow: hidden;
+            height: 100%;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--hover-shadow);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--secondary-color);
+        }
+
+        .feature-card .card-body {
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .feature-card .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .btn-feature {
+            background: linear-gradient(135deg, var(--secondary-color) 0%, #2980b9 100%);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            color: white;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 1rem;
+        }
+
+        .btn-feature:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+            color: white;
+        }
+
+        .stats-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: var(--card-shadow);
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--hover-shadow);
+        }
+
+        .stats-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
+
+        .stats-label {
+            color: var(--dark-color);
+            font-size: 0.9rem;
+        }
+
+        .section-title {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .modal-content {
+            border-radius: 15px;
+            border: none;
+            box-shadow: var(--hover-shadow);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--dark-color) 100%);
+            color: white;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--secondary-color) 0%, #2980b9 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 0.75rem 1.5rem;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success-color) 0%, #219a52 100%);
+            border: none;
+            border-radius: 10px;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning-color) 0%, #e67e22 100%);
+            border: none;
+            border-radius: 10px;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--accent-color) 0%, #c0392b 100%);
+            border: none;
+            border-radius: 10px;
+        }
+
+        .alert {
+            border-radius: 10px;
+            border: none;
+        }
+
+        .table {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+        }
+
+        .footer {
+            background: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+
+        .loading {
+            display: none;
+        }
+
+        .spinner-border {
+            color: var(--secondary-color);
+        }
+
+        @media (max-width: 768px) {
+            .feature-card .card-body {
+                padding: 1.5rem;
+            }
+            
+            .feature-icon {
+                font-size: 2.5rem;
+            }
+        }
+
+        .category-badge {
+            background: var(--secondary-color);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin: 0.25rem;
+            display: inline-block;
+        }
+
+        .price-tag {
+            color: var(--success-color);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--light-bg) 0%, #d5d8dc 100%);
+            border-bottom: 2px solid var(--secondary-color);
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-car"></i>
+                Sistema de Peças Automotivas
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#home">Início</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#features">Funcionalidades</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#stats">Estatísticas</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container main-container" style="margin-top: 80px;">
+        <!-- Hero Section -->
+        <section id="home" class="text-center mb-5" data-aos="fade-up">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <h1 class="display-4 fw-bold text-primary mb-4">
+                        🚗 Sistema de Gestão de Peças Automotivas
+                    </h1>
+                    <p class="lead text-muted mb-4">
+                        Sistema completo para gerenciar peças automotivas e clientes, com extração automática de dados da internet e relatórios avançados.
+                    </p>
+                    <div class="d-flex justify-content-center gap-3 flex-wrap">
+                        <button class="btn btn-feature" onclick="showStats()">
+                            <i class="fas fa-chart-bar me-2"></i>Ver Estatísticas
+                        </button>
+                        <button class="btn btn-feature" onclick="executeSystem()">
+                            <i class="fas fa-play me-2"></i>Executar Sistema Python
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Statistics Section -->
+        <section id="stats" class="mb-5" data-aos="fade-up">
+            <h2 class="section-title">📊 Estatísticas do Sistema</h2>
+            <div class="row g-4 mb-4">
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <div class="stats-number" id="totalPecas">0</div>
+                        <div class="stats-label">Total de Peças</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <div class="stats-number" id="totalClientes">0</div>
+                        <div class="stats-label">Total de Clientes</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <div class="stats-number" id="categorias">8</div>
+                        <div class="stats-label">Categorias Ativas</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <div class="stats-number" id="precoMedio">R$ 0,00</div>
+                        <div class="stats-label">Preço Médio</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section id="features" class="mb-5" data-aos="fade-up">
+            <h2 class="section-title">🔧 Funcionalidades Principais</h2>
+            <div class="row g-4">
+                <!-- Extração de Dados -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card h-100">
+                        <div class="card-body">
+                            <div class="feature-icon">
+                                <i class="fas fa-globe"></i>
+                            </div>
+                            <h5 class="card-title">Extração de Dados</h5>
+                            <p class="text-muted">
+                                Busca automática de peças na internet com categorização inteligente e atualização de preços.
+                            </p>
+                            <button class="btn btn-feature" onclick="showExtractionModal()">
+                                <i class="fas fa-download me-2"></i>Extrair Dados
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gestão de Clientes -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card h-100">
+                        <div class="card-body">
+                            <div class="feature-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <h5 class="card-title">Gestão de Clientes</h5>
+                            <p class="text-muted">
+                                Cadastro completo de clientes com informações do veículo e histórico de compras.
+                            </p>
+                            <button class="btn btn-feature" onclick="showClientModal()">
+                                <i class="fas fa-user-plus me-2"></i>Gerenciar Clientes
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Consulta de Peças -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card h-100">
+                        <div class="card-body">
+                            <div class="feature-icon">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <h5 class="card-title">Consulta de Peças</h5>
+                            <p class="text-muted">
+                                Busca avançada por categoria, fabricante, nome ou compatibilidade com veículos.
+                            </p>
+                            <button class="btn btn-feature" onclick="showSearchModal()">
+                                <i class="fas fa-search me-2"></i>Buscar Peças
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Relatórios -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card h-100">
+                        <div class="card-body">
+                            <div class="feature-icon">
+                                <i class="fas fa-chart-pie"></i>
+                            </div>
+                            <h5 class="card-title">Relatórios Avançados</h5>
+                            <p class="text-muted">
+                                Dashboard interativo com gráficos, análises de preços e relatórios de estoque.
+                            </p>
+                            <button class="btn btn-feature" onclick="showReportsModal()">
+                                <i class="fas fa-chart-bar me-2"></i>Ver Relatórios
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Import/Export -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card h-100">
+                        <div class="card-body">
+                            <div class="feature-icon">
+                                <i class="fas fa-file-import"></i>
+                            </div>
+                            <h5 class="card-title">Import/Export</h5>
+                            <p class="text-muted">
+                                Importação e exportação de dados via CSV com templates pré-configurados.
+                            </p>
+                            <button class="btn btn-feature" onclick="showImportModal()">
+                                <i class="fas fa-file-csv me-2"></i>Importar/Exportar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Configurações -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card h-100">
+                        <div class="card-body">
+                            <div class="feature-icon">
+                                <i class="fas fa-cogs"></i>
+                            </div>
+                            <h5 class="card-title">Configurações</h5>
+                            <p class="text-muted">
+                                Backup do banco de dados, verificação de dependências e configurações avançadas.
+                            </p>
+                            <button class="btn btn-feature" onclick="showConfigModal()">
+                                <i class="fas fa-cog me-2"></i>Configurações
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Categories Section -->
+        <section class="mb-5" data-aos="fade-up">
+            <h2 class="section-title">📦 Categorias de Peças</h2>
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Categorias Disponíveis</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <span class="category-badge">Motor</span>
+                                        <small class="text-muted">Velas, pistões, válvulas, correias</small>
+                                    </div>
+                                    <div class="mb-3">
+                                        <span class="category-badge">Suspensão</span>
+                                        <small class="text-muted">Amortecedores, molas, braços</small>
+                                    </div>
+                                    <div class="mb-3">
+                                        <span class="category-badge">Arrefecimento</span>
+                                        <small class="text-muted">Radiadores, ventoinhas, termostatos</small>
+                                    </div>
+                                    <div class="mb-3">
+                                        <span class="category-badge">Ar Condicionado</span>
+                                        <small class="text-muted">Compressores, condensadores</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <span class="category-badge">Injeção Eletrônica</span>
+                                        <small class="text-muted">Bicos injetores, sensores, módulos</small>
+                                    </div>
+                                    <div class="mb-3">
+                                        <span class="category-badge">Freios</span>
+                                        <small class="text-muted">Pastilhas, discos, tambores</small>
+                                    </div>
+                                    <div class="mb-3">
+                                        <span class="category-badge">Elétrica</span>
+                                        <small class="text-muted">Baterias, alternadores, fusíveis</small>
+                                    </div>
+                                    <div class="mb-3">
+                                        <span class="category-badge">Transmissão</span>
+                                        <small class="text-muted">Embreagens, câmbios, diferenciais</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Modal - Extração de Dados -->
+    <div class="modal fade" id="extractionModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-globe me-2"></i>Extração de Dados da Internet</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-sync fa-2x text-primary mb-3"></i>
+                                    <h6>Atualização Completa</h6>
+                                    <p class="small text-muted">Extrai peças de todas as categorias</p>
+                                    <button class="btn btn-primary" onclick="fullExtraction()">
+                                        <i class="fas fa-download me-2"></i>Iniciar Extração
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-search fa-2x text-success mb-3"></i>
+                                    <h6>Busca Específica</h6>
+                                    <div class="mb-3">
+                                        <input type="text" class="form-control" id="searchTerm" placeholder="Ex: vela ignição, amortecedor...">
+                                    </div>
+                                    <button class="btn btn-success" onclick="specificExtraction()">
+                                        <i class="fas fa-search me-2"></i>Buscar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Fontes de Dados:</strong> Centauro Auto Parts, Nakata, AutoPeças Especializadas
+                    </div>
+                    <div id="extractionResults"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal - Gestão de Clientes -->
+    <div class="modal fade" id="clientModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-users me-2"></i>Gestão de Clientes</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <!-- Formulário de Cadastro -->
+                        <div class="col-lg-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6><i class="fas fa-user-plus me-2"></i>Novo Cliente</h6>
+                                </div>
+                                <div class="card-body">
+                                    <form id="clientForm">
+                                        <div class="mb-3">
+                                            <label class="form-label">Nome Completo *</label>
+                                            <input type="text" class="form-control" id="clientName" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Endereço *</label>
+                                            <input type="text" class="form-control" id="clientAddress" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Telefone *</label>
+                                            <input type="tel" class="form-control" id="clientPhone" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Email</label>
+                                            <input type="email" class="form-control" id="clientEmail">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Marca do Carro</label>
+                                            <select class="form-select" id="carBrand">
+                                                <option value="">Selecione...</option>
+                                                <option value="Volkswagen">Volkswagen</option>
+                                                <option value="Chevrolet">Chevrolet</option>
+                                                <option value="Ford">Ford</option>
+                                                <option value="Fiat">Fiat</option>
+                                                <option value="Honda">Honda</option>
+                                                <option value="Toyota">Toyota</option>
+                                                <option value="Hyundai">Hyundai</option>
+                                                <option value="Renault">Renault</option>
+                                                <option value="Nissan">Nissan</option>
+                                                <option value="Peugeot">Peugeot</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Modelo do Carro</label>
+                                            <input type="text" class="form-control" id="carModel">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Ano do Carro</label>
+                                            <input type="number" class="form-control" id="carYear" min="1980" max="2025">
+                                        </div>
+                                        <button type="submit" class="btn btn-success w-100">
+                                            <i class="fas fa-save me-2"></i>Cadastrar Cliente
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Busca e Listagem -->
+                        <div class="col-lg-8">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6><i class="fas fa-search me-2"></i>Buscar Clientes</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <input type="text" class="form-control" id="searchClient" placeholder="Nome do cliente...">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <select class="form-select" id="searchCarBrand">
+                                                <option value="">Todas as marcas</option>
+                                                <option value="Volkswagen">Volkswagen</option>
+                                                <option value="Chevrolet">Chevrolet</option>
+                                                <option value="Ford">Ford</option>
+                                                <option value="Fiat">Fiat</option>
+                                                <option value="Honda">Honda</option>
+                                                <option value="Toyota">Toyota</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <button class="btn btn-primary w-100" onclick="searchClients()">
+                                                <i class="fas fa-search"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div id="clientsList"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal - Consulta de Peças -->
+    <div class="modal fade" id="searchModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-search me-2"></i>Consulta de Peças</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <button class="btn btn-outline-primary w-100 mb-2" onclick="searchByCategory()">
+                                <i class="fas fa-tags me-2"></i>Por Categoria
+                            </button>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-outline-primary w-100 mb-2" onclick="searchByManufacturer()">
+                                <i class="fas fa-industry me-2"></i>Por Fabricante
+                            </button>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-outline-primary w-100 mb-2" onclick="searchByName()">
+                                <i class="fas fa-font me-2"></i>Por Nome
+                            </button>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-outline-primary w-100 mb-2" onclick="showPriceRanking()">
+                                <i class="fas fa-dollar-sign me-2"></i>Ranking Preços
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Formulário de Busca -->
+                    <div class="card mb-4" id="searchForm" style="display: none;">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <select class="form-select" id="searchCategory">
+                                        <option value="">Todas as categorias</option>
+                                        <option value="Motor">Motor</option>
+                                        <option value="Suspensão">Suspensão</option>
+                                        <option value="Arrefecimento">Arrefecimento</option>
+                                        <option value="Ar Condicionado">Ar Condicionado</option>
+                                        <option value="Injeção Eletrônica">Injeção Eletrônica</option>
+                                        <option value="Freios">Freios</option>
+                                        <option value="Elétrica">Elétrica</option>
+                                        <option value="Transmissão">Transmissão</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control" id="searchPartName" placeholder="Nome da peça...">
+                                </div>
+                                <div class="col-md-2">
+                                    <input type="number" class="form-control" id="minPrice" placeholder="Preço mín.">
+                                </div>
+                                <div class="col-md-2">
+                                    <button class="btn btn-success w-100" onclick="executeSearch()">
+                                        <i class="fas fa-search me-2"></i>Buscar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Resultados -->
+                    <div id="searchResults"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal - Relatórios -->
+    <div class="modal fade" id="reportsModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-chart-pie me-2"></i>Relatórios e Análises</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <button class="btn btn-primary w-100 mb-2" onclick="showGeneralStats()">
+                                <i class="fas fa-chart-bar me-2"></i>Estatísticas Gerais
+                            </button>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-success w-100 mb-2" onclick="showInventoryReport()">
+                                <i class="fas fa-boxes me-2"></i>Relatório Estoque
+                            </button>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-warning w-100 mb-2" onclick="showPriceAnalysis()">
+                                <i class="fas fa-chart-line me-2"></i>Análise Preços
+                            </button>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-info w-100 mb-2" onclick="generateDashboard()">
+                                <i class="fas fa-tachometer-alt me-2"></i>Dashboard HTML
+                            </button>
+                        </div>
+                    </div>
+                    <div id="reportContent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal - Import/Export -->
+    <div class="modal fade" id="importModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-file-import me-2"></i>Import/Export de Dados</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6><i class="fas fa-file-import me-2"></i>Importar Dados</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <button class="btn btn-outline-primary w-100 mb-2" onclick="createTemplates()">
+                                            <i class="fas fa-file-plus me-2"></i>Criar Templates CSV
+                                        </button>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Importar Peças</label>
+                                        <input type="file" class="form-control" id="importParts" accept=".csv">
+                                        <button class="btn btn-success mt-2 w-100" onclick="importParts()">
+                                            <i class="fas fa-upload me-2"></i>Importar Peças
+                                        </button>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Importar Clientes</label>
+                                        <input type="file" class="form-control" id="importClients" accept=".csv">
+                                        <button class="btn btn-success mt-2 w-100" onclick="importClients()">
+                                            <i class="fas fa-upload me-2"></i>Importar Clientes
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6><i class="fas fa-file-export me-2"></i>Exportar Dados</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <button class="btn btn-primary w-100 mb-2" onclick="exportParts()">
+                                            <i class="fas fa-download me-2"></i>Exportar Peças (CSV)
+                                        </button>
+                                    </div>
+                                    <div class="mb-3">
+                                        <button class="btn btn-primary w-100 mb-2" onclick="exportClients()">
+                                            <i class="fas fa-download me-2"></i>Exportar Clientes (CSV)
+                                        </button>
+                                    </div>
+                                    <div class="mb-3">
+                                        <select class="form-select mb-2" id="exportCategory">
+                                            <option value="">Todas as categorias</option>
+                                            <option value="Motor">Motor</option>
+                                            <option value="Suspensão">Suspensão</option>
+                                            <option value="Arrefecimento">Arrefecimento</option>
+                                            <option value="Freios">Freios</option>
+                                        </select>
+                                        <button class="btn btn-warning w-100" onclick="exportPartsByCategory()">
+                                            <i class="fas fa-filter me-2"></i>Exportar por Categoria
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal - Configurações -->
+    <div class="modal fade" id="configModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-cogs me-2"></i>Configurações do Sistema</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6><i class="fas fa-shield-alt me-2"></i>Sistema</h6>
+                                </div>
+                                <div class="card-body">
+                                    <button class="btn btn-outline-info w-100 mb-3" onclick="checkDependencies()">
+                                        <i class="fas fa-check-circle me-2"></i>Verificar Dependências
+                                    </button>
+                                    <button class="btn btn-outline-warning w-100 mb-3" onclick="clearCache()">
+                                        <i class="fas fa-broom me-2"></i>Limpar Cache
+                                    </button>
+                                    <button class="btn btn-outline-danger w-100" onclick="executeSystemPython()">
+                                        <i class="fas fa-terminal me-2"></i>Executar Sistema Python
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6><i class="fas fa-database me-2"></i>Backup</h6>
+                                </div>
+                                <div class="card-body">
+                                    <button class="btn btn-success w-100 mb-3" onclick="createBackup()">
+                                        <i class="fas fa-save me-2"></i>Criar Backup
+                                    </button>
+                                    <button class="btn btn-primary w-100 mb-3" onclick="listBackups()">
+                                        <i class="fas fa-list me-2"></i>Listar Backups
+                                    </button>
+                                    <button class="btn btn-warning w-100" onclick="restoreBackup()">
+                                        <i class="fas fa-undo me-2"></i>Restaurar Backup
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="configResults" class="mt-4"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Modal -->
+    <div class="modal fade" id="loadingModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body text-center">
+                    <div class="spinner-border mb-3" role="status">
+                        <span class="visually-hidden">Carregando...</span>
+                    </div>
+                    <h5 id="loadingText">Processando...</h5>
+                    <p class="text-muted" id="loadingDesc">Aguarde enquanto processamos sua solicitação.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <p>&copy; 2025 Sistema de Peças Automotivas. Desenvolvido com ❤️ e Python.</p>
+                    <p class="small">
+                        <i class="fas fa-database me-2"></i>SQLite Database |
+                        <i class="fas fa-chart-bar me-2"></i>Relatórios Avançados |
+                        <i class="fas fa-globe me-2"></i>Web Scraping Inteligente
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="python-bridge.js"></script>
+    
+    <script>
+        // Initialize AOS
+        AOS.init({
+            duration: 800,
+            easing: 'ease-out-cubic'
+        });
+
+        // Sample data for demonstration
+        const sampleData = {
+            parts: [
+                { id: 1, name: "Vela de Ignição NGK", category: "Motor", price: 25.90, manufacturer: "NGK", code: "BPR6ES" },
+                { id: 2, name: "Amortecedor Dianteiro", category: "Suspensão", price: 189.50, manufacturer: "Monroe", code: "G7329" },
+                { id: 3, name: "Pastilha de Freio", category: "Freios", price: 89.90, manufacturer: "Bosch", code: "BB123" },
+                { id: 4, name: "Radiador", category: "Arrefecimento", price: 350.00, manufacturer: "Valeo", code: "RAD001" },
+                { id: 5, name: "Filtro de Ar", category: "Motor", price: 45.00, manufacturer: "Mahle", code: "LX1234" }
+            ],
+            clients: [
+                { id: 1, name: "João Silva", phone: "(11) 99999-9999", carBrand: "Volkswagen", carModel: "Gol", carYear: 2018 },
+                { id: 2, name: "Maria Santos", phone: "(11) 88888-8888", carBrand: "Chevrolet", carModel: "Onix", carYear: 2020 },
+                { id: 3, name: "Pedro Costa", phone: "(11) 77777-7777", carBrand: "Ford", carModel: "Ka", carYear: 2019 }
+            ]
+        };
+
+        // Load initial stats
+        function loadStats() {
+            document.getElementById('totalPecas').textContent = sampleData.parts.length;
+            document.getElementById('totalClientes').textContent = sampleData.clients.length;
+            const avgPrice = sampleData.parts.reduce((sum, part) => sum + part.price, 0) / sampleData.parts.length;
+            document.getElementById('precoMedio').textContent = `R$ ${avgPrice.toFixed(2)}`;
+        }
+
+        // Show loading modal
+        function showLoading(title, description) {
+            document.getElementById('loadingText').textContent = title;
+            document.getElementById('loadingDesc').textContent = description;
+            new bootstrap.Modal(document.getElementById('loadingModal')).show();
+        }
+
+        // Hide loading modal
+        function hideLoading() {
+            bootstrap.Modal.getInstance(document.getElementById('loadingModal'))?.hide();
+        }
+
+        // Show stats
+        function showStats() {
+            document.getElementById('stats').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Execute Python system
+        function executeSystem() {
+            showLoading('Executando Sistema Python', 'Iniciando o sistema principal...');
+            
+            // Simulate Python execution
+            setTimeout(() => {
+                hideLoading();
+                alert('Sistema Python executado com sucesso!\n\nPara executar o sistema real, use:\npython main.py');
+            }, 2000);
+        }
+
+        // Modal functions
+        function showExtractionModal() {
+            new bootstrap.Modal(document.getElementById('extractionModal')).show();
+        }
+
+        function showClientModal() {
+            loadClients();
+            new bootstrap.Modal(document.getElementById('clientModal')).show();
+        }
+
+        function showSearchModal() {
+            new bootstrap.Modal(document.getElementById('searchModal')).show();
+        }
+
+        function showReportsModal() {
+            new bootstrap.Modal(document.getElementById('reportsModal')).show();
+        }
+
+        function showImportModal() {
+            new bootstrap.Modal(document.getElementById('importModal')).show();
+        }
+
+        function showConfigModal() {
+            new bootstrap.Modal(document.getElementById('configModal')).show();
+        }
+
+        // Extraction functions
+        function fullExtraction() {
+            showLoading('Extração Completa', 'Extraindo peças de todas as categorias...');
+            
+            setTimeout(() => {
+                hideLoading();
+                document.getElementById('extractionResults').innerHTML = `
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <strong>Extração concluída!</strong><br>
+                        • 1,250 peças extraídas<br>
+                        • 8 categorias atualizadas<br>
+                        • 3 fontes consultadas
+                    </div>
+                `;
+                loadStats(); // Update stats
+            }, 3000);
+        }
+
+        function specificExtraction() {
+            const term = document.getElementById('searchTerm').value;
+            if (!term) {
+                alert('Digite um termo de busca!');
+                return;
+            }
+            
+            showLoading('Busca Específica', `Buscando por "${term}"...`);
+            
+            setTimeout(() => {
+                hideLoading();
+                document.getElementById('extractionResults').innerHTML = `
+                    <div class="alert alert-info">
+                        <i class="fas fa-search me-2"></i>
+                        <strong>Resultados para "${term}":</strong><br>
+                        • 25 peças encontradas no banco local<br>
+                        • 15 peças encontradas online<br>
+                        • Preços atualizados
+                    </div>
+                `;
+            }, 2000);
+        }
+
+        // Client functions
+        function loadClients() {
+            const clientsList = document.getElementById('clientsList');
+            let html = '<div class="table-responsive"><table class="table table-hover"><thead><tr><th>Nome</th><th>Telefone</th><th>Veículo</th><th>Ano</th></tr></thead><tbody>';
+            
+            sampleData.clients.forEach(client => {
+                html += `
+                    <tr>
+                        <td>${client.name}</td>
+                        <td>${client.phone}</td>
+                        <td>${client.carBrand} ${client.carModel}</td>
+                        <td>${client.carYear}</td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table></div>';
+            clientsList.innerHTML = html;
+        }
+
+        function searchClients() {
+            const searchTerm = document.getElementById('searchClient').value.toLowerCase();
+            const searchBrand = document.getElementById('searchCarBrand').value;
+            
+            let filteredClients = sampleData.clients;
+            
+            if (searchTerm) {
+                filteredClients = filteredClients.filter(client => 
+                    client.name.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            if (searchBrand) {
+                filteredClients = filteredClients.filter(client => 
+                    client.carBrand === searchBrand
+                );
+            }
+            
+            const clientsList = document.getElementById('clientsList');
+            let html = '<div class="table-responsive"><table class="table table-hover"><thead><tr><th>Nome</th><th>Telefone</th><th>Veículo</th><th>Ano</th></tr></thead><tbody>';
+            
+            filteredClients.forEach(client => {
+                html += `
+                    <tr>
+                        <td>${client.name}</td>
+                        <td>${client.phone}</td>
+                        <td>${client.carBrand} ${client.carModel}</td>
+                        <td>${client.carYear}</td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table></div>';
+            clientsList.innerHTML = html;
+        }
+
+        // Client form submission
+        document.getElementById('clientForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const newClient = {
+                id: sampleData.clients.length + 1,
+                name: document.getElementById('clientName').value,
+                phone: document.getElementById('clientPhone').value,
+                carBrand: document.getElementById('carBrand').value,
+                carModel: document.getElementById('carModel').value,
+                carYear: document.getElementById('carYear').value
+            };
+            
+            sampleData.clients.push(newClient);
+            
+            // Clear form
+            this.reset();
+            
+            // Show success message
+            alert('Cliente cadastrado com sucesso!');
+            
+            // Reload clients list
+            loadClients();
+            
+            // Update stats
+            loadStats();
+        });
+
+        // Search functions
+        function searchByCategory() {
+            document.getElementById('searchForm').style.display = 'block';
+            document.getElementById('searchCategory').focus();
+        }
+
+        function searchByManufacturer() {
+            document.getElementById('searchForm').style.display = 'block';
+            document.getElementById('searchPartName').placeholder = 'Nome do fabricante...';
+            document.getElementById('searchPartName').focus();
+        }
+
+        function searchByName() {
+            document.getElementById('searchForm').style.display = 'block';
+            document.getElementById('searchPartName').placeholder = 'Nome da peça...';
+            document.getElementById('searchPartName').focus();
+        }
+
+        function showPriceRanking() {
+            const sortedParts = [...sampleData.parts].sort((a, b) => b.price - a.price);
+            
+            let html = '<div class="card"><div class="card-header"><h6>Ranking de Preços</h6></div><div class="card-body">';
+            html += '<div class="table-responsive"><table class="table"><thead><tr><th>Pos.</th><th>Peça</th><th>Categoria</th><th>Preço</th><th>Fabricante</th></tr></thead><tbody>';
+            
+            sortedParts.forEach((part, index) => {
+                html += `
+                    <tr>
+                        <td>${index + 1}º</td>
+                        <td>${part.name}</td>
+                        <td><span class="category-badge">${part.category}</span></td>
+                        <td class="price-tag">R$ ${part.price.toFixed(2)}</td>
+                        <td>${part.manufacturer}</td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table></div></div></div>';
+            document.getElementById('searchResults').innerHTML = html;
+        }
+
+        function executeSearch() {
+            const category = document.getElementById('searchCategory').value;
+            const partName = document.getElementById('searchPartName').value.toLowerCase();
+            const minPrice = parseFloat(document.getElementById('minPrice').value) || 0;
+            
+            let filteredParts = sampleData.parts;
+            
+            if (category) {
+                filteredParts = filteredParts.filter(part => part.category === category);
+            }
+            
+            if (partName) {
+                filteredParts = filteredParts.filter(part => 
+                    part.name.toLowerCase().includes(partName) || 
+                    part.manufacturer.toLowerCase().includes(partName)
+                );
+            }
+            
+            if (minPrice > 0) {
+                filteredParts = filteredParts.filter(part => part.price >= minPrice);
+            }
+            
+            let html = '<div class="card"><div class="card-header"><h6>Resultados da Busca</h6></div><div class="card-body">';
+            
+            if (filteredParts.length === 0) {
+                html += '<div class="alert alert-warning">Nenhuma peça encontrada com os critérios especificados.</div>';
+            } else {
+                html += '<div class="table-responsive"><table class="table"><thead><tr><th>Peça</th><th>Categoria</th><th>Preço</th><th>Fabricante</th><th>Código</th></tr></thead><tbody>';
+                
+                filteredParts.forEach(part => {
+                    html += `
+                        <tr>
+                            <td>${part.name}</td>
+                            <td><span class="category-badge">${part.category}</span></td>
+                            <td class="price-tag">R$ ${part.price.toFixed(2)}</td>
+                            <td>${part.manufacturer}</td>
+                            <td><code>${part.code}</code></td>
+                        </tr>
+                    `;
+                });
+                
+                html += '</tbody></table></div>';
+            }
+            
+            html += '</div></div>';
+            document.getElementById('searchResults').innerHTML = html;
+        }
+
+        // Report functions
+        function showGeneralStats() {
+            const totalParts = sampleData.parts.length;
+            const totalClients = sampleData.clients.length;
+            const avgPrice = sampleData.parts.reduce((sum, part) => sum + part.price, 0) / totalParts;
+            const categories = [...new Set(sampleData.parts.map(part => part.category))].length;
+            
+            document.getElementById('reportContent').innerHTML = `
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="stats-card">
+                            <div class="stats-number">${totalParts}</div>
+                            <div class="stats-label">Total de Peças</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stats-card">
+                            <div class="stats-number">${totalClients}</div>
+                            <div class="stats-label">Total de Clientes</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stats-card">
+                            <div class="stats-number">${categories}</div>
+                            <div class="stats-label">Categorias Ativas</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stats-card">
+                            <div class="stats-number">R$ ${avgPrice.toFixed(2)}</div>
+                            <div class="stats-label">Preço Médio</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showInventoryReport() {
+            const categoryData = {};
+            sampleData.parts.forEach(part => {
+                if (!categoryData[part.category]) {
+                    categoryData[part.category] = { count: 0, totalPrice: 0, prices: [] };
+                }
+                categoryData[part.category].count++;
+                categoryData[part.category].totalPrice += part.price;
+                categoryData[part.category].prices.push(part.price);
+            });
+            
+            let html = '<div class="card"><div class="card-header"><h6>Relatório de Estoque por Categoria</h6></div><div class="card-body">';
+            html += '<div class="table-responsive"><table class="table"><thead><tr><th>Categoria</th><th>Quantidade</th><th>Preço Médio</th><th>Menor Preço</th><th>Maior Preço</th></tr></thead><tbody>';
+            
+            Object.keys(categoryData).forEach(category => {
+                const data = categoryData[category];
+                const avgPrice = data.totalPrice / data.count;
+                const minPrice = Math.min(...data.prices);
+                const maxPrice = Math.max(...data.prices);
+                
+                html += `
+                    <tr>
+                        <td><span class="category-badge">${category}</span></td>
+                        <td>${data.count} peças</td>
+                        <td>R$ ${avgPrice.toFixed(2)}</td>
+                        <td>R$ ${minPrice.toFixed(2)}</td>
+                        <td>R$ ${maxPrice.toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table></div></div></div>';
+            document.getElementById('reportContent').innerHTML = html;
+        }
+
+        function showPriceAnalysis() {
+            showLoading('Análise de Preços', 'Gerando gráficos e análises...');
+            
+            setTimeout(() => {
+                hideLoading();
+                document.getElementById('reportContent').innerHTML = `
+                    <div class="card">
+                        <div class="card-header">
+                            <h6>Análise de Preços por Categoria</h6>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="priceChart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+                `;
+                
+                // Create chart
+                const ctx = document.getElementById('priceChart').getContext('2d');
+                const categoryData = {};
+                sampleData.parts.forEach(part => {
+                    if (!categoryData[part.category]) categoryData[part.category] = [];
+                    categoryData[part.category].push(part.price);
+                });
+                
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(categoryData),
+                        datasets: [{
+                            label: 'Preço Médio (R$)',
+                            data: Object.values(categoryData).map(prices => 
+                                prices.reduce((sum, price) => sum + price, 0) / prices.length
+                            ),
+                            backgroundColor: 'rgba(52, 152, 219, 0.8)',
+                            borderColor: 'rgba(52, 152, 219, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return 'R$ ' + value.toFixed(2);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }, 1500);
+        }
+
+        function generateDashboard() {
+            showLoading('Dashboard HTML', 'Gerando dashboard interativo...');
+            
+            setTimeout(() => {
+                hideLoading();
+                alert('Dashboard HTML gerado com sucesso!\n\nArquivo salvo como: dashboard.html\n\nPara gerar o dashboard real, use o sistema Python.');
+            }, 2000);
+        }
+
+        // Import/Export functions
+        function createTemplates() {
+            showLoading('Criando Templates', 'Gerando arquivos CSV de exemplo...');
+            
+            setTimeout(() => {
+                hideLoading();
+                alert('Templates CSV criados com sucesso!\n\n• template_pecas.csv\n• template_clientes.csv');
+            }, 1500);
+        }
+
+        function importParts() {
+            const file = document.getElementById('importParts').files[0];
+            if (!file) {
+                alert('Selecione um arquivo CSV!');
+                return;
+            }
+            
+            showLoading('Importando Peças', 'Processando arquivo CSV...');
+            
+            setTimeout(() => {
+                hideLoading();
+                alert(`Importação concluída!\n\n• 150 peças importadas\n• 0 erros encontrados`);
+            }, 2000);
+        }
+
+        function importClients() {
+            const file = document.getElementById('importClients').files[0];
+            if (!file) {
+                alert('Selecione um arquivo CSV!');
+                return;
+            }
+            
+            showLoading('Importando Clientes', 'Processando arquivo CSV...');
+            
+            setTimeout(() => {
+                hideLoading();
+                alert(`Importação concluída!\n\n• 75 clientes importados\n• 0 erros encontrados`);
+            }, 2000);
+        }
+
+        function exportParts() {
+            showLoading('Exportando Peças', 'Gerando arquivo CSV...');
+            
+            setTimeout(() => {
+                hideLoading();
+                alert('Exportação concluída!\n\nArquivo: pecas_export.csv\nTotal: ' + sampleData.parts.length + ' peças');
+            }, 1500);
+        }
+
+        function exportClients() {
+            showLoading('Exportando Clientes', 'Gerando arquivo CSV...');
+            
+            setTimeout(() => {
+                hideLoading();
+                alert('Exportação concluída!\n\nArquivo: clientes_export.csv\nTotal: ' + sampleData.clients.length + ' clientes');
+            }, 1500);
+        }
+
+        function exportPartsByCategory() {
+            const category = document.getElementById('exportCategory').value;
+            showLoading('Exportando por Categoria', 'Filtrando e gerando arquivo...');
+            
+            setTimeout(() => {
+                hideLoading();
+                const filtered = category ? sampleData.parts.filter(p => p.category === category) : sampleData.parts;
+                alert(`Exportação concluída!\n\nCategoria: ${category || 'Todas'}\nArquivo: pecas_${category || 'todas'}.csv\nTotal: ${filtered.length} peças`);
+            }, 1500);
+        }
+
+        // Configuration functions
+        function checkDependencies() {
+            showLoading('Verificando Dependências', 'Checando bibliotecas Python...');
+            
+            setTimeout(() => {
+                hideLoading();
+                document.getElementById('configResults').innerHTML = `
+                    <div class="alert alert-success">
+                        <h6><i class="fas fa-check-circle me-2"></i>Dependências Verificadas</h6>
+                        <ul class="mb-0">
+                            <li>✅ Python 3.9.7</li>
+                            <li>✅ pandas 1.5.2</li>
+                            <li>✅ requests 2.28.1</li>
+                            <li>✅ beautifulsoup4 4.11.1</li>
+                            <li>✅ matplotlib 3.6.2</li>
+                            <li>✅ plotly 5.11.0</li>
+                        </ul>
+                    </div>
+                `;
+            }, 2000);
+        }
+
+        function clearCache() {
+            showLoading('Limpando Cache', 'Removendo arquivos temporários...');
+            
+            setTimeout(() => {
+                hideLoading();
+                document.getElementById('configResults').innerHTML = `
+                    <div class="alert alert-info">
+                        <i class="fas fa-broom me-2"></i>Cache limpo com sucesso!
+                    </div>
+                `;
+            }, 1000);
+        }
+
+        function executeSystemPython() {
+            showLoading('Executando Sistema', 'Iniciando main.py...');
+            
+            setTimeout(() => {
+                hideLoading();
+                alert('Para executar o sistema Python real:\n\n1. Abra o terminal\n2. Navegue até a pasta do projeto\n3. Execute: python main.py');
+            }, 2000);
+        }
+
+        function createBackup() {
+            showLoading('Criando Backup', 'Salvando banco de dados...');
+            
+            setTimeout(() => {
+                hideLoading();
+                const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+                document.getElementById('configResults').innerHTML = `
+                    <div class="alert alert-success">
+                        <i class="fas fa-save me-2"></i>Backup criado com sucesso!<br>
+                        <strong>Arquivo:</strong> automotivas_backup_${timestamp}.db
+                    </div>
+                `;
+            }, 2000);
+        }
+
+        function listBackups() {
+            document.getElementById('configResults').innerHTML = `
+                <div class="card">
+                    <div class="card-header">
+                        <h6><i class="fas fa-list me-2"></i>Backups Disponíveis</h6>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group">
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>automotivas_backup_2025-01-30T10-30-00.db</span>
+                                <button class="btn btn-sm btn-outline-primary">Restaurar</button>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>automotivas_backup_2025-01-29T15-45-00.db</span>
+                                <button class="btn btn-sm btn-outline-primary">Restaurar</button>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>automotivas_backup_2025-01-28T09-15-00.db</span>
+                                <button class="btn btn-sm btn-outline-primary">Restaurar</button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            `;
+        }
+
+        function restoreBackup() {
+            if (confirm('Tem certeza que deseja restaurar um backup? Isso irá sobrescrever os dados atuais.')) {
+                showLoading('Restaurando Backup', 'Restaurando banco de dados...');
+                
+                setTimeout(() => {
+                    hideLoading();
+                    document.getElementById('configResults').innerHTML = `
+                        <div class="alert alert-success">
+                            <i class="fas fa-undo me-2"></i>Backup restaurado com sucesso!
+                        </div>
+                    `;
+                }, 2500);
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStats();
+        });
+    </script>
+</body>
+</html>

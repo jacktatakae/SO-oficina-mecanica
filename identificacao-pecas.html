@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔧 Sistema de Identificação de Peças - VRS</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 1rem;
+        }
+
+        .main-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 1200px;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        .header-section {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .search-section {
+            padding: 2rem;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .content-section {
+            padding: 2rem;
+        }
+
+        .search-box {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .search-input {
+            border-radius: 15px;
+            border: 3px solid #e9ecef;
+            padding: 1rem 1.5rem;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.3rem rgba(0, 123, 255, 0.25);
+        }
+
+        .search-btn {
+            border-radius: 15px;
+            padding: 1rem 2rem;
+            font-weight: 600;
+        }
+
+        .result-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            border-left: 5px solid #007bff;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .supplier-badge {
+            display: inline-block;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .zelukar { background: #e3f2fd; color: #1976d2; }
+        .cofap { background: #e8f5e8; color: #2e7d32; }
+        .bosch { background: #fff3e0; color: #f57c00; }
+        .delphi { background: #fce4ec; color: #c2185b; }
+        .mahle { background: #f3e5f5; color: #7b1fa2; }
+
+        .part-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .info-item {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 10px;
+        }
+
+        .info-item strong {
+            color: #495057;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .compatibility-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .compatibility-list li {
+            background: #e3f2fd;
+            margin: 0.3rem 0;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            border-left: 3px solid #2196f3;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            color: #6c757d;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .suggestion-box {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .quick-search {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .quick-btn {
+            background: #e9ecef;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quick-btn:hover {
+            background: #007bff;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 0.5rem;
+            }
+            
+            .header-section, .search-section, .content-section {
+                padding: 1.5rem 1rem;
+            }
+            
+            .part-info {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- Cabeçalho -->
+        <div class="header-section">
+            <h1><i class="fas fa-search me-2"></i>Sistema de Identificação de Peças</h1>
+            <p class="mb-0">Oficina VRS - Identifique peças por código do fabricante</p>
+        </div>
+
+        <!-- Seção de Busca -->
+        <div class="search-section">
+            <div class="search-box">
+                <div class="row">
+                    <div class="col-md-8">
+                        <input type="text" 
+                               class="form-control search-input" 
+                               id="searchInput" 
+                               placeholder="Digite o código da peça (ex: Fi-001, B123, CF-456)..."
+                               autocomplete="off">
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn btn-primary search-btn w-100" onclick="searchPart()">
+                            <i class="fas fa-search me-2"></i>Buscar Peça
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Sugestões rápidas -->
+                <div class="quick-search">
+                    <strong class="me-2">Busca rápida:</strong>
+                    <button class="quick-btn" onclick="quickSearch('Fi-001')">Fi-001</button>
+                    <button class="quick-btn" onclick="quickSearch('CF-1234')">CF-1234</button>
+                    <button class="quick-btn" onclick="quickSearch('B456')">B456</button>
+                    <button class="quick-btn" onclick="quickSearch('D789')">D789</button>
+                    <button class="quick-btn" onclick="quickSearch('M321')">M321</button>
+                    <button class="quick-btn" onclick="mostrarCatalogos()">
+                        <i class="fas fa-book me-1"></i>Ver Catálogos
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resultados -->
+        <div class="content-section">
+            <div id="searchResults">
+                <div class="no-results">
+                    <i class="fas fa-search text-muted" style="font-size: 3rem;"></i>
+                    <h4 class="mt-3">Digite um código para começar</h4>
+                    <p>Nosso sistema reconhece códigos de diversos fabricantes automaticamente</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="catalogo-manager.js"></script>
+    <script>
+        // Inicializar gerenciador de catálogos
+        const catalogoManager = new CatalogoManager();
+        
+        // Base de dados de peças por fabricante
+        const PARTS_DATABASE = {
+            // Zelukar - Radiadores
+            'FI-001': {
+                supplier: 'Zelukar',
+                code: 'Fi-001',
+                name: 'Caixa de Radiador Doblô Superior',
+                category: 'Radiadores',
+                price: 450.00,
+                stock: 5,
+                compatibility: ['Fiat Doblô 1.3', 'Fiat Doblô 1.4', 'Fiat Doblô 1.6'],
+                description: 'Caixa superior do radiador para Fiat Doblô, material plástico reforçado',
+                applications: 'Motor Fire 1.0/1.3/1.4',
+                warranty: '12 meses',
+                weight: '1.2kg'
+            },
+            'FI-002': {
+                supplier: 'Zelukar',
+                code: 'Fi-002',
+                name: 'Caixa de Radiador Doblô Inferior',
+                category: 'Radiadores',
+                price: 420.00,
+                stock: 3,
+                compatibility: ['Fiat Doblô 1.3', 'Fiat Doblô 1.4', 'Fiat Doblô 1.6'],
+                description: 'Caixa inferior do radiador para Fiat Doblô',
+                applications: 'Motor Fire 1.0/1.3/1.4',
+                warranty: '12 meses',
+                weight: '1.1kg'
+            },
+            'VW-001': {
+                supplier: 'Zelukar',
+                code: 'VW-001',
+                name: 'Radiador Gol G5/G6 Completo',
+                category: 'Radiadores',
+                price: 380.00,
+                stock: 8,
+                compatibility: ['VW Gol G5', 'VW Gol G6', 'VW Voyage'],
+                description: 'Radiador completo para linha Gol nova geração',
+                applications: 'Motor 1.0/1.6 Total Flex',
+                warranty: '12 meses',
+                weight: '3.5kg'
+            },
+
+            // Cofap - Filtros
+            'CF-1234': {
+                supplier: 'Cofap',
+                code: 'CF-1234',
+                name: 'Filtro de Óleo Motor',
+                category: 'Filtros',
+                price: 25.90,
+                stock: 15,
+                compatibility: ['VW Gol 1.0', 'VW Fox 1.0', 'Fiat Uno 1.0'],
+                description: 'Filtro de óleo para motores 1.0 Flex',
+                applications: 'Motores Fire e EA111',
+                warranty: '6 meses',
+                weight: '0.3kg'
+            },
+            'CF-5678': {
+                supplier: 'Cofap',
+                code: 'CF-5678',
+                name: 'Filtro de Ar Motor',
+                category: 'Filtros',
+                price: 35.50,
+                stock: 12,
+                compatibility: ['Honda Civic', 'Honda Fit', 'Honda City'],
+                description: 'Filtro de ar para linha Honda',
+                applications: 'Motores i-VTEC',
+                warranty: '6 meses',
+                weight: '0.4kg'
+            },
+
+            // Bosch
+            'B456': {
+                supplier: 'Bosch',
+                code: 'B456',
+                name: 'Vela de Ignição Iridium',
+                category: 'Ignição',
+                price: 45.00,
+                stock: 20,
+                compatibility: ['VW Golf', 'Audi A3', 'VW Jetta'],
+                description: 'Vela de ignição com eletrodo de irídio',
+                applications: 'Motores TSI',
+                warranty: '24 meses',
+                weight: '0.1kg'
+            },
+
+            // Delphi
+            'D789': {
+                supplier: 'Delphi',
+                code: 'D789',
+                name: 'Bomba de Combustível',
+                category: 'Sistema de Combustível',
+                price: 320.00,
+                stock: 4,
+                compatibility: ['GM Corsa', 'GM Celta', 'GM Prisma'],
+                description: 'Bomba elétrica de combustível',
+                applications: 'Motores MPFI',
+                warranty: '12 meses',
+                weight: '1.8kg'
+            },
+
+            // Mahle
+            'M321': {
+                supplier: 'Mahle',
+                code: 'M321',
+                name: 'Pistão com Anéis',
+                category: 'Motor',
+                price: 180.00,
+                stock: 6,
+                compatibility: ['Ford Ka', 'Ford Fiesta 1.0'],
+                description: 'Conjunto pistão com anéis',
+                applications: 'Motor Rocam 1.0',
+                warranty: '12 meses',
+                weight: '0.8kg'
+            }
+        };
+
+        // Função para detectar fabricante pelo padrão do código
+        function detectSupplier(code) {
+            const codeUpper = code.toUpperCase();
+            
+            if (codeUpper.startsWith('FI-') || codeUpper.startsWith('VW-') || codeUpper.startsWith('GM-')) {
+                return 'Zelukar';
+            } else if (codeUpper.startsWith('CF-')) {
+                return 'Cofap';
+            } else if (codeUpper.startsWith('B')) {
+                return 'Bosch';
+            } else if (codeUpper.startsWith('D')) {
+                return 'Delphi';
+            } else if (codeUpper.startsWith('M')) {
+                return 'Mahle';
+            }
+            return 'Desconhecido';
+        }
+
+        // Função principal de busca
+        function searchPart() {
+            const searchTerm = document.getElementById('searchInput').value.trim();
+            
+            if (!searchTerm) {
+                alert('Digite um código para buscar');
+                return;
+            }
+
+            // Validar formato do código
+            const validacao = catalogoManager.validarCodigo(searchTerm);
+            if (!validacao.valido) {
+                displayValidationError(validacao, searchTerm);
+                return;
+            }
+
+            showLoading();
+            
+            // Buscar usando o sistema de catálogos
+            setTimeout(() => {
+                const resultado = catalogoManager.buscarPeca(searchTerm);
+                
+                if (resultado.encontrada) {
+                    displayResults([resultado.peca], searchTerm);
+                } else {
+                    displayNotFound(resultado, searchTerm);
+                }
+            }, 800);
+        }
+
+        // Exibir erro de validação
+        function displayValidationError(validacao, searchTerm) {
+            const container = document.getElementById('searchResults');
+            
+            let sugestoesHtml = '';
+            if (validacao.sugestoes && validacao.sugestoes.length > 0) {
+                sugestoesHtml = `
+                    <div class="suggestion-box mt-3">
+                        <strong><i class="fas fa-lightbulb me-2"></i>Formatos reconhecidos:</strong>
+                        <div class="mt-2">
+                            ${validacao.sugestoes.map(sug => `
+                                <div class="border rounded p-2 mb-2">
+                                    <strong>${sug.catalogo}:</strong> ${sug.formato}<br>
+                                    <small class="text-muted">Exemplo: ${sug.exemplo}</small>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = `
+                <div class="no-results">
+                    <i class="fas fa-exclamation-circle text-warning" style="font-size: 3rem;"></i>
+                    <h4 class="mt-3">Formato de código inválido</h4>
+                    <p>O código "${searchTerm}" não segue nenhum formato conhecido</p>
+                    ${sugestoesHtml}
+                </div>
+            `;
+        }
+
+        // Exibir quando não encontrado
+        function displayNotFound(resultado, searchTerm) {
+            const container = document.getElementById('searchResults');
+            
+            let acoesHtml = '';
+            if (resultado.acoes) {
+                acoesHtml = `
+                    <div class="mt-3">
+                        <h6>Ações disponíveis:</h6>
+                        ${resultado.acoes.map((acao, index) => `
+                            <button class="btn btn-outline-primary btn-sm me-2 mb-2" 
+                                    onclick="executarAcao('${acao}', '${searchTerm}', '${resultado.catalogoIdentificado?.nome || ''}')">
+                                ${acao}
+                            </button>
+                        `).join('')}
+                    </div>
+                `;
+            }
+            
+            const catalogoInfo = resultado.catalogoIdentificado ? `
+                <div class="alert alert-info">
+                    <strong>Catálogo identificado:</strong> ${resultado.catalogoIdentificado.nome}<br>
+                    <strong>Categoria:</strong> ${resultado.catalogoIdentificado.categoria}<br>
+                    <strong>Contato:</strong> ${resultado.catalogoIdentificado.contato}
+                </div>
+            ` : '';
+            
+            container.innerHTML = `
+                <div class="no-results">
+                    <i class="fas fa-search text-warning" style="font-size: 3rem;"></i>
+                    <h4 class="mt-3">Peça não encontrada localmente</h4>
+                    <p>Código "${searchTerm}" - ${resultado.erro}</p>
+                    ${catalogoInfo}
+                    ${acoesHtml}
+                </div>
+            `;
+        }
+
+        // Executar ação
+        async function executarAcao(acao, codigo, catalogoNome) {
+            switch(acao) {
+                case 'Consultar catálogo online':
+                    const catalogo = catalogoManager.identificarCatalogo(codigo);
+                    if (catalogo && catalogo.catalogo.url) {
+                        window.open(catalogo.catalogo.url, '_blank');
+                    }
+                    break;
+                    
+                case 'Solicitar importação automática':
+                    await importarAutomaticamente(codigo);
+                    break;
+                    
+                case 'Adicionar manualmente':
+                    mostrarFormularioAdicionar(codigo);
+                    break;
+            }
+        }
+
+        // Importar automaticamente
+        async function importarAutomaticamente(codigo) {
+            const catalogo = catalogoManager.identificarCatalogo(codigo);
+            if (!catalogo) return;
+            
+            showLoading();
+            
+            try {
+                const resultado = await catalogoManager.importarDoCatalogo(codigo, catalogo.id);
+                
+                if (resultado.sucesso) {
+                    // Adicionar à base local
+                    PARTS_DATABASE[codigo.toUpperCase()] = resultado.peca;
+                    
+                    // Exibir resultado
+                    displayResults([resultado.peca], codigo);
+                    
+                    // Notificar sucesso
+                    setTimeout(() => {
+                        alert(`✅ ${resultado.mensagem}\n\nPeça: ${resultado.peca.nome}\nPreço: R$ ${resultado.peca.preco.toFixed(2)}`);
+                    }, 500);
+                } else if (resultado.acaoSugerida === 'consultar_manual') {
+                    // Mostrar opções para catálogo visual
+                    mostrarOpcoesCatalogoVisual(codigo, resultado.dadosCatalogo, catalogo.catalogo);
+                } else {
+                    throw new Error(resultado.erro);
+                }
+            } catch (error) {
+                document.getElementById('searchResults').innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Erro na importação: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Mostrar opções para catálogo visual
+        function mostrarOpcoesCatalogoVisual(codigo, dadosCatalogo, catalogoInfo) {
+            const container = document.getElementById('searchResults');
+            
+            container.innerHTML = `
+                <div class="result-card">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-book-open text-primary" style="font-size: 3rem;"></i>
+                        <h4 class="mt-3">Catálogo Visual - ${catalogoInfo.nome}</h4>
+                        <p class="text-muted">Consulta manual necessária para código: <strong>${codigo}</strong></p>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Sobre este catálogo:</strong> ${catalogoInfo.observacoes}
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card h-100">
+                                <div class="card-header">
+                                    <h6><i class="fas fa-globe me-2"></i>Catálogo Online</h6>
+                                </div>
+                                <div class="card-body">
+                                    <p>Consulte o código <strong>${codigo}</strong> no catálogo eletrônico</p>
+                                    <a href="${dadosCatalogo.url}" target="_blank" class="btn btn-primary w-100">
+                                        <i class="fas fa-external-link-alt me-2"></i>Abrir Catálogo
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="card h-100">
+                                <div class="card-header">
+                                    <h6><i class="fas fa-file-pdf me-2"></i>Catálogo PDF</h6>
+                                </div>
+                                <div class="card-body">
+                                    <p>Download do catálogo completo em PDF</p>
+                                    <a href="${dadosCatalogo.urlPdf}" target="_blank" class="btn btn-outline-primary w-100">
+                                        <i class="fas fa-download me-2"></i>Baixar PDF
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <h6><i class="fas fa-phone me-2"></i>Contato Direto</h6>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <a href="https://wa.me/${dadosCatalogo.whatsapp}?text=Olá! Gostaria de consultar o código ${codigo}" 
+                                   target="_blank" class="btn btn-success w-100 mb-2">
+                                    <i class="fab fa-whatsapp me-2"></i>WhatsApp
+                                </a>
+                            </div>
+                            <div class="col-md-4">
+                                <a href="tel:${dadosCatalogo.telefone}" class="btn btn-outline-success w-100 mb-2">
+                                    <i class="fas fa-phone me-2"></i>Telefone
+                                </a>
+                            </div>
+                            <div class="col-md-4">
+                                <a href="mailto:${dadosCatalogo.email}?subject=Consulta código ${codigo}" class="btn btn-outline-primary w-100 mb-2">
+                                    <i class="fas fa-envelope me-2"></i>E-mail
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 p-3 bg-light rounded">
+                        <h6><i class="fas fa-lightbulb me-2"></i>Após consultar o catálogo:</h6>
+                        <button class="btn btn-primary me-2" onclick="mostrarFormularioAdicionar('${codigo}')">
+                            <i class="fas fa-plus me-2"></i>Adicionar Peça Encontrada
+                        </button>
+                        <button class="btn btn-secondary" onclick="searchPart()">
+                            <i class="fas fa-search me-2"></i>Nova Busca
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Mostrar formulário para adicionar manualmente
+        function mostrarFormularioAdicionar(codigo) {
+            const formulario = `
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-plus me-2"></i>Adicionar Peça Manualmente</h5>
+                    </div>
+                    <div class="card-body">
+                        <form onsubmit="salvarPecaManual(event, '${codigo}')">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="form-label">Código:</label>
+                                    <input type="text" class="form-control" value="${codigo}" readonly>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Nome da Peça:</label>
+                                    <input type="text" class="form-control" id="nomePeca" required>
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-md-4">
+                                    <label class="form-label">Preço (R$):</label>
+                                    <input type="number" step="0.01" class="form-control" id="precoPeca" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Estoque:</label>
+                                    <input type="number" class="form-control" id="estoquePeca" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Categoria:</label>
+                                    <select class="form-control" id="categoriaPeca" required>
+                                        <option value="">Selecione...</option>
+                                        <option value="Radiadores">Radiadores</option>
+                                        <option value="Filtros">Filtros</option>
+                                        <option value="Ignição">Ignição</option>
+                                        <option value="Motor">Motor</option>
+                                        <option value="Sistema de Combustível">Sistema de Combustível</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <label class="form-label">Descrição:</label>
+                                <textarea class="form-control" id="descricaoPeca" rows="3" required></textarea>
+                            </div>
+                            <div class="mt-3">
+                                <label class="form-label">Aplicações (uma por linha):</label>
+                                <textarea class="form-control" id="aplicacoesPeca" rows="3" placeholder="Ex: VW Gol 1.0&#10;Fiat Uno 1.0"></textarea>
+                            </div>
+                            <div class="mt-4">
+                                <button type="submit" class="btn btn-success me-2">
+                                    <i class="fas fa-save me-1"></i>Salvar Peça
+                                </button>
+                                <button type="button" class="btn btn-secondary" onclick="searchPart()">
+                                    <i class="fas fa-times me-1"></i>Cancelar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('searchResults').innerHTML = formulario;
+        }
+
+        // Salvar peça manual
+        function salvarPecaManual(event, codigo) {
+            event.preventDefault();
+            
+            const catalogo = catalogoManager.identificarCatalogo(codigo);
+            const aplicacoes = document.getElementById('aplicacoesPeca').value
+                .split('\n')
+                .filter(app => app.trim())
+                .map(app => app.trim());
+            
+            const novaPeca = {
+                code: codigo,
+                supplier: catalogo ? catalogo.catalogo.nome : 'Manual',
+                name: document.getElementById('nomePeca').value,
+                category: document.getElementById('categoriaPeca').value,
+                price: parseFloat(document.getElementById('precoPeca').value),
+                stock: parseInt(document.getElementById('estoquePeca').value),
+                compatibility: aplicacoes,
+                description: document.getElementById('descricaoPeca').value,
+                applications: aplicacoes.join(', '),
+                warranty: '12 meses',
+                weight: '1.0kg'
+            };
+            
+            // Adicionar à base
+            PARTS_DATABASE[codigo.toUpperCase()] = novaPeca;
+            
+            // Exibir resultado
+            displayResults([novaPeca], codigo);
+            
+            alert('✅ Peça adicionada com sucesso!');
+        }
+
+        // Buscar peça na base de dados
+        function findPart(code) {
+            const codeUpper = code.toUpperCase();
+            
+            // Busca exata
+            if (PARTS_DATABASE[codeUpper]) {
+                return [PARTS_DATABASE[codeUpper]];
+            }
+            
+            // Busca parcial
+            const partialResults = [];
+            for (const [key, part] of Object.entries(PARTS_DATABASE)) {
+                if (key.includes(codeUpper) || 
+                    part.name.toUpperCase().includes(codeUpper) ||
+                    part.code.toUpperCase().includes(codeUpper)) {
+                    partialResults.push(part);
+                }
+            }
+            
+            return partialResults;
+        }
+
+        // Exibir resultados
+        function displayResults(results, searchTerm) {
+            const container = document.getElementById('searchResults');
+            
+            if (results.length === 0) {
+                container.innerHTML = `
+                    <div class="no-results">
+                        <i class="fas fa-exclamation-triangle text-warning" style="font-size: 3rem;"></i>
+                        <h4 class="mt-3">Peça não encontrada</h4>
+                        <p>Código "${searchTerm}" não foi encontrado em nossa base de dados</p>
+                        <div class="suggestion-box">
+                            <strong>Sugestões:</strong>
+                            <ul class="mt-2 mb-0">
+                                <li>Verifique se o código está correto</li>
+                                <li>Fabricante detectado: <strong>${detectSupplier(searchTerm)}</strong></li>
+                                <li>Tente buscar apenas parte do código</li>
+                                <li>Entre em contato para adicionar nova peça</li>
+                            </ul>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = `<h4 class="mb-3">${results.length} resultado(s) encontrado(s) para "${searchTerm}"</h4>`;
+            
+            results.forEach(part => {
+                html += generatePartCard(part);
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // Gerar card da peça
+        function generatePartCard(part) {
+            const supplierClass = part.supplier.toLowerCase();
+            const stockStatus = part.stock > 0 ? 
+                `<span class="text-success"><i class="fas fa-check-circle"></i> Em estoque (${part.stock})</span>` :
+                `<span class="text-danger"><i class="fas fa-times-circle"></i> Sem estoque</span>`;
+            
+            return `
+                <div class="result-card">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <span class="supplier-badge ${supplierClass}">
+                                <i class="fas fa-industry me-1"></i>${part.supplier}
+                            </span>
+                            <h5 class="mb-1">${part.name}</h5>
+                            <p class="text-muted mb-0">Código: <strong>${part.code}</strong> | Categoria: ${part.category}</p>
+                        </div>
+                        <div class="text-end">
+                            <h4 class="text-primary mb-1">R$ ${part.price.toFixed(2)}</h4>
+                            ${stockStatus}
+                        </div>
+                    </div>
+                    
+                    <div class="part-info">
+                        <div class="info-item">
+                            <strong><i class="fas fa-info-circle me-1"></i>Descrição:</strong>
+                            ${part.description}
+                        </div>
+                        
+                        <div class="info-item">
+                            <strong><i class="fas fa-car me-1"></i>Aplicações:</strong>
+                            ${part.applications}
+                        </div>
+                        
+                        <div class="info-item">
+                            <strong><i class="fas fa-shield-alt me-1"></i>Garantia:</strong>
+                            ${part.warranty}
+                        </div>
+                        
+                        <div class="info-item">
+                            <strong><i class="fas fa-weight me-1"></i>Peso:</strong>
+                            ${part.weight}
+                        </div>
+                    </div>
+                    
+                    <div class="mt-3">
+                        <strong><i class="fas fa-check-double me-1"></i>Compatibilidade:</strong>
+                        <ul class="compatibility-list mt-2">
+                            ${part.compatibility.map(vehicle => `<li>${vehicle}</li>`).join('')}
+                        </ul>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <button class="btn btn-primary me-2" onclick="addToQuote('${part.code}')">
+                            <i class="fas fa-plus me-1"></i>Adicionar ao Orçamento
+                        </button>
+                        <button class="btn btn-outline-secondary me-2" onclick="checkStock('${part.code}')">
+                            <i class="fas fa-warehouse me-1"></i>Verificar Estoque
+                        </button>
+                        <button class="btn btn-outline-info" onclick="showMoreInfo('${part.code}')">
+                            <i class="fas fa-info me-1"></i>Mais Informações
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Mostrar loading
+        function showLoading() {
+            document.getElementById('searchResults').innerHTML = `
+                <div class="loading">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Carregando...</span>
+                    </div>
+                    <p class="mt-2">Buscando peça na base de dados...</p>
+                </div>
+            `;
+        }
+
+        // Busca rápida
+        function quickSearch(code) {
+            document.getElementById('searchInput').value = code;
+            searchPart();
+        }
+
+        // Adicionar ao orçamento
+        function addToQuote(code) {
+            const part = PARTS_DATABASE[code.toUpperCase()];
+            if (part) {
+                alert(`${part.name} adicionado ao orçamento!\nPreço: R$ ${part.price.toFixed(2)}`);
+                // Aqui você integraria com o sistema de orçamento
+            }
+        }
+
+        // Verificar estoque
+        function checkStock(code) {
+            const part = PARTS_DATABASE[code.toUpperCase()];
+            if (part) {
+                alert(`Estoque atual: ${part.stock} unidades\nCódigo: ${part.code}\nPeça: ${part.name}`);
+            }
+        }
+
+        // Mostrar mais informações
+        function showMoreInfo(code) {
+            const part = PARTS_DATABASE[code.toUpperCase()];
+            if (part) {
+                const info = `
+INFORMAÇÕES DETALHADAS
+
+Código: ${part.code}
+Nome: ${part.name}
+Fabricante: ${part.supplier}
+Categoria: ${part.category}
+Preço: R$ ${part.price.toFixed(2)}
+Estoque: ${part.stock} unidades
+Peso: ${part.weight}
+Garantia: ${part.warranty}
+
+Descrição:
+${part.description}
+
+Aplicações:
+${part.applications}
+
+Compatibilidade:
+${part.compatibility.join('\n')}
+                `;
+                alert(info);
+            }
+        }
+
+        // Enter para buscar
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchPart();
+            }
+        });
+
+        // Auto-complete enquanto digita
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const value = e.target.value;
+            if (value.length >= 2) {
+                const supplier = detectSupplier(value);
+                // Aqui você pode adicionar sugestões automáticas
+            }
+        });
+
+        // Mostrar catálogos disponíveis
+        function mostrarCatalogos() {
+            const catalogos = catalogoManager.listarCatalogos();
+            
+            let html = `
+                <div class="mb-4">
+                    <h4><i class="fas fa-book me-2"></i>Catálogos Disponíveis</h4>
+                    <p class="text-muted">Sistema reconhece automaticamente os seguintes fabricantes:</p>
+                </div>
+            `;
+            
+            catalogos.forEach(catalogo => {
+                const supplierClass = catalogo.nome.toLowerCase().split(' ')[0];
+                html += `
+                    <div class="result-card">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <span class="supplier-badge ${supplierClass}">
+                                    <i class="fas fa-industry me-1"></i>${catalogo.nome}
+                                </span>
+                                <h5 class="mb-1">${catalogo.categoria}</h5>
+                                <p class="text-muted mb-0">Contato: ${catalogo.contato}</p>
+                            </div>
+                            <div class="text-end">
+                                <a href="${catalogo.url}" target="_blank" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-external-link-alt me-1"></i>Catálogo Online
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="part-info">
+                            <div class="info-item">
+                                <strong><i class="fas fa-code me-1"></i>Prefixos Reconhecidos:</strong>
+                                ${catalogo.prefixos.map(p => `<span class="badge bg-light text-dark me-1">${p}</span>`).join('')}
+                            </div>
+                            
+                            <div class="info-item">
+                                <strong><i class="fas fa-format-list-bulleted me-1"></i>Formato:</strong>
+                                ${catalogo.formato.descricao}
+                            </div>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <button class="btn btn-primary btn-sm me-2" onclick="testarCatalogo('${catalogo.nome}')">
+                                <i class="fas fa-test-tube me-1"></i>Testar Código
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += `
+                <div class="mt-4 text-center">
+                    <button class="btn btn-secondary" onclick="location.reload()">
+                        <i class="fas fa-arrow-left me-1"></i>Voltar à Busca
+                    </button>
+                </div>
+            `;
+            
+            document.getElementById('searchResults').innerHTML = html;
+        }
+
+        // Testar catálogo específico
+        function testarCatalogo(catalogoNome) {
+            const exemplos = {
+                'Zelukar Radiadores': 'FI-001',
+                'Cofap Filtros': 'CF-1234',
+                'Robert Bosch': 'B456',
+                'Delphi Technologies': 'D789',
+                'Mahle Metal Leve': 'M321'
+            };
+            
+            const codigo = exemplos[catalogoNome];
+            if (codigo) {
+                document.getElementById('searchInput').value = codigo;
+                searchPart();
+            }
+        }
+    </script>
+</body>
+</html>
