@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔐 Login - Sistema de Peças Automotivas</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="mobile-responsive.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 1rem;
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            max-width: 1000px;
+            width: 100%;
+            margin: 0 auto;
+            min-height: 600px;
+        }
+
+        .login-left {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 3rem 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .login-right {
+            padding: 3rem 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .brand-logo {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            color: #3498db;
+        }
+
+        .brand-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .brand-subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+
+        .feature-list {
+            text-align: left;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+        }
+
+        .feature-item i {
+            color: #3498db;
+            margin-right: 0.8rem;
+            width: 20px;
+        }
+
+        .login-form {
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .form-title {
+            color: #2c3e50;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .form-floating {
+            margin-bottom: 1rem;
+        }
+
+        .form-control {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+        }
+
+        .form-control:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        }
+
+        .btn-login {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 0.8rem 2rem;
+            font-weight: 600;
+            color: white;
+            width: 100%;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(52, 152, 219, 0.3);
+            color: white;
+        }
+
+        .btn-public {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 0.6rem 1.5rem;
+            font-weight: 600;
+            color: white;
+            width: 100%;
+            margin-top: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-public:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(39, 174, 96, 0.3);
+            color: white;
+        }
+
+        .divider {
+            text-align: center;
+            margin: 1.5rem 0;
+            position: relative;
+            color: #6c757d;
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #dee2e6;
+        }
+
+        .divider span {
+            background: white;
+            padding: 0 1rem;
+        }
+
+        .access-levels {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .access-level {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding: 0.8rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .access-level:hover {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .access-level:last-child {
+            margin-bottom: 0;
+        }
+
+        .access-icon {
+            font-size: 1.5rem;
+            margin-right: 1rem;
+            width: 40px;
+            text-align: center;
+        }
+
+        .access-info h6 {
+            margin-bottom: 0.3rem;
+            color: #2c3e50;
+        }
+
+        .access-info small {
+            color: #6c757d;
+        }
+
+        .demo-credentials {
+            background: #e3f2fd;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .demo-credentials h6 {
+            color: #1976d2;
+            margin-bottom: 0.8rem;
+        }
+
+        .credential-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.3rem;
+        }
+
+        .quick-login {
+            margin-top: 1rem;
+        }
+
+        .quick-login-btn {
+            background: rgba(52, 152, 219, 0.1);
+            border: 1px solid #3498db;
+            color: #3498db;
+            border-radius: 6px;
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
+            margin: 0.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .quick-login-btn:hover {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-qr {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 0.6rem 1.5rem;
+            font-weight: 600;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .btn-qr:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(23, 162, 184, 0.3);
+            color: white;
+        }
+
+        .qr-container {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 0.5rem;
+            }
+
+            .login-container {
+                border-radius: 15px;
+                min-height: auto;
+            }
+
+            .login-left,
+            .login-right {
+                padding: 2rem 1.5rem;
+            }
+
+            .brand-logo {
+                font-size: 3rem;
+            }
+
+            .brand-title {
+                font-size: 1.5rem;
+            }
+
+            .brand-subtitle {
+                font-size: 1rem;
+            }
+
+            .feature-list {
+                max-width: 100%;
+            }
+
+            .feature-item {
+                font-size: 0.9rem;
+            }
+
+            .form-title {
+                font-size: 1.3rem;
+            }
+
+            .access-levels {
+                padding: 1rem;
+            }
+
+            .access-level {
+                padding: 0.6rem;
+            }
+
+            .access-icon {
+                font-size: 1.3rem;
+                width: 35px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .login-left,
+            .login-right {
+                padding: 1.5rem 1rem;
+            }
+
+            .brand-logo {
+                font-size: 2.5rem;
+            }
+
+            .brand-title {
+                font-size: 1.3rem;
+            }
+
+            .feature-item {
+                font-size: 0.85rem;
+            }
+
+            .access-level {
+                flex-direction: column;
+                text-align: center;
+                padding: 1rem;
+            }
+
+            .access-icon {
+                margin-right: 0;
+                margin-bottom: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row login-container">
+            <!-- Lado Esquerdo - Informações -->
+            <div class="col-lg-6 login-left d-flex flex-column justify-content-center">
+                <div class="brand-logo">
+                    <i class="fas fa-car"></i>
+                </div>
+                <h1 class="brand-title">Sistema de Peças Automotivas</h1>
+                <p class="brand-subtitle">Gestão completa e inteligente para seu negócio automotivo</p>
+                
+                <div class="feature-list">
+                    <div class="feature-item">
+                        <i class="fas fa-search"></i>
+                        <span>Busca inteligente de peças na internet</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Relatórios e análises avançadas</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-users"></i>
+                        <span>Gestão completa de clientes</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-box"></i>
+                        <span>Controle de estoque em tempo real</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-mobile-alt"></i>
+                        <span>Acesso mobile otimizado</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-cloud"></i>
+                        <span>Sincronização automática</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lado Direito - Login -->
+            <div class="col-lg-6 login-right d-flex flex-column justify-content-center">
+                <div class="login-form mx-auto">
+                    <h2 class="form-title">
+                        <i class="fas fa-sign-in-alt me-2"></i>
+                        Fazer Login
+                    </h2>
+
+                    <form id="loginForm">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="username" placeholder="Usuário" required>
+                            <label for="username">
+                                <i class="fas fa-user me-2"></i>Usuário
+                            </label>
+                        </div>
+
+                        <div class="form-floating">
+                            <input type="password" class="form-control" id="password" placeholder="Senha" required>
+                            <label for="password">
+                                <i class="fas fa-lock me-2"></i>Senha
+                            </label>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="rememberMe">
+                            <label class="form-check-label" for="rememberMe">
+                                Lembrar de mim
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-login">
+                            <i class="fas fa-sign-in-alt me-2"></i>
+                            Entrar no Sistema
+                        </button>
+                    </form>
+
+                    <div class="divider">
+                        <span>ou</span>
+                    </div>
+
+                    <button class="btn btn-public" onclick="accessPublic()">
+                        <i class="fas fa-eye me-2"></i>
+                        Acesso Público (Limitado)
+                    </button>
+
+                    <button class="btn btn-outline-info w-100 mt-2 btn-qr" onclick="showQRCode()">
+                        <i class="fas fa-qrcode me-2"></i>
+                        Gerar QR Code para Cadastro de Cliente
+                    </button>
+
+                    <a href="qr-permanente.html" class="btn btn-outline-success w-100 mt-2" target="_blank">
+                        <i class="fas fa-print me-2"></i>
+                        QR Code Permanente para Impressão
+                    </a>
+
+                    <!-- Login Rápido Seguro -->
+                    <div class="demo-credentials">
+                        <h6><i class="fas fa-bolt me-2"></i>Login Rápido</h6>
+                        <p class="small text-muted mb-3">Digite apenas a senha para entrar rapidamente:</p>
+                        
+                        <div class="quick-login">
+                            <div class="row g-2">
+                                <div class="col-4">
+                                    <button class="btn btn-outline-danger btn-sm w-100" onclick="showQuickLogin('admin')">
+                                        <i class="fas fa-crown"></i><br>
+                                        <small>Admin</small>
+                                    </button>
+                                </div>
+                                <div class="col-4">
+                                    <button class="btn btn-outline-primary btn-sm w-100" onclick="showQuickLogin('employee')">
+                                        <i class="fas fa-wrench"></i><br>
+                                        <small>Mecânico</small>
+                                    </button>
+                                </div>
+                                <div class="col-4">
+                                    <button class="btn btn-outline-success btn-sm w-100" onclick="showQuickLogin('seller')">
+                                        <i class="fas fa-handshake"></i><br>
+                                        <small>Vendedor</small>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Níveis de Acesso -->
+                    <div class="access-levels">
+                        <h6 class="text-center mb-3">
+                            <i class="fas fa-shield-alt me-2"></i>
+                            Níveis de Acesso
+                        </h6>
+
+                        <div class="access-level">
+                            <div class="access-icon text-danger">
+                                <i class="fas fa-crown"></i>
+                            </div>
+                            <div class="access-info">
+                                <h6>Administrador</h6>
+                                <small>Acesso completo: configurações, usuários, relatórios avançados</small>
+                            </div>
+                        </div>
+
+                        <div class="access-level">
+                            <div class="access-icon text-primary">
+                                <i class="fas fa-wrench"></i>
+                            </div>
+                            <div class="access-info">
+                                <h6>Mecânico</h6>
+                                <small>Gestão de produtos, clientes, estoque e vendas</small>
+                            </div>
+                        </div>
+
+                        <div class="access-level">
+                            <div class="access-icon text-success">
+                                <i class="fas fa-handshake"></i>
+                            </div>
+                            <div class="access-info">
+                                <h6>Vendedor</h6>
+                                <small>Consulta de produtos, clientes e criação de orçamentos</small>
+                            </div>
+                        </div>
+
+                        <div class="access-level">
+                            <div class="access-icon text-warning">
+                                <i class="fas fa-eye"></i>
+                            </div>
+                            <div class="access-info">
+                                <h6>Público</h6>
+                                <small>Visualização limitada de catálogo e informações básicas</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Sistema de autenticação
+        const users = {
+            'VRS': {
+                password: '654321',
+                role: 'admin',
+                name: 'Administrador VRS',
+                permissions: ['all']
+            },
+            'mecanico': {
+                password: 'aditivo',
+                role: 'employee',
+                name: 'Mecânico',
+                permissions: ['products', 'clients', 'sales', 'inventory', 'reports']
+            },
+            'vendedorradiadores': {
+                password: 'radiadores',
+                role: 'seller',
+                name: 'Vendedor Radiadores',
+                permissions: ['products_view', 'clients_view', 'quotes']
+            }
+        };
+
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const rememberMe = document.getElementById('rememberMe').checked;
+            
+            if (authenticateUser(username, password)) {
+                const user = users[username];
+                
+                // Salvar sessão
+                const sessionData = {
+                    username: username,
+                    role: user.role,
+                    name: user.name,
+                    permissions: user.permissions,
+                    loginTime: new Date().toISOString(),
+                    rememberMe: rememberMe
+                };
+                
+                if (rememberMe) {
+                    localStorage.setItem('userSession', JSON.stringify(sessionData));
+                } else {
+                    sessionStorage.setItem('userSession', JSON.stringify(sessionData));
+                }
+                
+                // Redirecionar para o launcher com parâmetros
+                window.location.href = `launcher.html?user=${username}&role=${user.role}`;
+            } else {
+                showError('Usuário ou senha incorretos!');
+            }
+        });
+
+        function authenticateUser(username, password) {
+            return users[username] && users[username].password === password;
+        }
+
+        function quickLogin(username, password) {
+            document.getElementById('username').value = username;
+            document.getElementById('password').value = password;
+            document.getElementById('loginForm').dispatchEvent(new Event('submit'));
+        }
+
+        function showQuickLogin(userType) {
+            // Mapear tipo de usuário para dados reais
+            const userMap = {
+                'admin': { username: 'VRS', placeholder: 'Digite a senha do administrador' },
+                'employee': { username: 'mecanico', placeholder: 'Digite a senha do mecânico' },
+                'seller': { username: 'vendedorradiadores', placeholder: 'Digite a senha do vendedor' }
+            };
+            
+            const userData = userMap[userType];
+            if (!userData) return;
+            
+            // Mostrar modal para entrada de senha
+            const modalHtml = `
+                <div class="modal fade" id="quickLoginModal" tabindex="-1">
+                    <div class="modal-dialog modal-sm">
+                        <div class="modal-content">
+                            <div class="modal-header bg-primary text-white">
+                                <h5 class="modal-title">
+                                    <i class="fas fa-key me-2"></i>Login Rápido
+                                </h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="quickLoginForm">
+                                    <div class="form-floating mb-3">
+                                        <input type="password" class="form-control" id="quickPassword" placeholder="Senha" required>
+                                        <label for="quickPassword">
+                                            <i class="fas fa-lock me-2"></i>${userData.placeholder}
+                                        </label>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="fas fa-sign-in-alt me-2"></i>Entrar
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Remover modal anterior se existir
+            const existingModal = document.getElementById('quickLoginModal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+            
+            // Adicionar novo modal
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            
+            const modal = new bootstrap.Modal(document.getElementById('quickLoginModal'));
+            modal.show();
+            
+            // Focar no campo de senha
+            document.getElementById('quickPassword').focus();
+            
+            // Lidar com o envio do formulário
+            document.getElementById('quickLoginForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const password = document.getElementById('quickPassword').value;
+                
+                // Fazer login com as credenciais
+                quickLogin(userData.username, password);
+                modal.hide();
+            });
+            
+            // Limpar modal quando fechado
+            document.getElementById('quickLoginModal').addEventListener('hidden.bs.modal', function() {
+                this.remove();
+            });
+        }
+
+        function showQRCode() {
+            const baseUrl = window.location.origin + window.location.pathname.replace('login.html', '');
+            const clientRegistrationUrl = baseUrl + 'cadastro-cliente.html';
+            
+            // Mostrar modal com QR Code
+            const modalHtml = `
+                <div class="modal fade" id="qrCodeModal" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header bg-info text-white">
+                                <h5 class="modal-title">
+                                    <i class="fas fa-qrcode me-2"></i>QR Code - Cadastro de Cliente
+                                </h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body text-center">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="qr-container mb-3">
+                                            <div id="qrcode"></div>
+                                        </div>
+                                        <div class="alert alert-info">
+                                            <i class="fas fa-mobile-alt me-2"></i>
+                                            <strong>Como usar:</strong><br>
+                                            1. Aponte a câmera do celular para o QR Code<br>
+                                            2. Toque no link que aparecer<br>
+                                            3. Preencha o formulário de cadastro
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6><i class="fas fa-link me-2"></i>Link Direto:</h6>
+                                        <div class="bg-light p-3 rounded mb-3">
+                                            <small class="text-break">${clientRegistrationUrl}</small>
+                                        </div>
+                                        <button class="btn btn-outline-primary btn-sm w-100 mb-2" onclick="copyToClipboard('${clientRegistrationUrl}')">
+                                            <i class="fas fa-copy me-1"></i>Copiar Link
+                                        </button>
+                                        <button class="btn btn-outline-success btn-sm w-100 mb-2" onclick="sendWhatsApp('${clientRegistrationUrl}')">
+                                            <i class="fab fa-whatsapp me-1"></i>Enviar por WhatsApp
+                                        </button>
+                                        <div class="mt-3">
+                                            <h6><i class="fas fa-info-circle me-2"></i>Informações Coletadas:</h6>
+                                            <ul class="list-unstyled small text-start">
+                                                <li><i class="fas fa-check text-success me-1"></i> Nome completo</li>
+                                                <li><i class="fas fa-check text-success me-1"></i> CPF/CNPJ</li>
+                                                <li><i class="fas fa-check text-success me-1"></i> Telefone</li>
+                                                <li><i class="fas fa-check text-success me-1"></i> E-mail</li>
+                                                <li><i class="fas fa-check text-success me-1"></i> Endereço completo</li>
+                                                <li><i class="fas fa-check text-success me-1"></i> Dados do veículo</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                                <button type="button" class="btn btn-info" onclick="printQRCode()">
+                                    <i class="fas fa-print me-1"></i>Imprimir QR Code
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Remover modal anterior se existir
+            const existingModal = document.getElementById('qrCodeModal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+            
+            // Adicionar novo modal
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            
+            const modal = new bootstrap.Modal(document.getElementById('qrCodeModal'));
+            modal.show();
+            
+            // Gerar QR Code usando biblioteca externa
+            generateQRCode(clientRegistrationUrl);
+            
+            // Limpar modal quando fechado
+            document.getElementById('qrCodeModal').addEventListener('hidden.bs.modal', function() {
+                this.remove();
+            });
+        }
+
+        function generateQRCode(url) {
+            // Usando QR Code API gratuita
+            const qrCodeDiv = document.getElementById('qrcode');
+            const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(url)}`;
+            
+            qrCodeDiv.innerHTML = `
+                <img src="${qrCodeUrl}" alt="QR Code" class="img-fluid border rounded" style="max-width: 200px;">
+                <p class="mt-2 small text-muted">Escaneie com a câmera do celular</p>
+            `;
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                // Mostrar feedback
+                const btn = event.target.closest('button');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check me-1"></i>Copiado!';
+                btn.classList.remove('btn-outline-primary');
+                btn.classList.add('btn-success');
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.classList.remove('btn-success');
+                    btn.classList.add('btn-outline-primary');
+                }, 2000);
+            });
+        }
+
+        function sendWhatsApp(url) {
+            const message = `🚗 *Cadastro de Cliente - Oficina VRS*\n\nOlá! Para se cadastrar como cliente da nossa oficina, acesse o link abaixo:\n\n${url}\n\nOu escaneie o QR Code que foi apresentado.\n\n✅ Cadastro rápido e seguro\n📱 Otimizado para celular`;
+            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
+        function printQRCode() {
+            const printContent = document.querySelector('#qrCodeModal .modal-body').innerHTML;
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>QR Code - Cadastro de Cliente</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; padding: 20px; text-align: center; }
+                        .qr-container { margin: 20px 0; }
+                        .alert { background: #e3f2fd; padding: 15px; border-radius: 5px; margin: 20px 0; }
+                        @media print { .no-print { display: none; } }
+                    </style>
+                </head>
+                <body>
+                    <h2>🚗 Cadastro de Cliente - Oficina VRS</h2>
+                    ${printContent}
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.print();
+        }
+
+        function accessPublic() {
+            // Criar sessão pública
+            const publicSession = {
+                username: 'publico',
+                role: 'public',
+                name: 'Usuário Público',
+                permissions: ['catalog_view', 'search_basic'],
+                loginTime: new Date().toISOString(),
+                rememberMe: false
+            };
+            
+            sessionStorage.setItem('userSession', JSON.stringify(publicSession));
+            window.location.href = 'launcher.html?user=publico&role=public';
+        }
+
+        function showError(message) {
+            // Criar toast de erro
+            const toast = document.createElement('div');
+            toast.className = 'position-fixed top-0 end-0 p-3';
+            toast.style.zIndex = '9999';
+            toast.innerHTML = `
+                <div class="toast show" role="alert">
+                    <div class="toast-header bg-danger text-white">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong class="me-auto">Erro de Login</strong>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+                    </div>
+                    <div class="toast-body">
+                        ${message}
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            // Remover após 5 segundos
+            setTimeout(() => {
+                toast.remove();
+            }, 5000);
+        }
+
+        // Verificar se já está logado
+        document.addEventListener('DOMContentLoaded', function() {
+            const session = localStorage.getItem('userSession') || sessionStorage.getItem('userSession');
+            
+            if (session) {
+                const userData = JSON.parse(session);
+                // Se já está logado, redirecionar
+                window.location.href = `launcher.html?user=${userData.username}&role=${userData.role}`;
+            }
+        });
+
+        // Efeitos visuais
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animação de entrada
+            document.querySelector('.login-container').style.opacity = '0';
+            document.querySelector('.login-container').style.transform = 'translateY(30px)';
+            
+            setTimeout(() => {
+                document.querySelector('.login-container').style.transition = 'all 0.6s ease';
+                document.querySelector('.login-container').style.opacity = '1';
+                document.querySelector('.login-container').style.transform = 'translateY(0)';
+            }, 100);
+        });
+    </script>
+</body>
+</html>

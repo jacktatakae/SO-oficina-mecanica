@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🖨️ QR Code Permanente - Cadastro de Cliente VRS</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 2rem;
+        }
+
+        .qr-print-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 3rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .qr-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            border-bottom: 3px solid #007bff;
+            padding-bottom: 2rem;
+        }
+
+        .qr-header h1 {
+            color: #2c3e50;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .qr-header .subtitle {
+            color: #6c757d;
+            font-size: 1.1rem;
+        }
+
+        .qr-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 3rem;
+            margin: 3rem 0;
+        }
+
+        .qr-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            border: 2px solid #e9ecef;
+            position: relative;
+        }
+
+        .qr-card.featured {
+            border-color: #007bff;
+            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+        }
+
+        .qr-code-display {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .qr-code-display img {
+            max-width: 200px;
+            width: 100%;
+            height: auto;
+        }
+
+        .qr-info {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            text-align: left;
+        }
+
+        .qr-info h6 {
+            color: #007bff;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .qr-link {
+            background: #e9ecef;
+            border-radius: 5px;
+            padding: 0.5rem;
+            font-family: monospace;
+            font-size: 0.9rem;
+            word-break: break-all;
+            margin: 0.5rem 0;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn-action {
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .btn-print {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+
+        .btn-print:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3);
+            color: white;
+        }
+
+        .btn-download {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+            color: white;
+        }
+
+        .btn-download:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(23, 162, 184, 0.3);
+            color: white;
+        }
+
+        .btn-whatsapp {
+            background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
+            color: white;
+        }
+
+        .btn-whatsapp:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(37, 211, 102, 0.3);
+            color: white;
+        }
+
+        .print-instructions {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .print-instructions h6 {
+            color: #856404;
+            margin-bottom: 1rem;
+        }
+
+        .print-instructions ul {
+            margin-bottom: 0;
+            color: #856404;
+        }
+
+        .permanent-notice {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border: 2px solid #28a745;
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .permanent-notice h5 {
+            color: #155724;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .permanent-notice p {
+            color: #155724;
+            margin-bottom: 0;
+            font-size: 1.1rem;
+        }
+
+        /* Estilos específicos para impressão */
+        @media print {
+            body {
+                background: white !important;
+                padding: 0 !important;
+            }
+            
+            .qr-print-container {
+                box-shadow: none !important;
+                border-radius: 0 !important;
+                padding: 1rem !important;
+            }
+            
+            .action-buttons,
+            .print-instructions,
+            .btn-action {
+                display: none !important;
+            }
+            
+            .qr-grid {
+                grid-template-columns: 1fr !important;
+                gap: 2rem !important;
+            }
+            
+            .qr-card {
+                border: 2px solid #000 !important;
+                background: white !important;
+                break-inside: avoid !important;
+                page-break-inside: avoid !important;
+            }
+            
+            .qr-code-display {
+                box-shadow: none !important;
+                border: 1px solid #ccc !important;
+            }
+            
+            .qr-header {
+                border-bottom: 3px solid #000 !important;
+            }
+            
+            .permanent-notice {
+                background: white !important;
+                border: 2px solid #000 !important;
+            }
+        }
+
+        /* Responsivo */
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            
+            .qr-print-container {
+                padding: 1.5rem;
+            }
+            
+            .qr-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="qr-print-container">
+        <!-- Cabeçalho -->
+        <div class="qr-header">
+            <h1>
+                <i class="fas fa-car text-primary me-3"></i>
+                Oficina VRS
+            </h1>
+            <p class="subtitle">Radiadores e Peças Automotivas</p>
+            <h3 class="mt-3">📱 QR Code para Cadastro de Cliente</h3>
+        </div>
+
+        <!-- Aviso de QR Permanente -->
+        <div class="permanent-notice">
+            <h5>
+                <i class="fas fa-check-circle me-2"></i>
+                QR Code Permanente
+            </h5>
+            <p>
+                Este QR Code é <strong>permanente</strong> e pode ser impresso, plastificado e usado indefinidamente. 
+                Ele sempre direcionará os clientes para o formulário de cadastro online.
+            </p>
+        </div>
+
+        <!-- Grid de QR Codes -->
+        <div class="qr-grid">
+            <!-- QR Code Principal -->
+            <div class="qr-card featured">
+                <h4 class="mb-3">
+                    <i class="fas fa-star text-warning me-2"></i>
+                    QR Code Principal
+                </h4>
+                
+                <div class="qr-code-display">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://tinyurl.com/cadastro-vrs" 
+                         alt="QR Code Cadastro VRS" 
+                         id="mainQRCode">
+                    <p class="mt-2 small text-muted">Escaneie com a câmera do celular</p>
+                </div>
+
+                <div class="qr-info">
+                    <h6><i class="fas fa-link me-2"></i>Link Permanente:</h6>
+                    <div class="qr-link">https://tinyurl.com/cadastro-vrs</div>
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Link encurtado permanente que redireciona para o cadastro
+                    </small>
+                </div>
+            </div>
+
+            <!-- QR Code de Backup -->
+            <div class="qr-card">
+                <h4 class="mb-3">
+                    <i class="fas fa-shield-alt text-success me-2"></i>
+                    QR Code de Backup
+                </h4>
+                
+                <div class="qr-code-display">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://bit.ly/vrs-cadastro" 
+                         alt="QR Code Backup VRS" 
+                         id="backupQRCode">
+                    <p class="mt-2 small text-muted">QR alternativo de segurança</p>
+                </div>
+
+                <div class="qr-info">
+                    <h6><i class="fas fa-link me-2"></i>Link de Backup:</h6>
+                    <div class="qr-link">https://bit.ly/vrs-cadastro</div>
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Link alternativo caso o principal apresente problemas
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Instruções de Impressão -->
+        <div class="print-instructions">
+            <h6>
+                <i class="fas fa-print me-2"></i>
+                Instruções para Impressão:
+            </h6>
+            <ul>
+                <li>Imprima em papel A4 comum ou couchê</li>
+                <li>Configure para impressão em alta qualidade (300 DPI)</li>
+                <li>Plastifique o papel para maior durabilidade</li>
+                <li>Teste o QR code após a impressão com seu celular</li>
+                <li>Coloque em locais visíveis na oficina</li>
+            </ul>
+        </div>
+
+        <!-- Informações Coletadas -->
+        <div class="qr-info">
+            <h6><i class="fas fa-clipboard-list me-2"></i>Dados Coletados pelo Formulário:</h6>
+            <div class="row">
+                <div class="col-md-6">
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-check text-success me-2"></i>Nome completo</li>
+                        <li><i class="fas fa-check text-success me-2"></i>CPF/CNPJ</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Telefone e WhatsApp</li>
+                        <li><i class="fas fa-check text-success me-2"></i>E-mail</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-check text-success me-2"></i>Endereço completo</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Dados do veículo</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Marca, modelo e ano</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Autorização para contato</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botões de Ação -->
+        <div class="action-buttons">
+            <button class="btn-action btn-print" onclick="printQR()">
+                <i class="fas fa-print me-2"></i>
+                Imprimir
+            </button>
+            
+            <button class="btn-action btn-download" onclick="downloadQR()">
+                <i class="fas fa-download me-2"></i>
+                Download
+            </button>
+            
+            <button class="btn-action btn-whatsapp" onclick="shareWhatsApp()">
+                <i class="fab fa-whatsapp me-2"></i>
+                Compartilhar
+            </button>
+            
+            <button class="btn-action btn-primary" onclick="testQR()">
+                <i class="fas fa-mobile-alt me-2"></i>
+                Testar QR
+            </button>
+        </div>
+
+        <!-- Rodapé -->
+        <div class="text-center mt-4 pt-4 border-top">
+            <p class="text-muted">
+                <i class="fas fa-calendar me-2"></i>
+                QR Code gerado em: <strong id="currentDate"></strong>
+            </p>
+            <p class="text-muted small">
+                Para suporte técnico: <strong>contato@oficinaVRS.com.br</strong> | 
+                WhatsApp: <strong>(11) 99999-9999</strong>
+            </p>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Definir URLs permanentes (você deve configurar estes redirecionamentos)
+        const PERMANENT_URLS = {
+            main: 'https://tinyurl.com/cadastro-vrs',
+            backup: 'https://bit.ly/vrs-cadastro',
+            direct: window.location.origin + window.location.pathname.replace('qr-permanente.html', 'cadastro-cliente.html')
+        };
+
+        // Atualizar data atual
+        document.getElementById('currentDate').textContent = new Date().toLocaleDateString('pt-BR');
+
+        // Função para imprimir
+        function printQR() {
+            window.print();
+        }
+
+        // Função para download do QR Code
+        function downloadQR() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = document.getElementById('mainQRCode');
+            
+            canvas.width = 300;
+            canvas.height = 350;
+            
+            // Fundo branco
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Título
+            ctx.fillStyle = 'black';
+            ctx.font = 'bold 16px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('Oficina VRS - Cadastro', canvas.width/2, 25);
+            ctx.fillText('de Cliente', canvas.width/2, 45);
+            
+            // QR Code
+            const qrImg = new Image();
+            qrImg.crossOrigin = 'anonymous';
+            qrImg.onload = function() {
+                ctx.drawImage(qrImg, 50, 60, 200, 200);
+                
+                // Texto inferior
+                ctx.font = '12px Arial';
+                ctx.fillText('Escaneie com a câmera', canvas.width/2, 280);
+                ctx.fillText('do seu celular', canvas.width/2, 295);
+                
+                ctx.font = '10px Arial';
+                ctx.fillText(PERMANENT_URLS.main, canvas.width/2, 320);
+                
+                // Download
+                const link = document.createElement('a');
+                link.download = 'qr-code-cadastro-vrs.png';
+                link.href = canvas.toDataURL();
+                link.click();
+            };
+            qrImg.src = img.src;
+        }
+
+        // Função para compartilhar no WhatsApp
+        function shareWhatsApp() {
+            const message = `🚗 *Cadastro de Cliente - Oficina VRS*\n\n` +
+                          `Para se cadastrar como cliente da nossa oficina, ` +
+                          `escaneie o QR Code ou acesse o link:\n\n` +
+                          `${PERMANENT_URLS.main}\n\n` +
+                          `✅ Cadastro rápido e seguro\n` +
+                          `📱 Otimizado para celular\n` +
+                          `🎁 Bônus de boas-vindas para novos clientes`;
+            
+            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
+        // Função para testar o QR Code
+        function testQR() {
+            // Tentar acessar a URL para verificar se está funcionando
+            const testWindow = window.open(PERMANENT_URLS.main, '_blank');
+            
+            // Mostrar mensagem de confirmação
+            setTimeout(() => {
+                const userConfirm = confirm('O QR Code foi aberto em uma nova aba. Funcionou corretamente?');
+                if (!userConfirm) {
+                    alert('Se o QR Code não estiver funcionando, verifique:\n\n' +
+                          '1. Conexão com a internet\n' +
+                          '2. Se o link de redirecionamento está configurado\n' +
+                          '3. Use o QR Code de backup como alternativa\n\n' +
+                          'Para suporte: contato@oficinaVRS.com.br');
+                }
+            }, 2000);
+        }
+
+        // Função para copiar link
+        function copyLink(url) {
+            navigator.clipboard.writeText(url).then(() => {
+                // Feedback visual
+                const originalText = event.target.innerHTML;
+                event.target.innerHTML = '<i class="fas fa-check me-2"></i>Copiado!';
+                event.target.style.background = '#28a745';
+                
+                setTimeout(() => {
+                    event.target.innerHTML = originalText;
+                    event.target.style.background = '';
+                }, 2000);
+            });
+        }
+
+        // Adicionar evento de clique nos links para copiar
+        document.querySelectorAll('.qr-link').forEach(link => {
+            link.addEventListener('click', function() {
+                copyLink(this.textContent);
+            });
+            link.style.cursor = 'pointer';
+            link.title = 'Clique para copiar';
+        });
+
+        // Verificar se as URLs estão funcionando ao carregar a página
+        document.addEventListener('DOMContentLoaded', function() {
+            // Verificar URL principal
+            fetch(PERMANENT_URLS.main, { method: 'HEAD', mode: 'no-cors' })
+                .catch(() => {
+                    console.warn('URL principal pode não estar funcionando');
+                });
+        });
+    </script>
+</body>
+</html>

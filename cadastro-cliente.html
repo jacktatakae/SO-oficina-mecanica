@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📱 Cadastro de Cliente - Oficina VRS</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="mobile-responsive.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 1rem;
+        }
+
+        .registration-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        .header-section {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .header-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #3498db;
+        }
+
+        .form-section {
+            padding: 2rem;
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            margin: 0 1rem;
+        }
+
+        .step-number {
+            background: #dee2e6;
+            color: #6c757d;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+
+        .step.active .step-number {
+            background: #007bff;
+            color: white;
+        }
+
+        .step.completed .step-number {
+            background: #28a745;
+            color: white;
+        }
+
+        .form-step {
+            display: none;
+        }
+
+        .form-step.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-floating {
+            margin-bottom: 1rem;
+        }
+
+        .form-control {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            padding: 0.75rem 1rem;
+        }
+
+        .form-control:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+
+        .btn-step {
+            border-radius: 10px;
+            padding: 0.8rem 2rem;
+            font-weight: 600;
+            margin: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            border: none;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+            border: none;
+        }
+
+        .vehicle-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .vehicle-card {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .vehicle-card:hover {
+            border-color: #007bff;
+            background: #e3f2fd;
+        }
+
+        .vehicle-card.selected {
+            border-color: #007bff;
+            background: #e3f2fd;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+
+        .vehicle-icon {
+            font-size: 2rem;
+            color: #007bff;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-bar-custom {
+            height: 6px;
+            border-radius: 3px;
+            background: #e9ecef;
+            margin: 1rem 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .success-animation {
+            text-align: center;
+            padding: 3rem;
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            color: #28a745;
+            margin-bottom: 1rem;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .info-card {
+            background: #e3f2fd;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .info-card h6 {
+            color: #1976d2;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 0.5rem;
+            }
+
+            .header-section {
+                padding: 1.5rem 1rem;
+            }
+
+            .form-section {
+                padding: 1.5rem 1rem;
+            }
+
+            .header-icon {
+                font-size: 2.5rem;
+            }
+
+            .step-indicator {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+
+            .step {
+                margin: 0.25rem;
+            }
+
+            .vehicle-grid {
+                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+                gap: 0.5rem;
+            }
+
+            .btn-step {
+                width: 100%;
+                margin: 0.25rem 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="registration-container">
+        <!-- Cabeçalho -->
+        <div class="header-section">
+            <div class="header-icon">
+                <i class="fas fa-car"></i>
+            </div>
+            <h1>Cadastro de Cliente</h1>
+            <p class="mb-0">Oficina VRS - Radiadores e Peças Automotivas</p>
+        </div>
+
+        <!-- Indicador de Progresso -->
+        <div class="form-section">
+            <div class="step-indicator">
+                <div class="step active" id="step1-indicator">
+                    <div class="step-number">1</div>
+                    <span class="d-none d-md-inline">Pessoal</span>
+                </div>
+                <div class="step" id="step2-indicator">
+                    <div class="step-number">2</div>
+                    <span class="d-none d-md-inline">Contato</span>
+                </div>
+                <div class="step" id="step3-indicator">
+                    <div class="step-number">3</div>
+                    <span class="d-none d-md-inline">Endereço</span>
+                </div>
+                <div class="step" id="step4-indicator">
+                    <div class="step-number">4</div>
+                    <span class="d-none d-md-inline">Veículo</span>
+                </div>
+                <div class="step" id="step5-indicator">
+                    <div class="step-number">5</div>
+                    <span class="d-none d-md-inline">Confirmar</span>
+                </div>
+            </div>
+
+            <div class="progress-bar-custom">
+                <div class="progress-fill" id="progressFill" style="width: 20%"></div>
+            </div>
+
+            <form id="clientRegistrationForm">
+                <!-- Etapa 1: Dados Pessoais -->
+                <div class="form-step active" id="step1">
+                    <h4><i class="fas fa-user me-2"></i>Dados Pessoais</h4>
+                    <p class="text-muted mb-3">Informe seus dados básicos</p>
+
+                    <div class="info-card">
+                        <h6><i class="fas fa-shield-alt me-2"></i>Seus dados estão seguros</h6>
+                        <p class="small mb-0">Utilizamos suas informações apenas para melhor atendê-lo. Não compartilhamos dados com terceiros.</p>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="nomeCompleto" placeholder="Nome Completo" required>
+                                <label for="nomeCompleto">
+                                    <i class="fas fa-user me-1"></i>Nome Completo
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating">
+                                <select class="form-select" id="tipoDocumento" required>
+                                    <option value="">Selecione</option>
+                                    <option value="cpf">CPF</option>
+                                    <option value="cnpj">CNPJ</option>
+                                </select>
+                                <label for="tipoDocumento">
+                                    <i class="fas fa-id-card me-1"></i>Tipo
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="documento" placeholder="CPF/CNPJ" required>
+                                <label for="documento">
+                                    <i class="fas fa-id-card me-1"></i>CPF/CNPJ
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="date" class="form-control" id="dataNascimento">
+                                <label for="dataNascimento">
+                                    <i class="fas fa-calendar me-1"></i>Data de Nascimento
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end">
+                        <button type="button" class="btn btn-primary btn-step" onclick="nextStep()">
+                            Próximo <i class="fas fa-arrow-right ms-1"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Etapa 2: Contato -->
+                <div class="form-step" id="step2">
+                    <h4><i class="fas fa-phone me-2"></i>Dados de Contato</h4>
+                    <p class="text-muted mb-3">Como podemos entrar em contato com você?</p>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="tel" class="form-control" id="telefone" placeholder="Telefone" required>
+                                <label for="telefone">
+                                    <i class="fas fa-phone me-1"></i>Telefone Principal
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="tel" class="form-control" id="whatsapp" placeholder="WhatsApp">
+                                <label for="whatsapp">
+                                    <i class="fab fa-whatsapp me-1"></i>WhatsApp
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-floating">
+                        <input type="email" class="form-control" id="email" placeholder="E-mail" required>
+                        <label for="email">
+                            <i class="fas fa-envelope me-1"></i>E-mail
+                        </label>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="receberPromocoes">
+                        <label class="form-check-label" for="receberPromocoes">
+                            <i class="fas fa-bell me-1"></i>
+                            Quero receber promoções e novidades por WhatsApp/E-mail
+                        </label>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <button type="button" class="btn btn-outline-secondary btn-step" onclick="prevStep()">
+                            <i class="fas fa-arrow-left me-1"></i> Anterior
+                        </button>
+                        <button type="button" class="btn btn-primary btn-step" onclick="nextStep()">
+                            Próximo <i class="fas fa-arrow-right ms-1"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Etapa 3: Endereço -->
+                <div class="form-step" id="step3">
+                    <h4><i class="fas fa-map-marker-alt me-2"></i>Endereço</h4>
+                    <p class="text-muted mb-3">Onde você está localizado?</p>
+
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="cep" placeholder="CEP" required>
+                                <label for="cep">
+                                    <i class="fas fa-map-pin me-1"></i>CEP
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="button" class="btn btn-outline-primary h-100 w-100" onclick="buscarCEP()">
+                                <i class="fas fa-search me-1"></i>Buscar
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="endereco" placeholder="Endereço" required>
+                                <label for="endereco">
+                                    <i class="fas fa-road me-1"></i>Endereço
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="numero" placeholder="Número" required>
+                                <label for="numero">
+                                    <i class="fas fa-hashtag me-1"></i>Número
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="complemento" placeholder="Complemento">
+                                <label for="complemento">
+                                    <i class="fas fa-building me-1"></i>Complemento
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="bairro" placeholder="Bairro" required>
+                                <label for="bairro">
+                                    <i class="fas fa-map me-1"></i>Bairro
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="cidade" placeholder="Cidade" required>
+                                <label for="cidade">
+                                    <i class="fas fa-city me-1"></i>Cidade
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating">
+                                <select class="form-select" id="estado" required>
+                                    <option value="">UF</option>
+                                    <option value="AC">AC</option>
+                                    <option value="AL">AL</option>
+                                    <option value="AP">AP</option>
+                                    <option value="AM">AM</option>
+                                    <option value="BA">BA</option>
+                                    <option value="CE">CE</option>
+                                    <option value="DF">DF</option>
+                                    <option value="ES">ES</option>
+                                    <option value="GO">GO</option>
+                                    <option value="MA">MA</option>
+                                    <option value="MT">MT</option>
+                                    <option value="MS">MS</option>
+                                    <option value="MG">MG</option>
+                                    <option value="PA">PA</option>
+                                    <option value="PB">PB</option>
+                                    <option value="PR">PR</option>
+                                    <option value="PE">PE</option>
+                                    <option value="PI">PI</option>
+                                    <option value="RJ">RJ</option>
+                                    <option value="RN">RN</option>
+                                    <option value="RS">RS</option>
+                                    <option value="RO">RO</option>
+                                    <option value="RR">RR</option>
+                                    <option value="SC">SC</option>
+                                    <option value="SP">SP</option>
+                                    <option value="SE">SE</option>
+                                    <option value="TO">TO</option>
+                                </select>
+                                <label for="estado">
+                                    <i class="fas fa-flag me-1"></i>Estado
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <button type="button" class="btn btn-outline-secondary btn-step" onclick="prevStep()">
+                            <i class="fas fa-arrow-left me-1"></i> Anterior
+                        </button>
+                        <button type="button" class="btn btn-primary btn-step" onclick="nextStep()">
+                            Próximo <i class="fas fa-arrow-right ms-1"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Etapa 4: Veículo -->
+                <div class="form-step" id="step4">
+                    <h4><i class="fas fa-car me-2"></i>Seu Veículo</h4>
+                    <p class="text-muted mb-3">Conte-nos sobre seu veículo para melhor atendimento</p>
+
+                    <h6>Tipo de Veículo:</h6>
+                    <div class="vehicle-grid mb-3">
+                        <div class="vehicle-card" onclick="selectVehicleType('carro')">
+                            <div class="vehicle-icon">
+                                <i class="fas fa-car"></i>
+                            </div>
+                            <div>Carro</div>
+                        </div>
+                        <div class="vehicle-card" onclick="selectVehicleType('moto')">
+                            <div class="vehicle-icon">
+                                <i class="fas fa-motorcycle"></i>
+                            </div>
+                            <div>Moto</div>
+                        </div>
+                        <div class="vehicle-card" onclick="selectVehicleType('caminhao')">
+                            <div class="vehicle-icon">
+                                <i class="fas fa-truck"></i>
+                            </div>
+                            <div>Caminhão</div>
+                        </div>
+                        <div class="vehicle-card" onclick="selectVehicleType('van')">
+                            <div class="vehicle-icon">
+                                <i class="fas fa-shuttle-van"></i>
+                            </div>
+                            <div>Van</div>
+                        </div>
+                    </div>
+
+                    <input type="hidden" id="tipoVeiculo" required>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="marca" placeholder="Marca" required>
+                                <label for="marca">
+                                    <i class="fas fa-industry me-1"></i>Marca
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="modelo" placeholder="Modelo" required>
+                                <label for="modelo">
+                                    <i class="fas fa-car-side me-1"></i>Modelo
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="number" class="form-control" id="ano" placeholder="Ano" min="1980" max="2025" required>
+                                <label for="ano">
+                                    <i class="fas fa-calendar-alt me-1"></i>Ano
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="cor" placeholder="Cor">
+                                <label for="cor">
+                                    <i class="fas fa-palette me-1"></i>Cor
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="placa" placeholder="Placa">
+                                <label for="placa">
+                                    <i class="fas fa-square me-1"></i>Placa
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select class="form-select" id="combustivel">
+                                    <option value="">Selecione</option>
+                                    <option value="gasolina">Gasolina</option>
+                                    <option value="etanol">Etanol</option>
+                                    <option value="flex">Flex</option>
+                                    <option value="diesel">Diesel</option>
+                                    <option value="gnv">GNV</option>
+                                    <option value="eletrico">Elétrico</option>
+                                    <option value="hibrido">Híbrido</option>
+                                </select>
+                                <label for="combustivel">
+                                    <i class="fas fa-gas-pump me-1"></i>Combustível
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-floating">
+                        <textarea class="form-control" id="observacoes" placeholder="Observações" style="height: 80px"></textarea>
+                        <label for="observacoes">
+                            <i class="fas fa-comment me-1"></i>Observações sobre o veículo
+                        </label>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <button type="button" class="btn btn-outline-secondary btn-step" onclick="prevStep()">
+                            <i class="fas fa-arrow-left me-1"></i> Anterior
+                        </button>
+                        <button type="button" class="btn btn-primary btn-step" onclick="nextStep()">
+                            Próximo <i class="fas fa-arrow-right ms-1"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Etapa 5: Confirmação -->
+                <div class="form-step" id="step5">
+                    <h4><i class="fas fa-check-circle me-2"></i>Confirmar Dados</h4>
+                    <p class="text-muted mb-3">Revise suas informações antes de finalizar</p>
+
+                    <div id="dadosResumo" class="row">
+                        <!-- Dados serão preenchidos dinamicamente -->
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="aceitarTermos" required>
+                        <label class="form-check-label" for="aceitarTermos">
+                            <i class="fas fa-file-contract me-1"></i>
+                            Li e aceito os <a href="#" onclick="showTerms()">termos de privacidade</a>
+                        </label>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="autorizarContato">
+                        <label class="form-check-label" for="autorizarContato">
+                            <i class="fas fa-phone-volume me-1"></i>
+                            Autorizo contato para agendamento de serviços
+                        </label>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <button type="button" class="btn btn-outline-secondary btn-step" onclick="prevStep()">
+                            <i class="fas fa-arrow-left me-1"></i> Anterior
+                        </button>
+                        <button type="submit" class="btn btn-success btn-step">
+                            <i class="fas fa-check me-1"></i> Finalizar Cadastro
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tela de Sucesso -->
+                <div class="form-step" id="stepSuccess" style="display: none;">
+                    <div class="success-animation">
+                        <div class="success-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <h3>Cadastro Realizado com Sucesso! 🎉</h3>
+                        <p class="text-muted mb-4">Bem-vindo à família VRS! Em breve entraremos em contato.</p>
+                        
+                        <div class="info-card">
+                            <h6><i class="fas fa-gift me-2"></i>Bônus de Boas-Vindas</h6>
+                            <p class="mb-2">Como novo cliente, você recebe:</p>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check text-success me-2"></i>10% de desconto na primeira compra</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Diagnóstico gratuito do veículo</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Prioridade no agendamento</li>
+                            </ul>
+                        </div>
+
+                        <div class="mt-4">
+                            <h6><i class="fas fa-phone me-2"></i>Fale Conosco</h6>
+                            <p class="mb-2">WhatsApp: <strong>(11) 99999-9999</strong></p>
+                            <p class="mb-2">Telefone: <strong>(11) 3333-3333</strong></p>
+                            <p class="mb-4">E-mail: <strong>contato@oficinaVRS.com.br</strong></p>
+                        </div>
+
+                        <button type="button" class="btn btn-primary btn-step" onclick="goToWebsite()">
+                            <i class="fas fa-globe me-1"></i> Acessar Site da Oficina
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentStep = 1;
+        const totalSteps = 5;
+
+        // Máscara para documentos
+        document.getElementById('documento').addEventListener('input', function(e) {
+            const tipo = document.getElementById('tipoDocumento').value;
+            let value = e.target.value.replace(/\D/g, '');
+            
+            if (tipo === 'cpf') {
+                value = value.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+                if (value.length > 14) value = value.substr(0, 14);
+            } else if (tipo === 'cnpj') {
+                value = value.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
+                if (value.length > 18) value = value.substr(0, 18);
+            }
+            
+            e.target.value = value;
+        });
+
+        // Máscara para telefone
+        ['telefone', 'whatsapp'].forEach(field => {
+            document.getElementById(field).addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                value = value.replace(/(\d{2})(\d{4,5})(\d{4})/, '($1) $2-$3');
+                if (value.length > 15) value = value.substr(0, 15);
+                e.target.value = value;
+            });
+        });
+
+        // Máscara para CEP
+        document.getElementById('cep').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            value = value.replace(/(\d{5})(\d{3})/, '$1-$2');
+            if (value.length > 9) value = value.substr(0, 9);
+            e.target.value = value;
+        });
+
+        // Buscar CEP
+        async function buscarCEP() {
+            const cep = document.getElementById('cep').value.replace(/\D/g, '');
+            
+            if (cep.length !== 8) {
+                alert('CEP deve ter 8 dígitos');
+                return;
+            }
+
+            try {
+                const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+                const data = await response.json();
+                
+                if (data.erro) {
+                    alert('CEP não encontrado');
+                    return;
+                }
+
+                document.getElementById('endereco').value = data.logradouro;
+                document.getElementById('bairro').value = data.bairro;
+                document.getElementById('cidade').value = data.localidade;
+                document.getElementById('estado').value = data.uf;
+                
+            } catch (error) {
+                alert('Erro ao buscar CEP. Preencha manualmente.');
+            }
+        }
+
+        // Seleção de tipo de veículo
+        function selectVehicleType(type) {
+            document.querySelectorAll('.vehicle-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            event.target.closest('.vehicle-card').classList.add('selected');
+            document.getElementById('tipoVeiculo').value = type;
+        }
+
+        // Navegação entre etapas
+        function nextStep() {
+            if (!validateCurrentStep()) return;
+            
+            if (currentStep < totalSteps) {
+                // Esconder etapa atual
+                document.getElementById(`step${currentStep}`).classList.remove('active');
+                document.getElementById(`step${currentStep}-indicator`).classList.add('completed');
+                document.getElementById(`step${currentStep}-indicator`).classList.remove('active');
+                
+                currentStep++;
+                
+                // Mostrar próxima etapa
+                document.getElementById(`step${currentStep}`).classList.add('active');
+                document.getElementById(`step${currentStep}-indicator`).classList.add('active');
+                
+                // Atualizar barra de progresso
+                const progress = (currentStep / totalSteps) * 100;
+                document.getElementById('progressFill').style.width = `${progress}%`;
+                
+                // Se for a última etapa, mostrar resumo
+                if (currentStep === totalSteps) {
+                    showSummary();
+                }
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 1) {
+                // Esconder etapa atual
+                document.getElementById(`step${currentStep}`).classList.remove('active');
+                document.getElementById(`step${currentStep}-indicator`).classList.remove('active');
+                
+                currentStep--;
+                
+                // Mostrar etapa anterior
+                document.getElementById(`step${currentStep}`).classList.add('active');
+                document.getElementById(`step${currentStep}-indicator`).classList.add('active');
+                document.getElementById(`step${currentStep}-indicator`).classList.remove('completed');
+                
+                // Atualizar barra de progresso
+                const progress = (currentStep / totalSteps) * 100;
+                document.getElementById('progressFill').style.width = `${progress}%`;
+            }
+        }
+
+        // Validação das etapas
+        function validateCurrentStep() {
+            const step = document.getElementById(`step${currentStep}`);
+            const requiredFields = step.querySelectorAll('[required]');
+            
+            for (let field of requiredFields) {
+                if (!field.value.trim()) {
+                    field.focus();
+                    field.classList.add('is-invalid');
+                    setTimeout(() => field.classList.remove('is-invalid'), 3000);
+                    return false;
+                }
+            }
+            
+            // Validações específicas
+            if (currentStep === 1) {
+                const email = document.getElementById('email');
+                if (email && email.value && !isValidEmail(email.value)) {
+                    alert('Digite um e-mail válido');
+                    email.focus();
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+
+        function isValidEmail(email) {
+            const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return regex.test(email);
+        }
+
+        // Mostrar resumo dos dados
+        function showSummary() {
+            const resumo = document.getElementById('dadosResumo');
+            const formData = collectFormData();
+            
+            resumo.innerHTML = `
+                <div class="col-md-6">
+                    <div class="info-card">
+                        <h6><i class="fas fa-user me-2"></i>Dados Pessoais</h6>
+                        <p><strong>Nome:</strong> ${formData.nomeCompleto}</p>
+                        <p><strong>Documento:</strong> ${formData.documento}</p>
+                        <p><strong>Data Nasc.:</strong> ${formData.dataNascimento || 'Não informado'}</p>
+                    </div>
+                    
+                    <div class="info-card">
+                        <h6><i class="fas fa-phone me-2"></i>Contato</h6>
+                        <p><strong>Telefone:</strong> ${formData.telefone}</p>
+                        <p><strong>WhatsApp:</strong> ${formData.whatsapp || 'Não informado'}</p>
+                        <p><strong>E-mail:</strong> ${formData.email}</p>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="info-card">
+                        <h6><i class="fas fa-map-marker-alt me-2"></i>Endereço</h6>
+                        <p><strong>CEP:</strong> ${formData.cep}</p>
+                        <p><strong>Endereço:</strong> ${formData.endereco}, ${formData.numero}</p>
+                        <p><strong>Bairro:</strong> ${formData.bairro}</p>
+                        <p><strong>Cidade:</strong> ${formData.cidade}/${formData.estado}</p>
+                    </div>
+                    
+                    <div class="info-card">
+                        <h6><i class="fas fa-car me-2"></i>Veículo</h6>
+                        <p><strong>Tipo:</strong> ${formData.tipoVeiculo}</p>
+                        <p><strong>Marca/Modelo:</strong> ${formData.marca} ${formData.modelo}</p>
+                        <p><strong>Ano:</strong> ${formData.ano}</p>
+                        <p><strong>Placa:</strong> ${formData.placa || 'Não informado'}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Coleta dados do formulário
+        function collectFormData() {
+            return {
+                nomeCompleto: document.getElementById('nomeCompleto').value,
+                tipoDocumento: document.getElementById('tipoDocumento').value,
+                documento: document.getElementById('documento').value,
+                dataNascimento: document.getElementById('dataNascimento').value,
+                telefone: document.getElementById('telefone').value,
+                whatsapp: document.getElementById('whatsapp').value,
+                email: document.getElementById('email').value,
+                receberPromocoes: document.getElementById('receberPromocoes').checked,
+                cep: document.getElementById('cep').value,
+                endereco: document.getElementById('endereco').value,
+                numero: document.getElementById('numero').value,
+                complemento: document.getElementById('complemento').value,
+                bairro: document.getElementById('bairro').value,
+                cidade: document.getElementById('cidade').value,
+                estado: document.getElementById('estado').value,
+                tipoVeiculo: document.getElementById('tipoVeiculo').value,
+                marca: document.getElementById('marca').value,
+                modelo: document.getElementById('modelo').value,
+                ano: document.getElementById('ano').value,
+                cor: document.getElementById('cor').value,
+                placa: document.getElementById('placa').value,
+                combustivel: document.getElementById('combustivel').value,
+                observacoes: document.getElementById('observacoes').value,
+                aceitarTermos: document.getElementById('aceitarTermos').checked,
+                autorizarContato: document.getElementById('autorizarContato').checked
+            };
+        }
+
+        // Submit do formulário
+        document.getElementById('clientRegistrationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (!document.getElementById('aceitarTermos').checked) {
+                alert('Você deve aceitar os termos de privacidade');
+                return;
+            }
+            
+            const formData = collectFormData();
+            
+            // Simular salvamento (aqui você conectaria com seu backend)
+            console.log('Dados do cliente:', formData);
+            
+            // Salvar localmente para demonstração
+            localStorage.setItem('novoCliente', JSON.stringify({
+                ...formData,
+                dataCadastro: new Date().toISOString(),
+                status: 'ativo'
+            }));
+            
+            // Mostrar tela de sucesso
+            document.getElementById('step5').classList.remove('active');
+            document.getElementById('stepSuccess').style.display = 'block';
+            document.getElementById('progressFill').style.width = '100%';
+            
+            // Enviar notificação para WhatsApp da oficina (simulado)
+            sendNotificationToWorkshop(formData);
+        });
+
+        function sendNotificationToWorkshop(clientData) {
+            const message = `🔔 *NOVO CLIENTE CADASTRADO*\n\n` +
+                          `👤 *Nome:* ${clientData.nomeCompleto}\n` +
+                          `📱 *Telefone:* ${clientData.telefone}\n` +
+                          `📧 *E-mail:* ${clientData.email}\n` +
+                          `🚗 *Veículo:* ${clientData.marca} ${clientData.modelo} ${clientData.ano}\n` +
+                          `📍 *Cidade:* ${clientData.cidade}/${clientData.estado}\n\n` +
+                          `*Cadastrado via QR Code*\n` +
+                          `🕐 ${new Date().toLocaleString('pt-BR')}`;
+            
+            // Aqui você pode integrar com API do WhatsApp Business
+            console.log('Notificação para oficina:', message);
+        }
+
+        function showTerms() {
+            alert('Termos de Privacidade:\n\nSeus dados pessoais são coletados apenas para prestação de serviços automotivos. Não compartilhamos informações com terceiros. Você pode solicitar exclusão dos dados a qualquer momento.');
+        }
+
+        function goToWebsite() {
+            // Redirecionar para o site da oficina ou página principal
+            window.location.href = 'index.html';
+        }
+
+        // Verificar se veio via QR Code
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const source = urlParams.get('source');
+            
+            if (source === 'qr') {
+                // Adicionar indicação visual de que veio via QR Code
+                const header = document.querySelector('.header-section');
+                header.innerHTML += '<div class="alert alert-info mt-2 mb-0"><i class="fas fa-qrcode me-2"></i>Cadastro via QR Code</div>';
+            }
+        });
+    </script>
+</body>
+</html>
