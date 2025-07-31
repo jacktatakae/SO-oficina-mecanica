@@ -162,7 +162,7 @@
                 <ol>
                     <li>Acesse: <a href="https://tinyurl.com" target="_blank">https://tinyurl.com</a></li>
                     <li>Cole este link na caixa: <br>
-                        <code>file:///C:/Users/Vinicius%20Radiadores/Documents/front%20engine/cadastro-cliente.html</code>
+                        <code>https://jacktatakae.github.io/SO-oficina-mecanica/cadastro-cliente.html</code>
                     </li>
                     <li>Personalize o nome: <strong>cadastro-vrs</strong></li>
                     <li>Clique em "Make TinyURL!"</li>
@@ -175,13 +175,13 @@
                     <li>Crie um repositório público</li>
                     <li>Faça upload dos seus arquivos HTML</li>
                     <li>Ative GitHub Pages nas configurações</li>
-                    <li>Seu site ficará em: <code>https://seuusuario.github.io/repositorio</code></li>
+                    <li>Seu site ficará em: <code>https://jacktatakae.github.io/SO-oficina-mecanica</code></li>
                 </ol>
 
                 <h6 class="mt-3 text-primary">Opção 3 - Servidor Local:</h6>
                 <p>No PowerShell, dentro da pasta dos arquivos:</p>
                 <code>python -m http.server 8000</code><br>
-                <small class="text-muted">Depois acesse: http://localhost:8000/cadastro-cliente.html</small>
+                <small class="text-muted">Depois acesse: https://jacktatakae.github.io/SO-oficina-mecanica/cadastro-cliente.html</small>
             </div>
         </div>
 
@@ -202,7 +202,7 @@
 1️⃣ Acesse: https://tinyurl.com
 
 2️⃣ Cole este link:
-file:///C:/Users/Vinicius%20Radiadores/Documents/front%20engine/cadastro-cliente.html
+https://jacktatakae.github.io/SO-oficina-mecanica/cadastro-cliente.html
 
 3️⃣ Personalize para: cadastro-vrs
 
@@ -229,11 +229,9 @@ file:///C:/Users/Vinicius%20Radiadores/Documents/front%20engine/cadastro-cliente
         }
 
         function testarCadastro() {
-            // Abrir o cadastro diretamente no mesmo dispositivo
-            const currentUrl = window.location.href;
-            const cadastroUrl = currentUrl.replace('qr-teste.html', 'cadastro-cliente.html') + '?source=teste';
-            
-            window.open(cadastroUrl, '_blank');
+            // Abrir o cadastro do GitHub Pages
+            const githubUrl = 'https://jacktatakae.github.io/SO-oficina-mecanica/cadastro-cliente.html?source=teste';
+            window.open(githubUrl, '_blank');
         }
 
         function mostrarInstrucoes() {
@@ -250,17 +248,17 @@ file:///C:/Users/Vinicius%20Radiadores/Documents/front%20engine/cadastro-cliente
 
         // Gerar QR code dinâmico baseado na URL atual
         document.addEventListener('DOMContentLoaded', function() {
-            const currentUrl = window.location.href;
-            const cadastroUrl = currentUrl.replace('qr-teste.html', 'cadastro-cliente.html') + '?source=qr';
+            // Usar o link real do GitHub Pages
+            const githubUrl = 'https://jacktatakae.github.io/SO-oficina-mecanica/cadastro-cliente.html?source=qr';
             
-            // Atualizar QR code para apontar para o cadastro local
+            // Atualizar QR code para apontar para o GitHub Pages
             const qrImage = document.getElementById('qrCodeImage');
-            qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(cadastroUrl)}`;
+            qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(githubUrl)}`;
             
             // Mostrar status
             document.getElementById('statusTeste').style.display = 'block';
             document.getElementById('statusTexto').textContent = 
-                'QR Code gerado para: ' + cadastroUrl.substring(0, 50) + '...';
+                'QR Code gerado para: ' + githubUrl.substring(0, 50) + '...';
         });
 
         // Testar se o arquivo existe
