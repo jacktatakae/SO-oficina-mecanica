@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔧 Teste de Instalação PWA</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#2196F3">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    
+    <link rel="manifest" href="./manifest.json">
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .test-container {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 2rem auto;
+            max-width: 800px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .test-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .test-header h1 {
+            color: #2196F3;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .test-item {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-left: 5px solid #6c757d;
+            transition: all 0.3s ease;
+        }
+
+        .test-item.success {
+            border-left-color: #28a745;
+            background: #d4edda;
+        }
+
+        .test-item.warning {
+            border-left-color: #ffc107;
+            background: #fff3cd;
+        }
+
+        .test-item.error {
+            border-left-color: #dc3545;
+            background: #f8d7da;
+        }
+
+        .test-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .test-status {
+            font-size: 1.2rem;
+        }
+
+        .status-success { color: #28a745; }
+        .status-warning { color: #ffc107; }
+        .status-error { color: #dc3545; }
+
+        .action-buttons {
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .btn-test {
+            margin: 0.5rem;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .install-info {
+            background: linear-gradient(45deg, #2196F3, #1976D2);
+            color: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .device-info {
+            background: #e3f2fd;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .progress-bar {
+            background: #e9ecef;
+            border-radius: 10px;
+            height: 20px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #28a745, #20c997);
+            height: 100%;
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="test-container">
+            <div class="test-header">
+                <h1><i class="fas fa-cogs me-2"></i>Teste de Instalação PWA</h1>
+                <p class="text-muted">Verificação completa da compatibilidade e instalação do VRS como app</p>
+                
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressBar" style="width: 0%;">0%</div>
+                </div>
+            </div>
+
+            <!-- Informações do Dispositivo -->
+            <div class="device-info">
+                <h5><i class="fas fa-mobile-alt me-2"></i>Informações do Dispositivo</h5>
+                <div id="deviceInfo">
+                    <strong>Carregando...</strong>
+                </div>
+            </div>
+
+            <!-- Testes de Compatibilidade -->
+            <div class="test-item" id="test1">
+                <div class="test-title">
+                    <span><i class="fas fa-globe me-2"></i>Suporte a Service Worker</span>
+                    <span class="test-status" id="status1"><i class="fas fa-spinner fa-spin"></i></span>
+                </div>
+                <div id="detail1">Verificando se o navegador suporta Service Workers...</div>
+            </div>
+
+            <div class="test-item" id="test2">
+                <div class="test-title">
+                    <span><i class="fas fa-file-alt me-2"></i>Manifesto PWA</span>
+                    <span class="test-status" id="status2"><i class="fas fa-spinner fa-spin"></i></span>
+                </div>
+                <div id="detail2">Carregando arquivo de manifesto...</div>
+            </div>
+
+            <div class="test-item" id="test3">
+                <div class="test-title">
+                    <span><i class="fas fa-shield-alt me-2"></i>Conexão HTTPS</span>
+                    <span class="test-status" id="status3"><i class="fas fa-spinner fa-spin"></i></span>
+                </div>
+                <div id="detail3">Verificando protocolo de segurança...</div>
+            </div>
+
+            <div class="test-item" id="test4">
+                <div class="test-title">
+                    <span><i class="fas fa-download me-2"></i>Instalação Disponível</span>
+                    <span class="test-status" id="status4"><i class="fas fa-spinner fa-spin"></i></span>
+                </div>
+                <div id="detail4">Aguardando evento de instalação...</div>
+            </div>
+
+            <div class="test-item" id="test5">
+                <div class="test-title">
+                    <span><i class="fas fa-mobile-alt me-2"></i>App Já Instalado</span>
+                    <span class="test-status" id="status5"><i class="fas fa-spinner fa-spin"></i></span>
+                </div>
+                <div id="detail5">Verificando se o app já está instalado...</div>
+            </div>
+
+            <!-- Resultado Final -->
+            <div class="install-info" id="finalResult" style="display: none;">
+                <h4 id="resultTitle"><i class="fas fa-check-circle me-2"></i>Status da Instalação</h4>
+                <p id="resultMessage">Aguardando testes...</p>
+                <div id="resultActions"></div>
+            </div>
+
+            <!-- Botões de Ação -->
+            <div class="action-buttons">
+                <button class="btn btn-primary btn-test" onclick="runTests()">
+                    <i class="fas fa-play me-2"></i>Executar Testes
+                </button>
+                <button class="btn btn-success btn-test" onclick="window.location.href='inventario-rapido.html'">
+                    <i class="fas fa-home me-2"></i>Ir para VRS
+                </button>
+                <button class="btn btn-info btn-test" onclick="window.location.href='instalar-app.html'">
+                    <i class="fas fa-book me-2"></i>Guia de Instalação
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let deferredPrompt;
+        let testResults = {};
+        let testProgress = 0;
+        const totalTests = 5;
+
+        // Detectar instalação disponível
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            console.log('🎯 PWA instalação detectada');
+        });
+
+        // Detectar app instalado
+        window.addEventListener('appinstalled', () => {
+            console.log('✅ PWA instalado com sucesso');
+        });
+
+        // Inicializar quando página carregar
+        window.addEventListener('load', () => {
+            displayDeviceInfo();
+            runTests();
+        });
+
+        function displayDeviceInfo() {
+            const info = {
+                userAgent: navigator.userAgent,
+                platform: navigator.platform,
+                language: navigator.language,
+                cookieEnabled: navigator.cookieEnabled,
+                onLine: navigator.onLine,
+                screen: `${screen.width}x${screen.height}`,
+                viewport: `${window.innerWidth}x${window.innerHeight}`
+            };
+
+            let html = '<div class="row">';
+            html += `<div class="col-md-6"><strong>Sistema:</strong> ${detectPlatform()}</div>`;
+            html += `<div class="col-md-6"><strong>Navegador:</strong> ${detectBrowser()}</div>`;
+            html += `<div class="col-md-6"><strong>Tela:</strong> ${info.screen}</div>`;
+            html += `<div class="col-md-6"><strong>Viewport:</strong> ${info.viewport}</div>`;
+            html += `<div class="col-md-6"><strong>Online:</strong> ${info.onLine ? '✅ Sim' : '❌ Não'}</div>`;
+            html += `<div class="col-md-6"><strong>Cookies:</strong> ${info.cookieEnabled ? '✅ Habilitado' : '❌ Desabilitado'}</div>`;
+            html += '</div>';
+
+            document.getElementById('deviceInfo').innerHTML = html;
+        }
+
+        function detectPlatform() {
+            const ua = navigator.userAgent;
+            if (/Android/i.test(ua)) return 'Android';
+            if (/iPhone|iPad|iPod/i.test(ua)) return 'iOS';
+            if (/Windows/i.test(ua)) return 'Windows';
+            if (/Mac/i.test(ua)) return 'macOS';
+            if (/Linux/i.test(ua)) return 'Linux';
+            return 'Desconhecido';
+        }
+
+        function detectBrowser() {
+            const ua = navigator.userAgent;
+            if (ua.includes('Chrome')) return 'Chrome';
+            if (ua.includes('Safari') && !ua.includes('Chrome')) return 'Safari';
+            if (ua.includes('Firefox')) return 'Firefox';
+            if (ua.includes('Edge')) return 'Edge';
+            return 'Outro';
+        }
+
+        async function runTests() {
+            testProgress = 0;
+            updateProgress(0);
+
+            // Teste 1: Service Worker
+            await test1ServiceWorker();
+            
+            // Teste 2: Manifesto
+            await test2Manifest();
+            
+            // Teste 3: HTTPS
+            await test3HTTPS();
+            
+            // Teste 4: Instalação Disponível
+            await test4InstallAvailable();
+            
+            // Teste 5: App Instalado
+            await test5AppInstalled();
+
+            // Mostrar resultado final
+            showFinalResult();
+        }
+
+        async function test1ServiceWorker() {
+            const testId = 'test1';
+            const statusId = 'status1';
+            const detailId = 'detail1';
+
+            try {
+                if ('serviceWorker' in navigator) {
+                    setTestResult(testId, statusId, detailId, 'success', 
+                        '✅ Suportado', 
+                        'Service Workers são suportados pelo navegador');
+                    testResults.serviceWorker = true;
+                } else {
+                    setTestResult(testId, statusId, detailId, 'error', 
+                        '❌ Não Suportado', 
+                        'Service Workers não são suportados. PWA não funcionará offline');
+                    testResults.serviceWorker = false;
+                }
+            } catch (error) {
+                setTestResult(testId, statusId, detailId, 'error', 
+                    '❌ Erro', 
+                    `Erro ao verificar Service Worker: ${error.message}`);
+                testResults.serviceWorker = false;
+            }
+
+            updateProgress(++testProgress);
+        }
+
+        async function test2Manifest() {
+            const testId = 'test2';
+            const statusId = 'status2';
+            const detailId = 'detail2';
+
+            try {
+                const response = await fetch('./manifest.json');
+                if (response.ok) {
+                    const manifest = await response.json();
+                    setTestResult(testId, statusId, detailId, 'success', 
+                        '✅ Encontrado', 
+                        `Manifesto carregado: "${manifest.name}"`);
+                    testResults.manifest = true;
+                } else {
+                    setTestResult(testId, statusId, detailId, 'error', 
+                        '❌ Não Encontrado', 
+                        'Arquivo manifest.json não foi encontrado');
+                    testResults.manifest = false;
+                }
+            } catch (error) {
+                setTestResult(testId, statusId, detailId, 'error', 
+                    '❌ Erro', 
+                    `Erro ao carregar manifesto: ${error.message}`);
+                testResults.manifest = false;
+            }
+
+            updateProgress(++testProgress);
+        }
+
+        async function test3HTTPS() {
+            const testId = 'test3';
+            const statusId = 'status3';
+            const detailId = 'detail3';
+
+            const isHttps = location.protocol === 'https:';
+            const isLocalhost = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+
+            if (isHttps || isLocalhost) {
+                setTestResult(testId, statusId, detailId, 'success', 
+                    '✅ Seguro', 
+                    isHttps ? 'Conexão HTTPS estabelecida' : 'Localhost detectado (OK para desenvolvimento)');
+                testResults.https = true;
+            } else {
+                setTestResult(testId, statusId, detailId, 'error', 
+                    '❌ Inseguro', 
+                    'PWA requer HTTPS. Use um servidor seguro');
+                testResults.https = false;
+            }
+
+            updateProgress(++testProgress);
+        }
+
+        async function test4InstallAvailable() {
+            const testId = 'test4';
+            const statusId = 'status4';
+            const detailId = 'detail4';
+
+            // Aguardar 2 segundos para o evento beforeinstallprompt
+            await new Promise(resolve => setTimeout(resolve, 2000));
+
+            if (deferredPrompt) {
+                setTestResult(testId, statusId, detailId, 'success', 
+                    '✅ Disponível', 
+                    'Instalação automática disponível');
+                testResults.installAvailable = true;
+            } else {
+                setTestResult(testId, statusId, detailId, 'warning', 
+                    '⚠️ Não Detectado', 
+                    'Instalação automática não detectada. Pode ser instalado manualmente');
+                testResults.installAvailable = false;
+            }
+
+            updateProgress(++testProgress);
+        }
+
+        async function test5AppInstalled() {
+            const testId = 'test5';
+            const statusId = 'status5';
+            const detailId = 'detail5';
+
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+            const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+            const isIOSStandalone = isIOS && window.navigator.standalone;
+
+            if (isStandalone || isIOSStandalone) {
+                setTestResult(testId, statusId, detailId, 'success', 
+                    '✅ Instalado', 
+                    'VRS está rodando como app instalado');
+                testResults.appInstalled = true;
+            } else {
+                setTestResult(testId, statusId, detailId, 'warning', 
+                    '⚠️ Não Instalado', 
+                    'VRS está rodando no navegador. Instale como app para melhor experiência');
+                testResults.appInstalled = false;
+            }
+
+            updateProgress(++testProgress);
+        }
+
+        function setTestResult(testId, statusId, detailId, type, status, detail) {
+            const testElement = document.getElementById(testId);
+            const statusElement = document.getElementById(statusId);
+            const detailElement = document.getElementById(detailId);
+
+            testElement.className = `test-item ${type}`;
+            statusElement.innerHTML = status;
+            statusElement.className = `test-status status-${type}`;
+            detailElement.innerHTML = detail;
+        }
+
+        function updateProgress(completed) {
+            const percentage = Math.round((completed / totalTests) * 100);
+            const progressBar = document.getElementById('progressBar');
+            progressBar.style.width = `${percentage}%`;
+            progressBar.textContent = `${percentage}%`;
+        }
+
+        function showFinalResult() {
+            const resultDiv = document.getElementById('finalResult');
+            const titleElement = document.getElementById('resultTitle');
+            const messageElement = document.getElementById('resultMessage');
+            const actionsElement = document.getElementById('resultActions');
+
+            let score = 0;
+            let message = '';
+            let actions = '';
+
+            // Calcular pontuação
+            if (testResults.serviceWorker) score++;
+            if (testResults.manifest) score++;
+            if (testResults.https) score++;
+
+            if (testResults.appInstalled) {
+                titleElement.innerHTML = '<i class="fas fa-check-circle me-2"></i>App Já Instalado!';
+                message = '🎉 Perfeito! O VRS já está instalado e funcionando como app nativo.';
+                actions = `
+                    <button class="btn btn-light btn-lg me-2" onclick="window.location.href='inventario-rapido.html'">
+                        <i class="fas fa-home me-2"></i>Abrir VRS
+                    </button>
+                `;
+            } else if (score >= 3) {
+                if (testResults.installAvailable) {
+                    titleElement.innerHTML = '<i class="fas fa-download me-2"></i>Pronto para Instalar!';
+                    message = '✅ Seu navegador suporta PWA. Você pode instalar o VRS como app agora!';
+                    actions = `
+                        <button class="btn btn-success btn-lg me-2" onclick="installApp()">
+                            <i class="fas fa-download me-2"></i>Instalar Agora
+                        </button>
+                        <button class="btn btn-light btn-lg me-2" onclick="window.location.href='instalar-app.html'">
+                            <i class="fas fa-book me-2"></i>Ver Guia
+                        </button>
+                    `;
+                } else {
+                    titleElement.innerHTML = '<i class="fas fa-info-circle me-2"></i>Instalação Manual';
+                    message = '✅ Seu navegador suporta PWA. Siga o guia para instalação manual.';
+                    actions = `
+                        <button class="btn btn-primary btn-lg me-2" onclick="window.location.href='instalar-app.html'">
+                            <i class="fas fa-book me-2"></i>Guia de Instalação
+                        </button>
+                    `;
+                }
+            } else {
+                titleElement.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>Limitações Detectadas';
+                message = '⚠️ Algumas funcionalidades do PWA podem não funcionar corretamente. Considere usar um navegador mais recente.';
+                actions = `
+                    <button class="btn btn-warning btn-lg me-2" onclick="window.location.href='inventario-rapido.html'">
+                        <i class="fas fa-globe me-2"></i>Usar no Navegador
+                    </button>
+                `;
+            }
+
+            messageElement.innerHTML = message;
+            actionsElement.innerHTML = actions;
+            resultDiv.style.display = 'block';
+        }
+
+        async function installApp() {
+            if (!deferredPrompt) {
+                alert('Instalação automática não disponível. Use o guia manual.');
+                return;
+            }
+
+            try {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                
+                if (outcome === 'accepted') {
+                    alert('✅ VRS instalado com sucesso!');
+                    location.reload();
+                } else {
+                    alert('Instalação cancelada pelo usuário');
+                }
+                
+                deferredPrompt = null;
+            } catch (error) {
+                alert(`Erro na instalação: ${error.message}`);
+            }
+        }
+
+        // Registrar Service Worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js')
+                .then(() => console.log('🔧 Service Worker registrado'))
+                .catch(err => console.log('❌ Erro no Service Worker:', err));
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📱 Instalar VRS como App</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#2196F3">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 0;
+            margin: 0;
+        }
+
+        .install-container {
+            background: white;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+            color: white;
+            padding: 3rem 1rem 2rem;
+            text-align: center;
+            border-radius: 0 0 40px 40px;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 25px rgba(33, 150, 243, 0.3);
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .header p {
+            opacity: 0.9;
+            margin: 0;
+            font-size: 1.1rem;
+        }
+
+        .install-section {
+            padding: 0 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .platform-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 3px solid #f0f0f0;
+            transition: all 0.3s ease;
+        }
+
+        .platform-card:hover {
+            border-color: #2196F3;
+            transform: translateY(-5px);
+        }
+
+        .platform-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .platform-icon {
+            font-size: 3rem;
+            margin-right: 1rem;
+            color: #2196F3;
+        }
+
+        .platform-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #333;
+            margin: 0;
+        }
+
+        .step {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+        }
+
+        .step-number {
+            background: linear-gradient(45deg, #2196F3, #1976D2);
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 1rem;
+            flex-shrink: 0;
+            font-size: 1rem;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-title {
+            font-weight: 600;
+            color: #2196F3;
+            margin-bottom: 0.5rem;
+        }
+
+        .step-description {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .install-button {
+            background: linear-gradient(45deg, #4CAF50, #388E3C);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            width: 100%;
+            margin: 1rem 0;
+            transition: all 0.3s ease;
+            display: none;
+        }
+
+        .install-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(76, 175, 80, 0.4);
+        }
+
+        .install-button.show {
+            display: block;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        .status-message {
+            padding: 1rem;
+            border-radius: 12px;
+            margin: 1rem 0;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .status-success {
+            background: #E8F5E8;
+            color: #2E7D32;
+            border: 2px solid #C8E6C9;
+        }
+
+        .status-info {
+            background: #E3F2FD;
+            color: #1976D2;
+            border: 2px solid #BBDEFB;
+        }
+
+        .status-warning {
+            background: #FFF8E1;
+            color: #F57C00;
+            border: 2px solid #FFECB3;
+        }
+
+        .bottom-actions {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 1rem;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+            border-radius: 20px 20px 0 0;
+        }
+
+        .action-btn {
+            border-radius: 12px;
+            padding: 1rem;
+            font-weight: 600;
+            border: 2px solid;
+            transition: all 0.3s ease;
+            margin: 0.25rem;
+        }
+
+        .btn-primary-action {
+            background: linear-gradient(45deg, #2196F3, #1976D2);
+            border-color: #2196F3;
+            color: white;
+        }
+
+        .btn-outline-action {
+            background: white;
+            border-color: #2196F3;
+            color: #2196F3;
+        }
+
+        .content-with-bottom {
+            padding-bottom: 100px;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .visual-guide {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-left: 4px solid #2196F3;
+        }
+
+        .visual-guide img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin: 0.5rem 0;
+        }
+
+        /* Estilos específicos para diferentes plataformas */
+        .android-card {
+            border-left: 6px solid #4CAF50;
+        }
+
+        .ios-card {
+            border-left: 6px solid #007AFF;
+        }
+
+        .desktop-card {
+            border-left: 6px solid #FF9800;
+        }
+    </style>
+</head>
+<body>
+    <div class="install-container">
+        <div class="header">
+            <h1><i class="fas fa-mobile-alt me-2"></i>Instalar VRS como App</h1>
+            <p>Transforme o VRS em um app nativo no seu dispositivo</p>
+        </div>
+
+        <div class="install-section content-with-bottom">
+            <!-- Detecção automática e botão de instalação -->
+            <div id="autoInstallSection" style="display: none;">
+                <div class="platform-card">
+                    <div class="status-success">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <strong>Instalação disponível!</strong><br>
+                        Seu dispositivo suporta instalação automática
+                    </div>
+                    <button class="install-button" id="installButton">
+                        <i class="fas fa-download me-2"></i>Instalar VRS como App
+                    </button>
+                </div>
+            </div>
+
+            <!-- Android -->
+            <div class="platform-card android-card">
+                <div class="platform-header">
+                    <i class="fab fa-android platform-icon"></i>
+                    <h3 class="platform-title">Android (Chrome/Edge)</h3>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <div class="step-title">Abrir no Chrome</div>
+                        <div class="step-description">Acesse esta página usando Chrome ou Edge no Android</div>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <div class="step-title">Procurar ícone de instalação</div>
+                        <div class="step-description">
+                            Procure por:
+                            <ul class="mt-2">
+                                <li><i class="fas fa-plus me-1"></i> Ícone "+" na barra de endereço</li>
+                                <li><i class="fas fa-ellipsis-v me-1"></i> Menu (3 pontos) → "Instalar app"</li>
+                                <li><i class="fas fa-home me-1"></i> "Adicionar à tela inicial"</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <div class="step-title">Confirmar instalação</div>
+                        <div class="step-description">Toque em "Instalar" ou "Adicionar" para finalizar</div>
+                    </div>
+                </div>
+
+                <div class="visual-guide">
+                    <strong><i class="fas fa-eye me-1"></i> Resultado esperado:</strong><br>
+                    ✅ Ícone "VRS Inventário" na tela inicial<br>
+                    ✅ Abre como app nativo (sem barra do navegador)<br>
+                    ✅ Funciona offline
+                </div>
+            </div>
+
+            <!-- iOS -->
+            <div class="platform-card ios-card">
+                <div class="platform-header">
+                    <i class="fab fa-apple platform-icon"></i>
+                    <h3 class="platform-title">iPhone/iPad (Safari)</h3>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <div class="step-title">Abrir no Safari</div>
+                        <div class="step-description">Use o Safari (navegador padrão do iPhone)</div>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <div class="step-title">Botão Compartilhar</div>
+                        <div class="step-description">
+                            Toque no botão compartilhar: <i class="fas fa-share-alt text-primary"></i> (quadrado com seta)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <div class="step-title">Adicionar à Tela Inicial</div>
+                        <div class="step-description">
+                            Role para baixo e toque em:<br>
+                            <i class="fas fa-plus-square me-1 text-primary"></i> "Adicionar à Tela de Início"
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <div class="step-title">Personalizar e confirmar</div>
+                        <div class="step-description">
+                            Edite o nome se quiser (ex: "VRS") e toque "Adicionar"
+                        </div>
+                    </div>
+                </div>
+
+                <div class="visual-guide">
+                    <strong><i class="fas fa-eye me-1"></i> Resultado esperado:</strong><br>
+                    ✅ Ícone "VRS Inventário" na tela inicial<br>
+                    ✅ Abre em tela cheia como app<br>
+                    ✅ Funciona offline
+                </div>
+            </div>
+
+            <!-- Desktop -->
+            <div class="platform-card desktop-card">
+                <div class="platform-header">
+                    <i class="fas fa-desktop platform-icon"></i>
+                    <h3 class="platform-title">Computador (Chrome/Edge)</h3>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <div class="step-title">Ícone na barra de endereço</div>
+                        <div class="step-description">
+                            Procure o ícone de instalação <i class="fas fa-plus me-1"></i> ao lado da URL
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <div class="step-title">Instalar aplicativo</div>
+                        <div class="step-description">
+                            Clique no ícone e depois em "Instalar"
+                        </div>
+                    </div>
+                </div>
+
+                <div class="visual-guide">
+                    <strong><i class="fas fa-eye me-1"></i> Resultado esperado:</strong><br>
+                    ✅ Atalho no desktop e menu iniciar<br>
+                    ✅ Abre em janela própria<br>
+                    ✅ Aparece na barra de tarefas
+                </div>
+            </div>
+
+            <!-- Status da instalação -->
+            <div id="installStatus" class="status-message" style="display: none;"></div>
+
+            <!-- Troubleshooting -->
+            <div class="platform-card">
+                <div class="platform-header">
+                    <i class="fas fa-tools platform-icon"></i>
+                    <h3 class="platform-title">Problemas Comuns</h3>
+                </div>
+                
+                <div class="visual-guide">
+                    <strong>❌ Não aparece opção de instalar:</strong><br>
+                    • Verifique se está usando HTTPS<br>
+                    • Aguarde a página carregar completamente<br>
+                    • Tente atualizar a página<br>
+                    • Use Chrome ou Safari mais recentes
+                </div>
+
+                <div class="visual-guide">
+                    <strong>❌ App não funciona offline:</strong><br>
+                    • Abra o app online primeiro<br>
+                    • Navegue pelas principais páginas<br>
+                    • Aguarde o cache ser populado<br>
+                    • Teste offline depois
+                </div>
+
+                <div class="visual-guide">
+                    <strong>❌ App não sincroniza:</strong><br>
+                    • Configure GitHub Sync primeiro<br>
+                    • Verifique conexão com internet<br>
+                    • Teste sync manual na configuração
+                </div>
+            </div>
+        </div>
+
+        <!-- Botões de ação fixos -->
+        <div class="bottom-actions">
+            <div class="row">
+                <div class="col-6">
+                    <button class="btn action-btn btn-outline-action w-100" onclick="window.location.href='inventario-rapido.html'">
+                        <i class="fas fa-arrow-left me-1"></i>Voltar
+                    </button>
+                </div>
+                <div class="col-6">
+                    <button class="btn action-btn btn-primary-action w-100" onclick="testarInstalacao()">
+                        <i class="fas fa-check me-1"></i>Testar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let deferredPrompt;
+        let isInstalled = false;
+
+        // Detectar se PWA é suportado
+        window.addEventListener('beforeinstallprompt', (e) => {
+            console.log('🎯 PWA instalação disponível');
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // Mostrar seção de instalação automática
+            document.getElementById('autoInstallSection').style.display = 'block';
+            document.getElementById('installButton').classList.add('show');
+        });
+
+        // Botão de instalação
+        document.getElementById('installButton').addEventListener('click', async () => {
+            if (!deferredPrompt) {
+                showStatus('Instalação automática não disponível neste navegador', 'warning');
+                return;
+            }
+
+            // Mostrar prompt de instalação
+            deferredPrompt.prompt();
+            
+            // Aguardar resposta do usuário
+            const { outcome } = await deferredPrompt.userChoice;
+            
+            if (outcome === 'accepted') {
+                showStatus('✅ VRS instalado com sucesso como app!', 'success');
+                isInstalled = true;
+            } else {
+                showStatus('Instalação cancelada pelo usuário', 'info');
+            }
+            
+            deferredPrompt = null;
+        });
+
+        // Detectar quando app é instalado
+        window.addEventListener('appinstalled', () => {
+            console.log('✅ VRS PWA instalado');
+            showStatus('🎉 VRS instalado com sucesso! Procure o ícone na tela inicial.', 'success');
+            isInstalled = true;
+        });
+
+        // Verificar se já está instalado
+        window.addEventListener('load', () => {
+            // Detectar se está rodando como PWA
+            if (window.matchMedia('(display-mode: standalone)').matches || 
+                window.navigator.standalone === true) {
+                showStatus('✅ VRS já está instalado e rodando como app!', 'success');
+                isInstalled = true;
+            }
+
+            // Detectar plataforma e destacar seção relevante
+            detectPlatform();
+        });
+
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('installStatus');
+            statusDiv.className = `status-message status-${type}`;
+            statusDiv.innerHTML = `<i class="fas fa-info-circle me-2"></i>${message}`;
+            statusDiv.style.display = 'block';
+            
+            // Auto-hide depois de 10 segundos se não for erro
+            if (type !== 'warning') {
+                setTimeout(() => {
+                    statusDiv.style.display = 'none';
+                }, 10000);
+            }
+        }
+
+        function detectPlatform() {
+            const userAgent = navigator.userAgent;
+            
+            if (/Android/i.test(userAgent)) {
+                highlightCard('.android-card');
+                showStatus('📱 Android detectado - siga as instruções da seção verde', 'info');
+            } else if (/iPhone|iPad|iPod/i.test(userAgent)) {
+                highlightCard('.ios-card');
+                showStatus('🍎 iOS detectado - siga as instruções da seção azul', 'info');
+            } else {
+                highlightCard('.desktop-card');
+                showStatus('💻 Desktop detectado - siga as instruções da seção laranja', 'info');
+            }
+        }
+
+        function highlightCard(selector) {
+            const card = document.querySelector(selector);
+            if (card) {
+                card.style.border = '3px solid #4CAF50';
+                card.style.boxShadow = '0 10px 30px rgba(76, 175, 80, 0.3)';
+                
+                // Scroll para a seção relevante
+                setTimeout(() => {
+                    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 1000);
+            }
+        }
+
+        function testarInstalacao() {
+            if (isInstalled) {
+                showStatus('✅ VRS já está instalado corretamente!', 'success');
+            } else if (window.matchMedia('(display-mode: standalone)').matches) {
+                showStatus('✅ VRS está rodando como app instalado!', 'success');
+            } else {
+                showStatus('⚠️ VRS ainda não está instalado. Siga as instruções acima.', 'warning');
+            }
+        }
+
+        // Service Worker para funcionamento offline
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js')
+                .then(() => console.log('🔧 Service Worker registrado'))
+                .catch(err => console.log('❌ Erro no Service Worker:', err));
+        }
+    </script>
+</body>
+</html>

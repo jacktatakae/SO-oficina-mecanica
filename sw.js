@@ -1,7 +1,7 @@
 // 🔄 SERVICE WORKER VRS - Funcionamento Offline
 // Versão 2.0 - Compatibilidade Total entre Plataformas
 
-const CACHE_NAME = 'vrs-catalogo-v2.0';
+const CACHE_NAME = 'vrs-catalogo-v2.1';
 const CACHE_VERSION = '2025.08.01';
 
 // Arquivos essenciais para cache
@@ -14,9 +14,14 @@ const CORE_FILES = [
   './qr-catalogacao.html',
   './inventario-mobile.html',
   './teste-completo.html',
+  './github-sync-mobile.html',
+  './teste-github-sync.html',
   './auto-backup-system.js',
   './ia-visual-radiadores.js',
-  './manifest.json'
+  './github-sync.js',
+  './manifest.json',
+  './styles.css',
+  './mobile-responsive.css'
 ];
 
 // Recursos externos (CDN) para cache
@@ -31,7 +36,9 @@ const EXTERNAL_RESOURCES = [
 // URLs que devem sempre ser buscadas da rede
 const NETWORK_FIRST = [
   '/api/',
-  '.json'
+  '.json',
+  'github.com',
+  'api.github.com'
 ];
 
 // Instalar Service Worker

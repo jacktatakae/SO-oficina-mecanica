@@ -1,8 +1,8 @@
 {
-  "name": "VRS - Sistema de Catalogação de Radiadores",
-  "short_name": "VRS Catalogo",
-  "description": "Sistema completo de catalogação e inventário de tanques de radiador com IA visual",
-  "start_url": "./index.html",
+  "name": "VRS - Sistema de Inventário de Radiadores",
+  "short_name": "VRS Inventário",
+  "description": "Sistema completo de catalogação e inventário de tanques de radiador com IA visual e sincronização GitHub",
+  "start_url": "./inventario-rapido.html",
   "display": "standalone",
   "background_color": "#2196F3",
   "theme_color": "#1976D2",
@@ -10,6 +10,7 @@
   "scope": "./",
   "lang": "pt-BR",
   "categories": ["business", "productivity", "utilities"],
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMjQiIGZpbGw9IiMyMTk2RjMiLz4KPHN2ZyB4PSI0OCIgeT0iNDgiIHdpZHRoPSI5NiIgaGVpZ2h0PSI5NiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJ3aGl0ZSI+CjxwYXRoIGQ9Ik0xOSA3VjVoLTJWMGgtMnY1SDdWMEg1djVIM3YyaDJWMTJoLTJWMTloMnY1aDJ2LTVIMTJ2NWgydi01aDJ2LTJoLTJWN2gyWk03IDdIMTJWMTJIN1Y3WiIvPgo8L3N2Zz4KPC9zdmc+",
