@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, minimum-scale=1.0, maximum-scale=5.0">
+    <title>🌐 VRS Universal - Compatibilidade Total</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest-universal.json">
+    
+    <!-- Meta tags universais -->
+    <meta name="theme-color" content="#1976D2">
+    <meta name="background-color" content="#1976D2">
+    <meta name="display" content="standalone">
+    <meta name="orientation" content="any">
+    
+    <!-- Compatibilidade universal -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="VRS Universal">
+    <meta name="msapplication-TileColor" content="#1976D2">
+    <meta name="format-detection" content="telephone=no">
+    
+    <!-- Fallback CSS inline para carregamento instantâneo -->
+    <style>
+        /* CSS CRÍTICO INLINE - Carrega instantaneamente */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1976D2 0%, #1565C0 100%);
+            min-height: 100vh;
+            color: #333;
+            position: relative;
+        }
+        
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1976D2 0%, #1565C0 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            color: white;
+        }
+        
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid #fff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .universal-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            min-height: 90vh;
+            margin-top: 2rem;
+            display: none;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 2rem 0;
+            border-bottom: 2px solid #f0f0f0;
+            margin-bottom: 2rem;
+        }
+        
+        .platform-status {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        
+        .status-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            border-left: 5px solid #28a745;
+        }
+        
+        .status-card.warning { border-left-color: #ffc107; }
+        .status-card.error { border-left-color: #dc3545; }
+        
+        .dependency-manager {
+            background: #e3f2fd;
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .btn {
+            background: #1976D2;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover { background: #1565C0; transform: translateY(-2px); }
+        .btn.success { background: #28a745; }
+        .btn.warning { background: #ffc107; color: #333; }
+        .btn.danger { background: #dc3545; }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #28a745, #20c997);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        
+        .module-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .module-card:hover {
+            border-color: #1976D2;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        
+        .module-card.active {
+            border-color: #28a745;
+            background: #f8fff8;
+        }
+        
+        /* Responsividade universal */
+        @media (max-width: 768px) {
+            .universal-container { 
+                margin: 0; 
+                border-radius: 0; 
+                min-height: 100vh; 
+                margin-top: 0;
+            }
+            .platform-status { grid-template-columns: 1fr; }
+            .modules-grid { grid-template-columns: 1fr; }
+            .btn { width: 100%; margin: 0.25rem 0; }
+        }
+        
+        /* Compatibilidade com modo escuro */
+        @media (prefers-color-scheme: dark) {
+            .universal-container { 
+                background: #2d2d2d; 
+                color: #fff; 
+            }
+            .status-card { 
+                background: #3d3d3d; 
+                color: #fff; 
+            }
+            .module-card { 
+                background: #3d3d3d; 
+                border-color: #555; 
+                color: #fff; 
+            }
+            .dependency-manager { 
+                background: #1a237e; 
+                color: #fff; 
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Tela de carregamento -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-spinner"></div>
+        <h2>🌐 VRS Universal</h2>
+        <p>Inicializando compatibilidade universal...</p>
+        <div class="progress-bar">
+            <div class="progress-fill" id="loadingProgress"></div>
+        </div>
+        <small id="loadingStatus">Verificando plataforma...</small>
+    </div>
+
+    <!-- Aplicativo principal -->
+    <div class="universal-container" id="mainApp">
+        <!-- Header -->
+        <div class="header">
+            <h1>🌐 VRS Universal</h1>
+            <p>Sistema de Compatibilidade Total com Carregamento Inteligente</p>
+            <div id="platformInfo"></div>
+        </div>
+
+        <!-- Status da plataforma -->
+        <div class="platform-status" id="platformStatus">
+            <!-- Será preenchido dinamicamente -->
+        </div>
+
+        <!-- Gerenciador de dependências -->
+        <div class="dependency-manager">
+            <h3>📦 Gerenciador de Dependências</h3>
+            <p>Sistema inteligente que baixa e gerencia todas as dependências automaticamente</p>
+            
+            <div class="progress-bar">
+                <div class="progress-fill" id="dependencyProgress"></div>
+            </div>
+            <small id="dependencyStatus">Aguardando...</small>
+            
+            <div style="margin-top: 1rem;">
+                <button class="btn" onclick="forceDownloadDependencies()">
+                    📥 Forçar Download Completo
+                </button>
+                <button class="btn success" onclick="verifyAllDependencies()">
+                    ✅ Verificar Dependências
+                </button>
+                <button class="btn warning" onclick="clearCache()">
+                    🗑️ Limpar Cache
+                </button>
+            </div>
+        </div>
+
+        <!-- Módulos disponíveis -->
+        <div class="modules-grid" id="modulesGrid">
+            <!-- Será preenchido dinamicamente -->
+        </div>
+
+        <!-- Console de diagnóstico -->
+        <div class="dependency-manager" style="background: #f8f9fa;">
+            <h3>🔧 Console de Diagnóstico</h3>
+            <div id="diagnosticConsole" style="background: #000; color: #0f0; padding: 1rem; border-radius: 8px; font-family: monospace; height: 200px; overflow-y: auto; margin: 1rem 0;">
+                VRS Universal Console iniciado...<br>
+            </div>
+            <button class="btn" onclick="runDiagnostics()">🔍 Executar Diagnósticos</button>
+            <button class="btn" onclick="clearConsole()">🗑️ Limpar Console</button>
+        </div>
+    </div>
+
+    <!-- Dependências carregadas dinamicamente -->
+    <script>
+        // ===== SISTEMA DE CARREGAMENTO UNIVERSAL =====
+        
+        class UniversalLoader {
+            constructor() {
+                this.dependencies = {
+                    bootstrap: {
+                        css: 'https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css',
+                        js: 'https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js',
+                        fallback: './assets/bootstrap.min.css',
+                        required: true
+                    },
+                    fontawesome: {
+                        css: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
+                        fallback: './assets/fontawesome.min.css',
+                        required: true
+                    },
+                    chartjs: {
+                        js: 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js',
+                        fallback: './assets/chart.min.js',
+                        required: false
+                    },
+                    jquery: {
+                        js: 'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js',
+                        fallback: './assets/jquery.min.js',
+                        required: false
+                    }
+                };
+                
+                this.loadedDependencies = new Set();
+                this.failedDependencies = new Set();
+                this.platform = this.detectPlatform();
+                
+                this.init();
+            }
+            
+            detectPlatform() {
+                const ua = navigator.userAgent.toLowerCase();
+                const platform = {
+                    name: 'Desconhecido',
+                    mobile: false,
+                    os: 'Desconhecido',
+                    browser: 'Desconhecido',
+                    version: 'Desconhecido',
+                    features: {
+                        localStorage: typeof Storage !== 'undefined',
+                        serviceWorker: 'serviceWorker' in navigator,
+                        webGL: !!window.WebGLRenderingContext,
+                        touchEvents: 'ontouchstart' in window,
+                        geolocation: 'geolocation' in navigator,
+                        camera: 'mediaDevices' in navigator,
+                        notifications: 'Notification' in window
+                    }
+                };
+                
+                // Detectar OS
+                if (ua.includes('android')) platform.os = 'Android';
+                else if (ua.includes('iphone') || ua.includes('ipad')) platform.os = 'iOS';
+                else if (ua.includes('windows')) platform.os = 'Windows';
+                else if (ua.includes('mac')) platform.os = 'macOS';
+                else if (ua.includes('linux')) platform.os = 'Linux';
+                
+                // Detectar Browser
+                if (ua.includes('chrome')) platform.browser = 'Chrome';
+                else if (ua.includes('firefox')) platform.browser = 'Firefox';
+                else if (ua.includes('safari')) platform.browser = 'Safari';
+                else if (ua.includes('edge')) platform.browser = 'Edge';
+                
+                // Detectar se é mobile
+                platform.mobile = /android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(ua);
+                
+                // Nome da plataforma
+                platform.name = `${platform.os} - ${platform.browser}`;
+                
+                return platform;
+            }
+            
+            async init() {
+                this.updateLoadingStatus('Detectando plataforma...');
+                this.updateProgress(10);
+                
+                await this.sleep(500);
+                this.displayPlatformInfo();
+                
+                this.updateLoadingStatus('Verificando dependências...');
+                this.updateProgress(30);
+                
+                await this.loadAllDependencies();
+                
+                this.updateLoadingStatus('Inicializando módulos...');
+                this.updateProgress(80);
+                
+                await this.initializeModules();
+                
+                this.updateLoadingStatus('Finalizando...');
+                this.updateProgress(100);
+                
+                await this.sleep(500);
+                this.showMainApp();
+            }
+            
+            updateLoadingStatus(status) {
+                document.getElementById('loadingStatus').textContent = status;
+                this.log(`[LOADER] ${status}`);
+            }
+            
+            updateProgress(percent) {
+                document.getElementById('loadingProgress').style.width = `${percent}%`;
+                if (document.getElementById('dependencyProgress')) {
+                    document.getElementById('dependencyProgress').style.width = `${percent}%`;
+                }
+            }
+            
+            async loadAllDependencies() {
+                const total = Object.keys(this.dependencies).length;
+                let loaded = 0;
+                
+                for (const [name, config] of Object.entries(this.dependencies)) {
+                    try {
+                        this.updateLoadingStatus(`Carregando ${name}...`);
+                        await this.loadDependency(name, config);
+                        this.loadedDependencies.add(name);
+                        loaded++;
+                        this.updateProgress(30 + (loaded / total) * 40);
+                    } catch (error) {
+                        this.log(`[ERROR] Falha ao carregar ${name}: ${error.message}`);
+                        this.failedDependencies.add(name);
+                        
+                        if (config.required) {
+                            this.log(`[WARNING] Dependência obrigatória ${name} falhou, tentando fallback...`);
+                            await this.loadFallback(name, config);
+                        }
+                    }
+                }
+                
+                this.updateDependencyStatus();
+            }
+            
+            async loadDependency(name, config) {
+                const promises = [];
+                
+                if (config.css) {
+                    promises.push(this.loadCSS(config.css, name));
+                }
+                
+                if (config.js) {
+                    promises.push(this.loadJS(config.js, name));
+                }
+                
+                await Promise.all(promises);
+            }
+            
+            loadCSS(url, name) {
+                return new Promise((resolve, reject) => {
+                    const link = document.createElement('link');
+                    link.rel = 'stylesheet';
+                    link.href = url;
+                    link.onload = () => {
+                        this.log(`[CSS] ${name} carregado com sucesso`);
+                        resolve();
+                    };
+                    link.onerror = () => {
+                        reject(new Error(`Falha ao carregar CSS ${name}`));
+                    };
+                    document.head.appendChild(link);
+                    
+                    // Timeout para evitar travamento
+                    setTimeout(() => reject(new Error(`Timeout ao carregar CSS ${name}`)), 10000);
+                });
+            }
+            
+            loadJS(url, name) {
+                return new Promise((resolve, reject) => {
+                    const script = document.createElement('script');
+                    script.src = url;
+                    script.onload = () => {
+                        this.log(`[JS] ${name} carregado com sucesso`);
+                        resolve();
+                    };
+                    script.onerror = () => {
+                        reject(new Error(`Falha ao carregar JS ${name}`));
+                    };
+                    document.head.appendChild(script);
+                    
+                    // Timeout para evitar travamento
+                    setTimeout(() => reject(new Error(`Timeout ao carregar JS ${name}`)), 10000);
+                });
+            }
+            
+            async loadFallback(name, config) {
+                if (config.fallback) {
+                    try {
+                        this.log(`[FALLBACK] Tentando carregar ${name} localmente...`);
+                        await this.loadDependency(name, { 
+                            css: config.fallback, 
+                            js: config.fallback.replace('.css', '.js') 
+                        });
+                        this.loadedDependencies.add(name);
+                        this.log(`[FALLBACK] ${name} carregado com sucesso`);
+                    } catch (error) {
+                        this.log(`[FALLBACK ERROR] ${name}: ${error.message}`);
+                    }
+                }
+            }
+            
+            displayPlatformInfo() {
+                const info = document.getElementById('platformInfo');
+                info.innerHTML = `
+                    <div style="margin: 1rem 0; padding: 1rem; background: rgba(255,255,255,0.9); border-radius: 10px;">
+                        <strong>🔍 Plataforma Detectada:</strong> ${this.platform.name}<br>
+                        <strong>📱 Dispositivo:</strong> ${this.platform.mobile ? 'Mobile' : 'Desktop'}<br>
+                        <strong>🌐 Recursos:</strong> ${Object.entries(this.platform.features)
+                            .filter(([key, value]) => value)
+                            .map(([key]) => key)
+                            .join(', ')}
+                    </div>
+                `;
+                
+                this.updatePlatformStatus();
+            }
+            
+            updatePlatformStatus() {
+                const container = document.getElementById('platformStatus');
+                const features = this.platform.features;
+                
+                container.innerHTML = `
+                    <div class="status-card ${features.localStorage ? '' : 'error'}">
+                        <h4>💾 Armazenamento Local</h4>
+                        <p>${features.localStorage ? '✅ Disponível' : '❌ Não disponível'}</p>
+                    </div>
+                    
+                    <div class="status-card ${features.serviceWorker ? '' : 'warning'}">
+                        <h4>⚡ Service Worker</h4>
+                        <p>${features.serviceWorker ? '✅ Suportado' : '⚠️ Não suportado'}</p>
+                    </div>
+                    
+                    <div class="status-card ${features.camera ? '' : 'warning'}">
+                        <h4>📷 Câmera</h4>
+                        <p>${features.camera ? '✅ Disponível' : '⚠️ Não disponível'}</p>
+                    </div>
+                    
+                    <div class="status-card ${features.notifications ? '' : 'warning'}">
+                        <h4>🔔 Notificações</h4>
+                        <p>${features.notifications ? '✅ Suportadas' : '⚠️ Não suportadas'}</p>
+                    </div>
+                `;
+            }
+            
+            updateDependencyStatus() {
+                const status = document.getElementById('dependencyStatus');
+                const loaded = this.loadedDependencies.size;
+                const failed = this.failedDependencies.size;
+                const total = Object.keys(this.dependencies).length;
+                
+                status.innerHTML = `
+                    ✅ ${loaded} carregadas | ❌ ${failed} falharam | 📦 ${total} total
+                `;
+            }
+            
+            async initializeModules() {
+                const modules = [
+                    {
+                        name: 'Scanner Visual',
+                        icon: '📷',
+                        description: 'Scanner de peças com IA otimizada',
+                        file: 'scanner-visual.html',
+                        status: 'active'
+                    },
+                    {
+                        name: 'Inventário Rápido',
+                        icon: '📋',
+                        description: 'Sistema de inventário com sync GitHub',
+                        file: 'inventario-rapido.html',
+                        status: 'active'
+                    },
+                    {
+                        name: 'Central de Sistemas',
+                        icon: '🏢',
+                        description: 'Hub central de todas as funcionalidades',
+                        file: 'central-sistemas.html',
+                        status: 'active'
+                    },
+                    {
+                        name: 'Gerenciador de Clientes',
+                        icon: '👥',
+                        description: 'Sistema completo de CRM',
+                        file: 'gerenciador-clientes.html',
+                        status: 'active'
+                    },
+                    {
+                        name: 'Identificação de Peças',
+                        icon: '🔍',
+                        description: 'Sistema de identificação automática',
+                        file: 'identificacao-pecas.html',
+                        status: 'active'
+                    },
+                    {
+                        name: 'QR Permanente',
+                        icon: '📱',
+                        description: 'Sistema de QR codes persistentes',
+                        file: 'qr-permanente.html',
+                        status: 'active'
+                    }
+                ];
+                
+                const container = document.getElementById('modulesGrid');
+                container.innerHTML = modules.map(module => `
+                    <div class="module-card ${module.status}" onclick="openModule('${module.file}')">
+                        <h3>${module.icon} ${module.name}</h3>
+                        <p>${module.description}</p>
+                        <div style="margin-top: 1rem;">
+                            <span style="background: #28a745; color: white; padding: 0.25rem 0.5rem; border-radius: 5px; font-size: 0.8rem;">
+                                ${module.status === 'active' ? '✅ ATIVO' : '⚠️ INDISPONÍVEL'}
+                            </span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            showMainApp() {
+                document.getElementById('loadingScreen').style.display = 'none';
+                document.getElementById('mainApp').style.display = 'block';
+                this.log('[INIT] VRS Universal inicializado com sucesso!');
+            }
+            
+            log(message) {
+                const console = document.getElementById('diagnosticConsole');
+                if (console) {
+                    const timestamp = new Date().toLocaleTimeString();
+                    console.innerHTML += `[${timestamp}] ${message}<br>`;
+                    console.scrollTop = console.scrollHeight;
+                }
+            }
+            
+            sleep(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+        }
+        
+        // ===== FUNÇÕES GLOBAIS =====
+        
+        function openModule(file) {
+            window.open(file, '_blank');
+            universalLoader.log(`[MODULE] Abrindo ${file}`);
+        }
+        
+        async function forceDownloadDependencies() {
+            universalLoader.log('[FORCE] Forçando download de todas as dependências...');
+            universalLoader.loadedDependencies.clear();
+            universalLoader.failedDependencies.clear();
+            await universalLoader.loadAllDependencies();
+            universalLoader.log('[FORCE] Download forçado concluído');
+        }
+        
+        async function verifyAllDependencies() {
+            universalLoader.log('[VERIFY] Verificando todas as dependências...');
+            
+            // Verificar Bootstrap
+            const hasBootstrap = typeof bootstrap !== 'undefined';
+            universalLoader.log(`[VERIFY] Bootstrap: ${hasBootstrap ? '✅' : '❌'}`);
+            
+            // Verificar jQuery (se carregado)
+            const hasJQuery = typeof $ !== 'undefined';
+            universalLoader.log(`[VERIFY] jQuery: ${hasJQuery ? '✅' : 'N/A'}`);
+            
+            // Verificar Chart.js (se carregado)
+            const hasChart = typeof Chart !== 'undefined';
+            universalLoader.log(`[VERIFY] Chart.js: ${hasChart ? '✅' : 'N/A'}`);
+            
+            universalLoader.log('[VERIFY] Verificação concluída');
+        }
+        
+        function clearCache() {
+            if (confirm('Deseja limpar todo o cache e recarregar?')) {
+                localStorage.clear();
+                sessionStorage.clear();
+                
+                if ('caches' in window) {
+                    caches.keys().then(names => {
+                        names.forEach(name => {
+                            caches.delete(name);
+                        });
+                    });
+                }
+                
+                location.reload();
+            }
+        }
+        
+        function runDiagnostics() {
+            universalLoader.log('[DIAG] === INICIANDO DIAGNÓSTICOS ===');
+            universalLoader.log(`[DIAG] User Agent: ${navigator.userAgent}`);
+            universalLoader.log(`[DIAG] Plataforma: ${universalLoader.platform.name}`);
+            universalLoader.log(`[DIAG] Resolução: ${screen.width}x${screen.height}`);
+            universalLoader.log(`[DIAG] Viewport: ${window.innerWidth}x${window.innerHeight}`);
+            universalLoader.log(`[DIAG] Conexão: ${navigator.onLine ? 'Online' : 'Offline'}`);
+            universalLoader.log(`[DIAG] Dependências carregadas: ${Array.from(universalLoader.loadedDependencies).join(', ')}`);
+            universalLoader.log(`[DIAG] Dependências falharam: ${Array.from(universalLoader.failedDependencies).join(', ')}`);
+            universalLoader.log('[DIAG] === DIAGNÓSTICOS CONCLUÍDOS ===');
+        }
+        
+        function clearConsole() {
+            document.getElementById('diagnosticConsole').innerHTML = 'Console limpo...<br>';
+        }
+        
+        // ===== INICIALIZAÇÃO =====
+        let universalLoader;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            universalLoader = new UniversalLoader();
+        });
+        
+        // Service Worker para cache offline
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw-universal.js')
+                .then(registration => {
+                    console.log('Service Worker registrado:', registration);
+                })
+                .catch(error => {
+                    console.error('Erro ao registrar Service Worker:', error);
+                });
+        }
+    </script>
+</body>
+</html>

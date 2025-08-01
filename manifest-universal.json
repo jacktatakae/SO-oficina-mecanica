@@ -1,0 +1,61 @@
+{
+  "name": "VRS Universal",
+  "short_name": "VRS Universal",
+  "description": "Sistema Universal VRS com Compatibilidade Total",
+  "start_url": "./vrs-universal.html",
+  "display": "standalone",
+  "orientation": "any",
+  "theme_color": "#1976D2",
+  "background_color": "#1976D2",
+  "categories": ["business", "productivity", "utilities"],
+  "icons": [
+    {
+      "src": "./assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icon-512.png", 
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icon-maskable-192.png",
+      "sizes": "192x192", 
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Scanner Visual",
+      "short_name": "Scanner",
+      "description": "Abrir Scanner de Peças",
+      "url": "./scanner-visual.html",
+      "icons": [
+        {
+          "src": "./assets/scanner-icon.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Inventário",
+      "short_name": "Inventário", 
+      "description": "Abrir Inventário Rápido",
+      "url": "./inventario-rapido.html",
+      "icons": [
+        {
+          "src": "./assets/inventory-icon.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "prefer_related_applications": false,
+  "scope": "./",
+  "lang": "pt-BR",
+  "dir": "ltr"
+}

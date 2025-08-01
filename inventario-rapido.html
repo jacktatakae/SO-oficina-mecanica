@@ -336,23 +336,31 @@
             <button class="btn btn-secondary btn-lg me-2" onclick="abrirGerenciadorBackup()">
                 <i class="fas fa-database me-1"></i> Gerenciar Backups
             </button>
+            <button class="btn btn-outline-primary btn-lg me-2" onclick="abrirConfigGitHub()">
+                <i class="fab fa-github me-1"></i> Config GitHub
+            </button>
             <button class="btn btn-secondary btn-lg" onclick="limparTudo()">
                 <i class="fas fa-trash me-1"></i> Limpar Tudo
             </button>
         </div>
 
-        <!-- Status do Auto Backup -->
+        <!-- Status do Auto Backup e GitHub Sync -->
         <div class="alert alert-info mt-4" id="backupStatus">
             <div class="d-flex align-items-center">
                 <i class="fas fa-shield-alt me-2"></i>
                 <div class="flex-grow-1">
-                    <strong>🔄 Sistema de Auto Backup Ativo</strong>
+                    <strong>🔄 Sistema de Proteção de Dados</strong>
                     <br>
-                    <small id="backupStatusText">Seus dados estão sendo protegidos automaticamente</small>
+                    <small id="backupStatusText">Backup local + GitHub Sync para máxima segurança</small>
                 </div>
-                <button class="btn btn-sm btn-outline-primary" onclick="forceBackupNow()">
-                    <i class="fas fa-sync"></i> Backup Agora
-                </button>
+                <div>
+                    <button class="btn btn-sm btn-outline-primary me-2" onclick="forceBackupNow()">
+                        <i class="fas fa-sync"></i> Backup Agora
+                    </button>
+                    <button class="btn btn-sm btn-outline-success" onclick="abrirConfigGitHub()">
+                        <i class="fab fa-github"></i> GitHub
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -370,6 +378,82 @@
             <h6><i class="fas fa-lightbulb me-2"></i>Sugestões Baseadas no Catálogo Zelukar</h6>
             <div id="sugestoes" class="row">
                 <!-- Será preenchido dinamicamente -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Configuração GitHub -->
+    <div class="modal fade" id="githubModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fab fa-github me-2"></i>Configurar Sincronização GitHub</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Sincronize seus dados com GitHub para:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li>✅ Backup automático na nuvem</li>
+                            <li>✅ Sincronização entre dispositivos</li>
+                            <li>✅ Histórico de versões</li>
+                            <li>✅ Acesso de qualquer lugar</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Token do GitHub</label>
+                        <input type="password" class="form-control" id="githubToken" placeholder="ghp_xxxxxxxxxxxx">
+                        <small class="text-muted">
+                            <a href="https://github.com/settings/tokens" target="_blank">
+                                <i class="fas fa-external-link-alt"></i> Criar token no GitHub
+                            </a> (repo permissions necessárias)
+                        </small>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label">Usuário GitHub</label>
+                            <input type="text" class="form-control" id="githubOwner" placeholder="seu-usuario">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Repositório</label>
+                            <input type="text" class="form-control" id="githubRepo" placeholder="vrs-inventario-backup">
+                        </div>
+                    </div>
+                    
+                    <div class="mt-3">
+                        <button class="btn btn-primary" onclick="testarConexaoGitHub()">
+                            <i class="fas fa-plug me-1"></i> Testar Conexão
+                        </button>
+                        <button class="btn btn-success" onclick="salvarConfigGitHub()">
+                            <i class="fas fa-save me-1"></i> Salvar e Ativar
+                        </button>
+                    </div>
+                    
+                    <div id="githubStatus" class="mt-3" style="display: none;"></div>
+                    
+                    <!-- Status atual -->
+                    <div class="mt-4">
+                        <h6>Status Atual:</h6>
+                        <div id="githubCurrentStatus" class="alert alert-secondary">
+                            GitHub Sync não configurado
+                        </div>
+                    </div>
+                    
+                    <!-- Lista de backups -->
+                    <div id="githubBackups" style="display: none;">
+                        <h6>Backups no GitHub:</h6>
+                        <div id="backupsList"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-danger" onclick="desativarGitHub()">
+                        Desativar Sync
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                </div>
             </div>
         </div>
     </div>
@@ -424,6 +508,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script src="auto-backup-system.js"></script>
+    <script src="github-sync.js"></script>
     <script>
         // Banco de dados do inventário
         let inventario = {
@@ -455,10 +540,29 @@
             atualizarInterface();
         }
 
-        // Salvar dados
+        // Salvar dados - COM SYNC GITHUB ATIVO
         function salvarDados() {
             inventario.atualizado = new Date().toISOString();
             localStorage.setItem('inventario_tanques', JSON.stringify(inventario));
+            
+            // Auto sync ATIVO com GitHub
+            if (window.githubSync && window.githubSync.isEnabled) {
+                window.githubSync.autoSync(inventario)
+                    .then(result => {
+                        if (result && result.success) {
+                            console.log('✅ Auto sync GitHub realizado');
+                            showInventarioToast('☁️ Dados sincronizados com GitHub!', 'success', 2000);
+                            updateGitHubStatus();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('❌ Erro no auto sync:', error);
+                        showInventarioToast('⚠️ Erro na sincronização - dados salvos localmente', 'warning', 3000);
+                    });
+            } else {
+                // Mostrar lembrete para configurar GitHub
+                showInventarioToast('💡 Configure GitHub Sync para backup automático!', 'info', 3000);
+            }
         }
 
         // Adicionar tanque rapidamente
@@ -489,12 +593,13 @@
             };
 
             inventario.tanques.push(novoTanque);
-            salvarDados();
+            salvarDados(); // Vai sincronizar automaticamente com GitHub
             atualizarInterface();
             limparFormulario();
 
-            // Feedback visual
+            // Feedback visual aprimorado
             document.getElementById('quickModelo').style.borderColor = '#28a745';
+            showInventarioToast(`✅ Tanque ${modelo} adicionado!`, 'success', 2000);
             setTimeout(() => {
                 document.getElementById('quickModelo').style.borderColor = '';
             }, 1000);
@@ -741,6 +846,177 @@
             }
         }
 
+        // ===== FUNÇÕES GITHUB =====
+        
+        // Abrir configuração GitHub
+        function abrirConfigGitHub() {
+            updateGitHubStatus();
+            new bootstrap.Modal(document.getElementById('githubModal')).show();
+        }
+        
+        // Testar conexão GitHub
+        async function testarConexaoGitHub() {
+            const token = document.getElementById('githubToken').value;
+            const owner = document.getElementById('githubOwner').value;
+            const repo = document.getElementById('githubRepo').value;
+            
+            if (!token || !owner || !repo) {
+                showGitHubStatus('Por favor, preencha todos os campos', 'warning');
+                return;
+            }
+            
+            showGitHubStatus('Testando conexão...', 'info');
+            
+            try {
+                const tempSync = new GitHubSync();
+                const result = await tempSync.configure(token, owner, repo);
+                
+                if (result.success) {
+                    showGitHubStatus('✅ ' + result.message, 'success');
+                } else {
+                    showGitHubStatus('❌ ' + result.message, 'danger');
+                }
+            } catch (error) {
+                showGitHubStatus('❌ Erro: ' + error.message, 'danger');
+            }
+        }
+        
+        // Salvar configuração GitHub
+        async function salvarConfigGitHub() {
+            const token = document.getElementById('githubToken').value;
+            const owner = document.getElementById('githubOwner').value;
+            const repo = document.getElementById('githubRepo').value;
+            
+            if (!token || !owner || !repo) {
+                showGitHubStatus('Por favor, preencha todos os campos', 'warning');
+                return;
+            }
+            
+            showGitHubStatus('Configurando GitHub Sync...', 'info');
+            
+            try {
+                const result = await window.githubSync.configure(token, owner, repo);
+                
+                if (result.success) {
+                    showGitHubStatus('✅ GitHub Sync ativado com sucesso!', 'success');
+                    
+                    // Fazer primeiro backup
+                    const syncResult = await window.githubSync.syncInventory(inventario);
+                    if (syncResult.success) {
+                        showGitHubStatus('✅ Primeiro backup criado: ' + syncResult.url, 'success');
+                    }
+                    
+                    updateGitHubStatus();
+                    loadGitHubBackups();
+                } else {
+                    showGitHubStatus('❌ ' + result.message, 'danger');
+                }
+            } catch (error) {
+                showGitHubStatus('❌ Erro: ' + error.message, 'danger');
+            }
+        }
+        
+        // Desativar GitHub
+        function desativarGitHub() {
+            if (confirm('Tem certeza que deseja desativar o GitHub Sync?')) {
+                window.githubSync.disable();
+                showGitHubStatus('GitHub Sync desativado', 'warning');
+                updateGitHubStatus();
+            }
+        }
+        
+        // Mostrar status GitHub
+        function showGitHubStatus(message, type) {
+            const statusDiv = document.getElementById('githubStatus');
+            statusDiv.style.display = 'block';
+            statusDiv.className = `alert alert-${type}`;
+            statusDiv.innerHTML = message;
+        }
+        
+        // Atualizar status GitHub
+        function updateGitHubStatus() {
+            if (!window.githubSync) return;
+            
+            const status = window.githubSync.getStatus();
+            const statusDiv = document.getElementById('githubCurrentStatus');
+            
+            if (status.enabled && status.configured) {
+                statusDiv.className = 'alert alert-success';
+                statusDiv.innerHTML = `
+                    <strong>✅ GitHub Sync Ativo</strong><br>
+                    📂 Repositório: ${status.repo}<br>
+                    🕒 Último sync: ${status.lastSync ? new Date(status.lastSync).toLocaleString('pt-BR') : 'Nunca'}
+                `;
+                loadGitHubBackups();
+            } else if (status.configured) {
+                statusDiv.className = 'alert alert-warning';
+                statusDiv.innerHTML = '⚠️ GitHub configurado mas desativado';
+            } else {
+                statusDiv.className = 'alert alert-secondary';
+                statusDiv.innerHTML = '❌ GitHub Sync não configurado';
+            }
+        }
+        
+        // Carregar lista de backups
+        async function loadGitHubBackups() {
+            if (!window.githubSync || !window.githubSync.isEnabled) return;
+            
+            try {
+                const result = await window.githubSync.listBackups();
+                
+                if (result.success) {
+                    const backupsDiv = document.getElementById('githubBackups');
+                    const listDiv = document.getElementById('backupsList');
+                    
+                    if (result.backups.length > 0) {
+                        backupsDiv.style.display = 'block';
+                        
+                        listDiv.innerHTML = result.backups.map(backup => `
+                            <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+                                <div>
+                                    <strong>${backup.name}</strong><br>
+                                    <small class="text-muted">${(backup.size / 1024).toFixed(1)} KB</small>
+                                </div>
+                                <div>
+                                    <button class="btn btn-sm btn-outline-primary" onclick="downloadGitHubBackup('${backup.name}')">
+                                        <i class="fas fa-download"></i> Baixar
+                                    </button>
+                                    <a href="${backup.url}" target="_blank" class="btn btn-sm btn-outline-secondary">
+                                        <i class="fas fa-external-link-alt"></i> Ver
+                                    </a>
+                                </div>
+                            </div>
+                        `).join('');
+                    } else {
+                        backupsDiv.style.display = 'none';
+                    }
+                }
+            } catch (error) {
+                console.error('Erro ao carregar backups:', error);
+            }
+        }
+        
+        // Baixar backup do GitHub
+        async function downloadGitHubBackup(fileName) {
+            try {
+                const result = await window.githubSync.downloadBackup(fileName);
+                
+                if (result.success) {
+                    if (confirm(`Backup baixado do GitHub!\n\nDeseja substituir os dados atuais por este backup?\n\nArquivo: ${fileName}`)) {
+                        inventario = result.data;
+                        salvarDados();
+                        atualizarInterface();
+                        alert('✅ Dados restaurados do GitHub com sucesso!');
+                        bootstrap.Modal.getInstance(document.getElementById('githubModal')).hide();
+                    }
+                } else {
+                    alert('❌ ' + result.message);
+                }
+            } catch (error) {
+                alert('❌ Erro ao baixar backup: ' + error.message);
+            }
+        }
+
         // Atalhos de teclado
         document.addEventListener('keydown', function(e) {
             if (e.ctrlKey && e.key === 'Enter') {
@@ -852,9 +1128,17 @@
             // Configurar sistema de backup
             setTimeout(() => {
                 updateBackupStatus();
+                updateGitHubStatus(); // Verificar status do GitHub
                 
                 // Atualizar status do backup a cada minuto
                 setInterval(updateBackupStatus, 60000);
+                
+                // Mostrar dica sobre GitHub se não configurado
+                if (!window.githubSync || !window.githubSync.isEnabled) {
+                    setTimeout(() => {
+                        showInventarioToast('💡 Configure GitHub Sync para backup automático na nuvem!', 'info', 5000);
+                    }, 3000);
+                }
                 
                 // Escutar eventos de backup
                 if (window.autoBackup) {
