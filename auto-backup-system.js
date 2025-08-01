@@ -20,7 +20,14 @@ class AutoBackupSystem {
             ],
             compressionEnabled: true,
             cloudSyncEnabled: false, // Para futuro uso com API
-            notificationsEnabled: true
+            notificationsEnabled: true,
+            // Configurações GitHub
+            githubSyncEnabled: false,
+            githubToken: null,
+            githubOwner: 'jacktatakae',
+            githubRepo: 'vrs-inventario-backup',
+            githubBranch: 'main',
+            githubPath: 'auto-backups'
         };
         
         this.backupHistory = JSON.parse(localStorage.getItem('backup_history') || '[]');
@@ -117,6 +124,11 @@ class AutoBackupSystem {
             localStorage.setItem('backup_history', JSON.stringify(this.backupHistory));
             
             console.log(`💾 Backup automático criado: ${backupInfo.id}`);
+            
+            // Sync com GitHub se habilitado
+            if (this.config.githubSyncEnabled && this.config.githubToken) {
+                await this.syncToGitHub(backupInfo.id, backupData);
+            }
             
             // Notificar se habilitado
             if (this.config.notificationsEnabled) {
@@ -650,6 +662,405 @@ class AutoBackupSystem {
             return false;
         }
     }
+
+    // ========== MÉTODOS GITHUB SYNC ==========
+
+    async syncToGitHub(backupId, backupData) {
+        if (!this.config.githubToken) {
+            throw new Error('Token do GitHub não configurado');
+        }
+
+        try {
+            const fileName = `backup_${backupId}.json`;
+            const filePath = `${this.config.githubPath}/${fileName}`;
+            
+            // Preparar dados para envio
+            const content = btoa(unescape(encodeURIComponent(JSON.stringify(backupData, null, 2))));
+            
+            // Verificar se arquivo já existe
+            let sha = null;
+            try {
+                const existingFile = await this.githubApiRequest(
+                    `contents/${filePath}`,
+                    'GET'
+                );
+                sha = existingFile.sha;
+            } catch (error) {
+                // Arquivo não existe, criar novo
+                console.log(`📤 Criando novo backup no GitHub: ${fileName}`);
+            }
+
+            // Criar ou atualizar arquivo
+            const requestBody = {
+                message: `Backup automático VRS - ${new Date().toLocaleString('pt-BR')}`,
+                content: content,
+                branch: this.config.githubBranch
+            };
+
+            if (sha) {
+                requestBody.sha = sha;
+                console.log(`📤 Atualizando backup no GitHub: ${fileName}`);
+            }
+
+            const response = await this.githubApiRequest(
+                `contents/${filePath}`,
+                'PUT',
+                requestBody
+            );
+
+            console.log(`✅ Backup sincronizado com GitHub: ${response.content.name}`);
+            
+            // Atualizar histórico com info do GitHub
+            const backupIndex = this.backupHistory.findIndex(b => b.id === backupId);
+            if (backupIndex !== -1) {
+                this.backupHistory[backupIndex].githubSync = {
+                    synced: true,
+                    url: response.content.html_url,
+                    sha: response.content.sha,
+                    syncDate: new Date().toISOString()
+                };
+                localStorage.setItem('backup_history', JSON.stringify(this.backupHistory));
+            }
+
+            return response;
+
+        } catch (error) {
+            console.error('❌ Erro ao sincronizar com GitHub:', error);
+            
+            // Atualizar histórico com erro
+            const backupIndex = this.backupHistory.findIndex(b => b.id === backupId);
+            if (backupIndex !== -1) {
+                this.backupHistory[backupIndex].githubSync = {
+                    synced: false,
+                    error: error.message,
+                    lastAttempt: new Date().toISOString()
+                };
+                localStorage.setItem('backup_history', JSON.stringify(this.backupHistory));
+            }
+
+            throw error;
+        }
+    }
+
+    async downloadFromGitHub(fileName) {
+        if (!this.config.githubToken) {
+            throw new Error('Token do GitHub não configurado');
+        }
+
+        try {
+            const filePath = `${this.config.githubPath}/${fileName}`;
+            
+            const response = await this.githubApiRequest(
+                `contents/${filePath}`,
+                'GET'
+            );
+
+            // Decodificar conteúdo base64
+            const content = decodeURIComponent(escape(atob(response.content)));
+            const backupData = JSON.parse(content);
+
+            console.log(`📥 Backup baixado do GitHub: ${fileName}`);
+            return backupData;
+
+        } catch (error) {
+            console.error('❌ Erro ao baixar do GitHub:', error);
+            throw error;
+        }
+    }
+
+    async listGitHubBackups() {
+        if (!this.config.githubToken) {
+            throw new Error('Token do GitHub não configurado');
+        }
+
+        try {
+            const response = await this.githubApiRequest(
+                `contents/${this.config.githubPath}`,
+                'GET'
+            );
+
+            // Filtrar apenas arquivos de backup
+            const backupFiles = response
+                .filter(file => file.type === 'file' && file.name.startsWith('backup_') && file.name.endsWith('.json'))
+                .map(file => ({
+                    name: file.name,
+                    size: file.size,
+                    url: file.download_url,
+                    sha: file.sha,
+                    lastModified: file.name.includes('_') ? 
+                        this.parseBackupIdDate(file.name.replace('backup_', '').replace('.json', '')) : 
+                        null
+                }))
+                .sort((a, b) => new Date(b.lastModified) - new Date(a.lastModified));
+
+            console.log(`📋 Encontrados ${backupFiles.length} backups no GitHub`);
+            return backupFiles;
+
+        } catch (error) {
+            console.error('❌ Erro ao listar backups do GitHub:', error);
+            throw error;
+        }
+    }
+
+    async githubApiRequest(endpoint, method = 'GET', data = null) {
+        const url = `https://api.github.com/repos/${this.config.githubOwner}/${this.config.githubRepo}/${endpoint}`;
+        
+        const options = {
+            method: method,
+            headers: {
+                'Authorization': `token ${this.config.githubToken}`,
+                'Accept': 'application/vnd.github.v3+json',
+                'Content-Type': 'application/json'
+            }
+        };
+
+        if (data) {
+            options.body = JSON.stringify(data);
+        }
+
+        const response = await fetch(url, options);
+        
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(`GitHub API Error: ${response.status} - ${errorData.message || response.statusText}`);
+        }
+
+        return await response.json();
+    }
+
+    parseBackupIdDate(backupId) {
+        // Extrair data do ID do backup (formato: YYYYMMDD_HHMMSS_XXX)
+        const match = backupId.match(/^(\d{4})(\d{2})(\d{2})_(\d{2})(\d{2})(\d{2})/);
+        if (match) {
+            const [, year, month, day, hour, minute, second] = match;
+            return new Date(
+                parseInt(year), 
+                parseInt(month) - 1, 
+                parseInt(day), 
+                parseInt(hour), 
+                parseInt(minute), 
+                parseInt(second)
+            ).toISOString();
+        }
+        return null;
+    }
+
+    // ========== INTERFACE GITHUB ==========
+
+    renderGitHubInterface() {
+        return `
+            <div class="github-section">
+                <h3>🐙 Sincronização GitHub</h3>
+                
+                <div class="github-config">
+                    <div class="config-row">
+                        <label>Repositório:</label>
+                        <span class="repo-info">${this.config.githubOwner}/${this.config.githubRepo}</span>
+                    </div>
+                    
+                    <div class="config-row">
+                        <label>Branch:</label>
+                        <span>${this.config.githubBranch}</span>
+                    </div>
+                    
+                    <div class="config-row">
+                        <label>Pasta:</label>
+                        <span>${this.config.githubPath}</span>
+                    </div>
+                    
+                    <div class="config-row">
+                        <label>Token:</label>
+                        <input type="password" id="github-token" placeholder="ghp_..." 
+                               value="${this.config.githubToken || ''}" 
+                               style="width: 300px;">
+                        <button onclick="autoBackupSystem.saveGitHubToken()">💾 Salvar</button>
+                    </div>
+                    
+                    <div class="config-row">
+                        <label>
+                            <input type="checkbox" id="github-sync-enabled" 
+                                   ${this.config.githubSyncEnabled ? 'checked' : ''}>
+                            Sincronização automática habilitada
+                        </label>
+                    </div>
+                </div>
+
+                <div class="github-actions">
+                    <button onclick="autoBackupSystem.testGitHubConnection()" class="test-btn">
+                        🔍 Testar Conexão
+                    </button>
+                    
+                    <button onclick="autoBackupSystem.manualGitHubSync()" class="sync-btn">
+                        🔄 Sincronizar Agora
+                    </button>
+                    
+                    <button onclick="autoBackupSystem.showGitHubBackups()" class="list-btn">
+                        📋 Ver Backups na Nuvem
+                    </button>
+                </div>
+
+                <div id="github-status" class="status-area"></div>
+            </div>
+        `;
+    }
+
+    async saveGitHubToken() {
+        const token = document.getElementById('github-token').value.trim();
+        const syncEnabled = document.getElementById('github-sync-enabled').checked;
+        
+        this.config.githubToken = token;
+        this.config.githubSyncEnabled = syncEnabled;
+        
+        this.saveConfig();
+        
+        if (token) {
+            this.showNotification('Token do GitHub salvo com sucesso!', 'success');
+            
+            // Testar conexão automaticamente
+            await this.testGitHubConnection();
+        } else {
+            this.showNotification('Token do GitHub removido', 'info');
+        }
+    }
+
+    async testGitHubConnection() {
+        if (!this.config.githubToken) {
+            this.showNotification('Configure o token do GitHub primeiro', 'error');
+            return;
+        }
+
+        const statusEl = document.getElementById('github-status');
+        statusEl.innerHTML = '<div class="loading">🔍 Testando conexão...</div>';
+
+        try {
+            // Testar acesso ao repositório
+            await this.githubApiRequest('', 'GET');
+            
+            // Listar backups existentes
+            const backups = await this.listGitHubBackups();
+            
+            statusEl.innerHTML = `
+                <div class="success">
+                    ✅ Conexão estabelecida com sucesso!<br>
+                    📁 Encontrados ${backups.length} backups na nuvem
+                </div>
+            `;
+            
+        } catch (error) {
+            statusEl.innerHTML = `
+                <div class="error">
+                    ❌ Erro na conexão: ${error.message}
+                </div>
+            `;
+        }
+    }
+
+    async manualGitHubSync() {
+        if (!this.config.githubToken) {
+            this.showNotification('Configure o token do GitHub primeiro', 'error');
+            return;
+        }
+
+        try {
+            // Criar backup atual
+            const backupData = this.createBackupData();
+            const backupInfo = this.createBackupInfo(backupData);
+            
+            // Sincronizar com GitHub
+            await this.syncToGitHub(backupInfo.id, backupData);
+            
+            this.showNotification('Backup sincronizado com GitHub!', 'success');
+            
+        } catch (error) {
+            console.error('Erro na sincronização manual:', error);
+            this.showNotification(`Erro na sincronização: ${error.message}`, 'error');
+        }
+    }
+
+    async showGitHubBackups() {
+        if (!this.config.githubToken) {
+            this.showNotification('Configure o token do GitHub primeiro', 'error');
+            return;
+        }
+
+        try {
+            const backups = await this.listGitHubBackups();
+            
+            let html = `
+                <div class="github-backups-modal">
+                    <h3>☁️ Backups na Nuvem (${backups.length})</h3>
+                    <div class="backups-list">
+            `;
+
+            if (backups.length === 0) {
+                html += '<p>Nenhum backup encontrado no GitHub.</p>';
+            } else {
+                backups.forEach(backup => {
+                    const date = backup.lastModified ? 
+                        new Date(backup.lastModified).toLocaleString('pt-BR') : 
+                        'Data desconhecida';
+                    
+                    const size = (backup.size / 1024).toFixed(1);
+                    
+                    html += `
+                        <div class="backup-item">
+                            <div class="backup-info">
+                                <strong>${backup.name}</strong><br>
+                                📅 ${date}<br>
+                                💾 ${size} KB
+                            </div>
+                            <div class="backup-actions">
+                                <button onclick="autoBackupSystem.downloadGitHubBackup('${backup.name}')" 
+                                        class="download-btn">📥 Baixar</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            html += `
+                    </div>
+                    <button onclick="this.parentElement.remove()" class="close-btn">❌ Fechar</button>
+                </div>
+            `;
+
+            // Adicionar modal à página
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.innerHTML = html;
+            document.body.appendChild(modal);
+
+        } catch (error) {
+            console.error('Erro ao listar backups:', error);
+            this.showNotification(`Erro ao acessar backups: ${error.message}`, 'error');
+        }
+    }
+
+    async downloadGitHubBackup(fileName) {
+        try {
+            const backupData = await this.downloadFromGitHub(fileName);
+            
+            // Criar download local
+            const blob = new Blob([JSON.stringify(backupData, null, 2)], {
+                type: 'application/json'
+            });
+            
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            a.click();
+            
+            URL.revokeObjectURL(url);
+            
+            this.showNotification(`Backup ${fileName} baixado!`, 'success');
+            
+        } catch (error) {
+            console.error('Erro ao baixar backup:', error);
+            this.showNotification(`Erro ao baixar: ${error.message}`, 'error');
+        }
+        }
+    }
 }
 
 // Exportar para uso global
@@ -657,7 +1068,7 @@ window.AutoBackupSystem = AutoBackupSystem;
 
 // Inicializar automaticamente se não estiver em modo de teste
 if (typeof window !== 'undefined' && !window.BACKUP_TEST_MODE) {
-    window.autoBackup = new AutoBackupSystem();
+    window.autoBackupSystem = new AutoBackupSystem();
 }
 
-console.log('💾 Sistema de Auto Backup carregado com sucesso!');
+console.log('💾 Sistema de Auto Backup com GitHub Sync carregado com sucesso!');

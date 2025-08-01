@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐙 Teste GitHub Sync - VRS Auto Backup</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+        }
+
+        .test-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 800px;
+            width: 90%;
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .status-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 5px solid #667eea;
+        }
+
+        .github-config {
+            background: #e8f4fd;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            border: 2px solid #0366d6;
+        }
+
+        .config-row {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+            gap: 15px;
+        }
+
+        .config-row label {
+            font-weight: 600;
+            min-width: 100px;
+            color: #0366d6;
+        }
+
+        .config-row input[type="password"], .config-row input[type="text"] {
+            flex: 1;
+            padding: 10px 15px;
+            border: 2px solid #e1e4e8;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .config-row input:focus {
+            outline: none;
+            border-color: #0366d6;
+            box-shadow: 0 0 0 3px rgba(3, 102, 214, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-size: 14px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .test-btn { background: linear-gradient(45deg, #28a745, #20c997); }
+        .sync-btn { background: linear-gradient(45deg, #007bff, #0056b3); }
+        .list-btn { background: linear-gradient(45deg, #6f42c1, #5a2d91); }
+
+        .status-area {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            min-height: 50px;
+        }
+
+        .loading {
+            color: #ffc107;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .success {
+            color: #28a745;
+            background: #d4edda;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error {
+            color: #dc3545;
+            background: #f8d7da;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #f5c6cb;
+        }
+
+        .info {
+            color: #0c5460;
+            background: #d1ecf1;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #bee5eb;
+        }
+
+        .actions {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+
+        .repo-info {
+            font-family: 'Courier New', monospace;
+            background: #f1f3f4;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: 600;
+            color: #0366d6;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .github-backups-modal {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .backups-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .backup-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border: 1px solid #e1e4e8;
+            border-radius: 8px;
+            margin: 10px 0;
+            background: #f8f9fa;
+        }
+
+        .backup-info {
+            flex: 1;
+        }
+
+        .backup-actions {
+            margin-left: 15px;
+        }
+
+        .download-btn {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .close-btn {
+            background: linear-gradient(45deg, #dc3545, #c82333);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 20px;
+            float: right;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            z-index: 1001;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .notification.success { background: #28a745; }
+        .notification.error { background: #dc3545; }
+        .notification.info { background: #17a2b8; }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .spinner {
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="header">
+            <h1>🐙 Teste GitHub Sync</h1>
+            <p>Sistema de backup automático com sincronização na nuvem</p>
+        </div>
+
+        <div class="status-card">
+            <h3>📊 Status do Sistema</h3>
+            <div id="system-status">
+                <p>🔧 Carregando sistema de backup...</p>
+            </div>
+        </div>
+
+        <div class="github-config">
+            <h3>⚙️ Configuração GitHub</h3>
+            
+            <div class="config-row">
+                <label>Repositório:</label>
+                <span class="repo-info">jacktatakae/vrs-inventario-backup</span>
+            </div>
+            
+            <div class="config-row">
+                <label>Branch:</label>
+                <span>main</span>
+            </div>
+            
+            <div class="config-row">
+                <label>Pasta:</label>
+                <span>auto-backups</span>
+            </div>
+            
+            <div class="config-row">
+                <label>Token:</label>
+                <input type="password" id="github-token" placeholder="ghp_..." style="width: 300px;">
+                <button onclick="saveGitHubToken()" class="btn">💾 Salvar</button>
+            </div>
+            
+            <div class="config-row">
+                <label>
+                    <input type="checkbox" id="github-sync-enabled">
+                    Sincronização automática habilitada
+                </label>
+            </div>
+        </div>
+
+        <div class="actions">
+            <button onclick="testGitHubConnection()" class="btn test-btn">
+                🔍 Testar Conexão
+            </button>
+            
+            <button onclick="manualGitHubSync()" class="btn sync-btn">
+                🔄 Sincronizar Agora
+            </button>
+            
+            <button onclick="showGitHubBackups()" class="btn list-btn">
+                📋 Ver Backups na Nuvem
+            </button>
+            
+            <button onclick="createTestData()" class="btn">
+                📝 Criar Dados de Teste
+            </button>
+        </div>
+
+        <div id="github-status" class="status-area"></div>
+    </div>
+
+    <script src="auto-backup-system.js"></script>
+    <script>
+        let backupSystem;
+
+        // Inicializar sistema quando página carregar
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // Aguardar carregamento do sistema
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                backupSystem = new AutoBackupSystem();
+                
+                // Atualizar status
+                document.getElementById('system-status').innerHTML = `
+                    <p>✅ Sistema de backup carregado com sucesso!</p>
+                    <p>📊 Backups locais: ${backupSystem.backupHistory.length}</p>
+                    <p>⚙️ Auto backup: ${backupSystem.isRunning ? 'Ativo' : 'Inativo'}</p>
+                `;
+
+                // Carregar configurações salvas
+                const token = backupSystem.config.githubToken;
+                const syncEnabled = backupSystem.config.githubSyncEnabled;
+                
+                if (token) {
+                    document.getElementById('github-token').value = token;
+                }
+                document.getElementById('github-sync-enabled').checked = syncEnabled;
+
+            } catch (error) {
+                document.getElementById('system-status').innerHTML = `
+                    <p style="color: #dc3545;">❌ Erro ao carregar sistema: ${error.message}</p>
+                `;
+            }
+        });
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.remove();
+            }, 4000);
+        }
+
+        function saveGitHubToken() {
+            const token = document.getElementById('github-token').value.trim();
+            const syncEnabled = document.getElementById('github-sync-enabled').checked;
+            
+            backupSystem.config.githubToken = token;
+            backupSystem.config.githubSyncEnabled = syncEnabled;
+            backupSystem.saveConfig();
+            
+            if (token) {
+                showNotification('Token do GitHub salvo com sucesso!', 'success');
+                testGitHubConnection();
+            } else {
+                showNotification('Token do GitHub removido', 'info');
+            }
+        }
+
+        async function testGitHubConnection() {
+            if (!backupSystem.config.githubToken) {
+                showNotification('Configure o token do GitHub primeiro', 'error');
+                return;
+            }
+
+            const statusEl = document.getElementById('github-status');
+            statusEl.innerHTML = '<div class="loading"><span class="spinner">🔍</span> Testando conexão...</div>';
+
+            try {
+                // Testar acesso ao repositório
+                await backupSystem.githubApiRequest('', 'GET');
+                
+                // Listar backups existentes
+                const backups = await backupSystem.listGitHubBackups();
+                
+                statusEl.innerHTML = `
+                    <div class="success">
+                        ✅ Conexão estabelecida com sucesso!<br>
+                        📁 Encontrados ${backups.length} backups na nuvem<br>
+                        🔗 Repositório: jacktatakae/vrs-inventario-backup
+                    </div>
+                `;
+                
+            } catch (error) {
+                statusEl.innerHTML = `
+                    <div class="error">
+                        ❌ Erro na conexão: ${error.message}<br>
+                        💡 Verifique se o token tem permissões de escrita no repositório
+                    </div>
+                `;
+            }
+        }
+
+        async function manualGitHubSync() {
+            if (!backupSystem.config.githubToken) {
+                showNotification('Configure o token do GitHub primeiro', 'error');
+                return;
+            }
+
+            try {
+                showNotification('🔄 Iniciando sincronização...', 'info');
+                
+                // Criar backup atual
+                const backupData = backupSystem.createBackupData();
+                const backupInfo = backupSystem.createBackupInfo(backupData);
+                
+                // Adicionar ao histórico local
+                backupSystem.backupHistory.unshift(backupInfo);
+                localStorage.setItem('backup_history', JSON.stringify(backupSystem.backupHistory));
+                
+                // Sincronizar com GitHub
+                await backupSystem.syncToGitHub(backupInfo.id, backupData);
+                
+                showNotification('✅ Backup sincronizado com GitHub!', 'success');
+                
+                // Atualizar status
+                document.getElementById('system-status').innerHTML = `
+                    <p>✅ Sistema funcionando perfeitamente!</p>
+                    <p>📊 Backups locais: ${backupSystem.backupHistory.length}</p>
+                    <p>☁️ Último sync: ${new Date().toLocaleString('pt-BR')}</p>
+                `;
+                
+            } catch (error) {
+                console.error('Erro na sincronização manual:', error);
+                showNotification(`❌ Erro na sincronização: ${error.message}`, 'error');
+            }
+        }
+
+        async function showGitHubBackups() {
+            if (!backupSystem.config.githubToken) {
+                showNotification('Configure o token do GitHub primeiro', 'error');
+                return;
+            }
+
+            try {
+                const backups = await backupSystem.listGitHubBackups();
+                
+                let html = `
+                    <div class="github-backups-modal">
+                        <h3>☁️ Backups na Nuvem (${backups.length})</h3>
+                        <div class="backups-list">
+                `;
+
+                if (backups.length === 0) {
+                    html += '<p>Nenhum backup encontrado no GitHub.</p>';
+                } else {
+                    backups.forEach(backup => {
+                        const date = backup.lastModified ? 
+                            new Date(backup.lastModified).toLocaleString('pt-BR') : 
+                            'Data desconhecida';
+                        
+                        const size = (backup.size / 1024).toFixed(1);
+                        
+                        html += `
+                            <div class="backup-item">
+                                <div class="backup-info">
+                                    <strong>${backup.name}</strong><br>
+                                    📅 ${date}<br>
+                                    💾 ${size} KB
+                                </div>
+                                <div class="backup-actions">
+                                    <button onclick="downloadGitHubBackup('${backup.name}')" 
+                                            class="download-btn">📥 Baixar</button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+
+                html += `
+                        </div>
+                        <button onclick="this.parentElement.parentElement.remove()" class="close-btn">❌ Fechar</button>
+                    </div>
+                `;
+
+                // Adicionar modal à página
+                const modal = document.createElement('div');
+                modal.className = 'modal-overlay';
+                modal.innerHTML = html;
+                document.body.appendChild(modal);
+
+            } catch (error) {
+                console.error('Erro ao listar backups:', error);
+                showNotification(`❌ Erro ao acessar backups: ${error.message}`, 'error');
+            }
+        }
+
+        async function downloadGitHubBackup(fileName) {
+            try {
+                const backupData = await backupSystem.downloadFromGitHub(fileName);
+                
+                // Criar download local
+                const blob = new Blob([JSON.stringify(backupData, null, 2)], {
+                    type: 'application/json'
+                });
+                
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = fileName;
+                a.click();
+                
+                URL.revokeObjectURL(url);
+                
+                showNotification(`📥 Backup ${fileName} baixado!`, 'success');
+                
+            } catch (error) {
+                console.error('Erro ao baixar backup:', error);
+                showNotification(`❌ Erro ao baixar: ${error.message}`, 'error');
+            }
+        }
+
+        function createTestData() {
+            // Criar dados de teste para demonstrar o sistema
+            const testData = {
+                inventario_tanques: {
+                    tanques: [
+                        {
+                            id: 'test_001',
+                            montadora: 'VOLKSWAGEN',
+                            modelo: 'GOL',
+                            ano_inicial: 2020,
+                            ano_final: 2024,
+                            combustivel: 'FLEX',
+                            codigo_peca: 'VRS-VW-GOL-2020-FL',
+                            observacoes: 'Dados de teste - GitHub Sync Demo',
+                            data_cadastro: new Date().toISOString()
+                        },
+                        {
+                            id: 'test_002',
+                            montadora: 'FIAT',
+                            modelo: 'ARGO',
+                            ano_inicial: 2018,
+                            ano_final: 2024,
+                            combustivel: 'FLEX',
+                            codigo_peca: 'VRS-FT-ARGO-2018-FL',
+                            observacoes: 'Dados de teste - Sistema VRS',
+                            data_cadastro: new Date().toISOString()
+                        }
+                    ],
+                    ultima_atualizacao: new Date().toISOString()
+                },
+                qrCodes: [
+                    {
+                        id: 'qr_test_001',
+                        codigo: 'VRS-TEST-QR-001',
+                        url: 'https://github.com/jacktatakae/vrs-inventario-backup',
+                        data_criacao: new Date().toISOString(),
+                        tipo: 'teste_github_sync'
+                    }
+                ],
+                configuracoes_sistema: {
+                    versao: '2.0.0',
+                    github_sync_enabled: true,
+                    backup_interval: 300000,
+                    ultima_configuracao: new Date().toISOString()
+                }
+            };
+
+            // Salvar no localStorage
+            Object.entries(testData).forEach(([key, value]) => {
+                localStorage.setItem(key, JSON.stringify(value));
+            });
+
+            showNotification('📝 Dados de teste criados com sucesso!', 'success');
+            
+            // Atualizar status
+            document.getElementById('system-status').innerHTML = `
+                <p>✅ Sistema carregado com dados de teste!</p>
+                <p>📊 Tanques: ${testData.inventario_tanques.tanques.length}</p>
+                <p>🔗 QR Codes: ${testData.qrCodes.length}</p>
+                <p>⚙️ Configurações: Ativas</p>
+            `;
+        }
+    </script>
+</body>
+</html>
