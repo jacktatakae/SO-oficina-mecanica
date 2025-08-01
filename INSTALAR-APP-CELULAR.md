@@ -105,6 +105,22 @@ O VRS pode ser instalado como um aplicativo nativo no seu dispositivo móvel, fu
 - ✅ Verifique se tem internet
 - ✅ Force um backup manual
 
+### ❌ "Erro 'está faltando arquivos' ao navegar"
+**Este é um problema comum no celular!**
+
+**Soluções Imediatas:**
+- ✅ Use o botão "Voltar" do navegador ao invés de links
+- ✅ Instale como PWA para navegação mais estável
+- ✅ Execute o "Diagnóstico" no menu principal
+- ✅ Limpe cache do navegador
+- ✅ Recarregue a página (puxe para baixo)
+
+**Soluções Avançadas:**
+- ✅ Acesse `diagnostico-arquivos.html` para análise completa
+- ✅ Use o corretor automático incluído no sistema
+- ✅ Verifique se todos os arquivos estão na mesma pasta
+- ✅ Configure um servidor local ou use hospedagem online
+
 ### ❌ "App desapareceu da tela inicial"
 **Possíveis causas:**
 - Limpeza de cache

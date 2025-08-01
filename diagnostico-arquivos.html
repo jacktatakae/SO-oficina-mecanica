@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔧 Diagnóstico de Arquivos - VRS</title>
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .diagnostic-container {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 2rem auto;
+            max-width: 1000px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .test-item {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-left: 5px solid #6c757d;
+            transition: all 0.3s ease;
+        }
+
+        .test-item.loading {
+            border-left-color: #ffc107;
+            background: #fff3cd;
+        }
+
+        .test-item.success {
+            border-left-color: #28a745;
+            background: #d4edda;
+        }
+
+        .test-item.error {
+            border-left-color: #dc3545;
+            background: #f8d7da;
+        }
+
+        .file-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .progress-bar {
+            background: #e9ecef;
+            border-radius: 10px;
+            height: 25px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #28a745, #20c997);
+            height: 100%;
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="diagnostic-container">
+            <div class="text-center mb-4">
+                <h1><i class="fas fa-tools me-2 text-primary"></i>Diagnóstico de Arquivos VRS</h1>
+                <p class="text-muted">Verificação completa de dependências e integridade do sistema</p>
+                
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressBar" style="width: 0%;">0%</div>
+                </div>
+            </div>
+
+            <!-- Status Geral -->
+            <div class="alert alert-info" id="generalStatus">
+                <i class="fas fa-info-circle me-2"></i>
+                <strong>Iniciando diagnóstico...</strong>
+                <div id="statusDetails">Preparando verificações...</div>
+            </div>
+
+            <!-- Seção: Páginas HTML -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5><i class="fas fa-file-alt me-2"></i>Páginas HTML</h5>
+                </div>
+                <div class="card-body">
+                    <div class="file-grid" id="htmlFiles"></div>
+                </div>
+            </div>
+
+            <!-- Seção: Arquivos JavaScript -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5><i class="fab fa-js-square me-2"></i>Arquivos JavaScript</h5>
+                </div>
+                <div class="card-body">
+                    <div class="file-grid" id="jsFiles"></div>
+                </div>
+            </div>
+
+            <!-- Seção: Arquivos CSS -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5><i class="fas fa-paint-brush me-2"></i>Arquivos CSS</h5>
+                </div>
+                <div class="card-body">
+                    <div class="file-grid" id="cssFiles"></div>
+                </div>
+            </div>
+
+            <!-- Seção: Outros Arquivos -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5><i class="fas fa-file me-2"></i>Outros Arquivos</h5>
+                </div>
+                <div class="card-body">
+                    <div class="file-grid" id="otherFiles"></div>
+                </div>
+            </div>
+
+            <!-- Resultado Final -->
+            <div class="alert" id="finalResult" style="display: none;">
+                <h4 id="resultTitle"></h4>
+                <div id="resultMessage"></div>
+                <div id="resultActions" class="mt-3"></div>
+            </div>
+
+            <!-- Botões de Ação -->
+            <div class="text-center">
+                <button class="btn btn-primary btn-lg me-2" onclick="runDiagnostic()">
+                    <i class="fas fa-play me-2"></i>Executar Diagnóstico
+                </button>
+                <button class="btn btn-success btn-lg me-2" onclick="fixCommonIssues()">
+                    <i class="fas fa-wrench me-2"></i>Corrigir Problemas
+                </button>
+                <button class="btn btn-info btn-lg" onclick="window.location.href='inventario-rapido.html'">
+                    <i class="fas fa-home me-2"></i>Voltar ao VRS
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Lista de arquivos para verificar
+        const FILES_TO_CHECK = {
+            html: [
+                'index.html',
+                'inventario-rapido.html',
+                'scanner-visual.html',
+                'github-sync-mobile.html',
+                'instalar-app.html',
+                'teste-pwa.html',
+                'gerenciador-backup.html',
+                'cadastro-cliente.html',
+                'central-sistemas.html',
+                'gerenciador-clientes.html'
+            ],
+            js: [
+                'auto-backup-system.js',
+                'github-sync.js',
+                'ia-visual-radiadores.js',
+                'python-bridge.js',
+                'catalogo-manager.js',
+                'config-contatos.js',
+                'sw.js'
+            ],
+            css: [
+                'styles.css',
+                'mobile-responsive.css'
+            ],
+            other: [
+                'manifest.json',
+                'sw.js'
+            ]
+        };
+
+        let diagnosticResults = {};
+        let totalFiles = 0;
+        let checkedFiles = 0;
+
+        // Calcular total de arquivos
+        for (const category in FILES_TO_CHECK) {
+            totalFiles += FILES_TO_CHECK[category].length;
+        }
+
+        async function runDiagnostic() {
+            diagnosticResults = {};
+            checkedFiles = 0;
+            
+            updateProgress(0);
+            updateStatus('Iniciando verificação de arquivos...', 'info');
+            
+            // Verificar cada categoria
+            for (const [category, files] of Object.entries(FILES_TO_CHECK)) {
+                await checkFileCategory(category, files);
+            }
+            
+            // Mostrar resultado final
+            showFinalResults();
+        }
+
+        async function checkFileCategory(category, files) {
+            const container = document.getElementById(category + 'Files');
+            container.innerHTML = '';
+            
+            for (const file of files) {
+                const testItem = createTestItem(file);
+                container.appendChild(testItem);
+                
+                const result = await checkFile(file);
+                updateTestItem(testItem, result);
+                
+                diagnosticResults[file] = result;
+                checkedFiles++;
+                updateProgress((checkedFiles / totalFiles) * 100);
+            }
+        }
+
+        async function checkFile(filename) {
+            try {
+                console.log('🔍 Verificando arquivo:', filename);
+                
+                const response = await fetch(filename, { 
+                    method: 'HEAD',
+                    cache: 'no-cache'
+                });
+                
+                if (response.ok) {
+                    return {
+                        status: 'success',
+                        message: `✅ Encontrado (${Math.round(response.headers.get('content-length')/1024) || '?'}KB)`,
+                        details: `Status: ${response.status} | Tipo: ${response.headers.get('content-type') || 'Desconhecido'}`
+                    };
+                } else {
+                    return {
+                        status: 'error',
+                        message: `❌ Erro HTTP ${response.status}`,
+                        details: `Não foi possível carregar o arquivo`
+                    };
+                }
+            } catch (error) {
+                return {
+                    status: 'error',
+                    message: `❌ Não encontrado`,
+                    details: `Erro: ${error.message}`
+                };
+            }
+        }
+
+        function createTestItem(filename) {
+            const item = document.createElement('div');
+            item.className = 'test-item loading';
+            item.innerHTML = `
+                <div class="d-flex justify-content-between align-items-center">
+                    <strong>${filename}</strong>
+                    <span class="status-icon"><i class="fas fa-spinner fa-spin"></i></span>
+                </div>
+                <div class="status-message">Verificando...</div>
+                <div class="status-details" style="font-size: 0.8rem; color: #666;"></div>
+            `;
+            return item;
+        }
+
+        function updateTestItem(item, result) {
+            item.className = `test-item ${result.status}`;
+            
+            const statusIcon = item.querySelector('.status-icon');
+            const statusMessage = item.querySelector('.status-message');
+            const statusDetails = item.querySelector('.status-details');
+            
+            if (result.status === 'success') {
+                statusIcon.innerHTML = '<i class="fas fa-check-circle text-success"></i>';
+            } else {
+                statusIcon.innerHTML = '<i class="fas fa-exclamation-triangle text-danger"></i>';
+            }
+            
+            statusMessage.innerHTML = result.message;
+            statusDetails.innerHTML = result.details;
+        }
+
+        function updateProgress(percentage) {
+            const progressBar = document.getElementById('progressBar');
+            progressBar.style.width = `${percentage}%`;
+            progressBar.textContent = `${Math.round(percentage)}%`;
+        }
+
+        function updateStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('generalStatus');
+            const statusDetails = document.getElementById('statusDetails');
+            
+            statusDiv.className = `alert alert-${type}`;
+            statusDetails.innerHTML = message;
+        }
+
+        function showFinalResults() {
+            const resultDiv = document.getElementById('finalResult');
+            const titleElement = document.getElementById('resultTitle');
+            const messageElement = document.getElementById('resultMessage');
+            const actionsElement = document.getElementById('resultActions');
+            
+            let successCount = 0;
+            let errorCount = 0;
+            let missingFiles = [];
+            
+            for (const [file, result] of Object.entries(diagnosticResults)) {
+                if (result.status === 'success') {
+                    successCount++;
+                } else {
+                    errorCount++;
+                    missingFiles.push(file);
+                }
+            }
+            
+            if (errorCount === 0) {
+                resultDiv.className = 'alert alert-success';
+                titleElement.innerHTML = '<i class="fas fa-check-circle me-2"></i>Diagnóstico Completo - Tudo OK!';
+                messageElement.innerHTML = `
+                    🎉 Todos os ${successCount} arquivos foram encontrados com sucesso!<br>
+                    ✅ O sistema VRS está funcionando corretamente.<br>
+                    ✅ Navegação entre páginas deve funcionar sem problemas.
+                `;
+                actionsElement.innerHTML = `
+                    <button class="btn btn-primary" onclick="window.location.href='inventario-rapido.html'">
+                        <i class="fas fa-rocket me-2"></i>Usar VRS Agora
+                    </button>
+                `;
+            } else {
+                resultDiv.className = 'alert alert-warning';
+                titleElement.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>Problemas Encontrados';
+                messageElement.innerHTML = `
+                    ⚠️ ${errorCount} arquivo(s) não encontrado(s) de ${totalFiles} verificados.<br>
+                    ✅ ${successCount} arquivo(s) estão funcionando corretamente.<br><br>
+                    <strong>Arquivos com problema:</strong><br>
+                    ${missingFiles.map(file => `❌ ${file}`).join('<br>')}
+                `;
+                actionsElement.innerHTML = `
+                    <button class="btn btn-warning me-2" onclick="fixCommonIssues()">
+                        <i class="fas fa-wrench me-2"></i>Tentar Corrigir
+                    </button>
+                    <button class="btn btn-info me-2" onclick="showWorkarounds()">
+                        <i class="fas fa-lightbulb me-2"></i>Ver Soluções
+                    </button>
+                    <button class="btn btn-primary" onclick="window.location.href='inventario-rapido.html'">
+                        <i class="fas fa-play me-2"></i>Usar Mesmo Assim
+                    </button>
+                `;
+            }
+            
+            resultDiv.style.display = 'block';
+            updateStatus(`Diagnóstico concluído: ${successCount} OK, ${errorCount} problemas`, 
+                        errorCount === 0 ? 'success' : 'warning');
+        }
+
+        function fixCommonIssues() {
+            alert('🔧 Correção Automática\n\nAs seguintes ações serão tentadas:\n\n1. Limpar cache do navegador\n2. Recarregar service worker\n3. Forçar atualização\n\nIsso pode resolver problemas de cache e arquivos ausentes.');
+            
+            // Limpar caches
+            if ('caches' in window) {
+                caches.keys().then(cacheNames => {
+                    return Promise.all(
+                        cacheNames.map(cacheName => caches.delete(cacheName))
+                    );
+                }).then(() => {
+                    console.log('✅ Caches limpos');
+                });
+            }
+            
+            // Recarregar service worker
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then(registrations => {
+                    registrations.forEach(registration => {
+                        registration.update();
+                    });
+                });
+            }
+            
+            // Recarregar página após breve delay
+            setTimeout(() => {
+                location.reload(true);
+            }, 2000);
+        }
+
+        function showWorkarounds() {
+            const workarounds = `
+🛠️ SOLUÇÕES PARA PROBLEMAS COMUNS:
+
+1. 📱 NAVEGAÇÃO NO CELULAR:
+   • Use o botão "Voltar" do navegador
+   • Evite links quebrados
+   • Instale como PWA para melhor experiência
+
+2. 🔄 ARQUIVOS AUSENTES:
+   • Recarregue a página (F5)
+   • Limpe cache do navegador
+   • Verifique conexão com internet
+
+3. 📂 PROBLEMAS DE CAMINHO:
+   • Certifique-se que todos arquivos estão na mesma pasta
+   • Verifique se nomes estão corretos
+   • Use caminhos relativos (./)
+
+4. 🌐 PROBLEMAS DE SERVIDOR:
+   • Use servidor HTTP local
+   • Evite abrir arquivos diretamente (file://)
+   • Configure servidor Python ou Node.js
+
+5. 📱 INSTALAÇÃO PWA:
+   • Acesse via HTTPS
+   • Use navegador compatível
+   • Aguarde manifesto carregar
+            `;
+            
+            alert(workarounds);
+        }
+
+        // Executar diagnóstico automaticamente ao carregar
+        window.addEventListener('load', () => {
+            setTimeout(runDiagnostic, 1000);
+        });
+    </script>
+</body>
+</html>
