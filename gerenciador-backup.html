@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💾 Gerenciador de Backup - VRS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 1rem;
+        }
+
+        .backup-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .status-card {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .status-card.danger {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        }
+
+        .status-card.warning {
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+            color: #212529;
+        }
+
+        .backup-item {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            transition: all 0.3s ease;
+        }
+
+        .backup-item:hover {
+            border-color: #1e3c72;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .backup-item.manual {
+            border-left: 5px solid #007bff;
+        }
+
+        .backup-item.automatic {
+            border-left: 5px solid #28a745;
+        }
+
+        .backup-item.imported {
+            border-left: 5px solid #6f42c1;
+        }
+
+        .config-section {
+            background: #e9ecef;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .btn-backup {
+            border-radius: 10px;
+            padding: 0.7rem 1.5rem;
+            font-weight: 600;
+            margin: 0.2rem;
+        }
+
+        .progress-ring {
+            width: 60px;
+            height: 60px;
+        }
+
+        .progress-ring-circle {
+            transition: stroke-dashoffset 0.35s;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+
+        .backup-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .stat-item {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #1e3c72;
+        }
+
+        .log-area {
+            background: #212529;
+            color: #ffffff;
+            border-radius: 10px;
+            padding: 1rem;
+            height: 200px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+        }
+
+        .log-entry {
+            margin: 0.2rem 0;
+            padding: 0.1rem 0;
+        }
+
+        .log-info { color: #17a2b8; }
+        .log-success { color: #28a745; }
+        .log-warning { color: #ffc107; }
+        .log-error { color: #dc3545; }
+
+        @media (max-width: 768px) {
+            .backup-container {
+                padding: 1rem;
+            }
+            
+            .backup-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="backup-container">
+        <!-- Header -->
+        <div class="text-center mb-4">
+            <i class="fas fa-database text-primary" style="font-size: 3rem;"></i>
+            <h2 class="mt-3">💾 Gerenciador de Backup</h2>
+            <p class="text-muted">Sistema de backup automático e gerenciamento de dados - VRS</p>
+        </div>
+
+        <!-- Status do Sistema -->
+        <div id="statusCard" class="status-card">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h5 class="mb-1">
+                        <i id="statusIcon" class="fas fa-check-circle me-2"></i>
+                        <span id="statusText">Sistema de Backup Ativo</span>
+                    </h5>
+                    <p class="mb-0" id="statusDetail">Backup automático funcionando normalmente</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <div class="btn-group">
+                        <button class="btn btn-light btn-sm" onclick="toggleAutoBackup()" id="toggleBtn">
+                            <i class="fas fa-pause me-1"></i> Pausar
+                        </button>
+                        <button class="btn btn-light btn-sm" onclick="forceBackup()">
+                            <i class="fas fa-sync me-1"></i> Backup Agora
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <small>Próximo backup: <span id="nextBackupTime">Calculando...</span></small>
+                </div>
+                <div class="col-md-6 text-end">
+                    <small>Último backup: <span id="lastBackupTime">Nunca</span></small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estatísticas -->
+        <div class="backup-stats">
+            <div class="stat-item">
+                <div class="stat-number" id="totalBackups">0</div>
+                <div class="text-muted">Total de Backups</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="totalSize">0 MB</div>
+                <div class="text-muted">Espaço Usado</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="totalItems">0</div>
+                <div class="text-muted">Itens Protegidos</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="dataIntegrity">100%</div>
+                <div class="text-muted">Integridade</div>
+            </div>
+        </div>
+
+        <!-- Controles Principais -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <h5><i class="fas fa-tools me-2"></i>Ações Rápidas</h5>
+                <div class="btn-group-vertical w-100">
+                    <button class="btn btn-primary btn-backup" onclick="createManualBackup()">
+                        <i class="fas fa-plus me-2"></i>Criar Backup Manual
+                    </button>
+                    <button class="btn btn-success btn-backup" onclick="exportAllBackups()">
+                        <i class="fas fa-download me-2"></i>Exportar Todos os Backups
+                    </button>
+                    <button class="btn btn-warning btn-backup" onclick="cleanupOldBackups()">
+                        <i class="fas fa-broom me-2"></i>Limpar Backups Antigos
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h5><i class="fas fa-upload me-2"></i>Importação</h5>
+                <div class="card">
+                    <div class="card-body">
+                        <input type="file" class="form-control mb-3" id="importFile" accept=".json" onchange="handleFileImport(this)">
+                        <div class="d-grid">
+                            <button class="btn btn-info btn-backup" onclick="document.getElementById('importFile').click()">
+                                <i class="fas fa-file-import me-2"></i>Importar Backup
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Configurações -->
+        <div class="config-section">
+            <h5><i class="fas fa-cog me-2"></i>Configurações de Backup</h5>
+            <div class="row">
+                <div class="col-md-4">
+                    <label class="form-label">Intervalo (minutos)</label>
+                    <select class="form-select" id="backupInterval" onchange="updateBackupConfig()">
+                        <option value="5">5 minutos</option>
+                        <option value="15" selected>15 minutos</option>
+                        <option value="30">30 minutos</option>
+                        <option value="60">1 hora</option>
+                        <option value="120">2 horas</option>
+                        <option value="360">6 horas</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Máximo de Backups</label>
+                    <select class="form-select" id="maxBackups" onchange="updateBackupConfig()">
+                        <option value="10">10 backups</option>
+                        <option value="25">25 backups</option>
+                        <option value="50" selected>50 backups</option>
+                        <option value="100">100 backups</option>
+                        <option value="200">200 backups</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Opções</label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="enableNotifications" checked onchange="updateBackupConfig()">
+                        <label class="form-check-label" for="enableNotifications">
+                            Notificações
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="enableCompression" checked onchange="updateBackupConfig()">
+                        <label class="form-check-label" for="enableCompression">
+                            Compressão
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de Backups -->
+        <div class="row">
+            <div class="col-md-8">
+                <h5><i class="fas fa-list me-2"></i>Histórico de Backups</h5>
+                <div id="backupList" style="max-height: 400px; overflow-y: auto;">
+                    <!-- Será preenchido dinamicamente -->
+                </div>
+            </div>
+            <div class="col-md-4">
+                <h5><i class="fas fa-terminal me-2"></i>Log do Sistema</h5>
+                <div id="logArea" class="log-area">
+                    <div class="log-entry log-info">[INFO] Sistema de backup inicializado</div>
+                    <div class="log-entry log-success">[OK] Configurações carregadas</div>
+                    <div class="log-entry log-info">[INFO] Monitorando alterações...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal para Detalhes do Backup -->
+        <div class="modal fade" id="backupDetailsModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Detalhes do Backup</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body" id="backupDetailsContent">
+                        <!-- Conteúdo será preenchido dinamicamente -->
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                        <button type="button" class="btn btn-warning" onclick="restoreSelectedBackup()">Restaurar</button>
+                        <button type="button" class="btn btn-primary" onclick="exportSelectedBackup()">Exportar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center mt-4 pt-3 border-top">
+            <p class="text-muted">
+                <i class="fas fa-shield-alt"></i> 
+                Sistema de Backup VRS v2.0 - Proteção automática de dados
+                <br>
+                <small>Última atualização: <span id="lastUpdate">Carregando...</span></small>
+            </p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="auto-backup-system.js"></script>
+    <script>
+        let selectedBackupId = null;
+
+        // Inicializar interface
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeInterface();
+            updateInterface();
+            
+            // Atualizar interface a cada 30 segundos
+            setInterval(updateInterface, 30000);
+        });
+
+        function initializeInterface() {
+            addLog('Inicializando interface de gerenciamento...', 'info');
+            
+            // Carregar configurações atuais
+            if (window.autoBackup) {
+                loadCurrentConfig();
+                addLog('Sistema de backup detectado', 'success');
+            } else {
+                addLog('Sistema de backup não encontrado', 'error');
+                showErrorState();
+            }
+        }
+
+        function loadCurrentConfig() {
+            const info = window.autoBackup.getBackupInfo();
+            
+            // Atualizar campos de configuração
+            document.getElementById('backupInterval').value = info.config.backupInterval / 60000;
+            document.getElementById('maxBackups').value = info.config.maxBackups;
+            document.getElementById('enableNotifications').checked = info.config.notificationsEnabled;
+            document.getElementById('enableCompression').checked = info.config.compressionEnabled;
+        }
+
+        function updateInterface() {
+            if (!window.autoBackup) return;
+
+            const info = window.autoBackup.getBackupInfo();
+            const backupList = window.autoBackup.getBackupList();
+            
+            // Atualizar status
+            updateStatusCard(info);
+            
+            // Atualizar estatísticas
+            updateStats(info, backupList);
+            
+            // Atualizar lista de backups
+            updateBackupList(backupList);
+            
+            // Atualizar timestamp
+            document.getElementById('lastUpdate').textContent = new Date().toLocaleString('pt-BR');
+        }
+
+        function updateStatusCard(info) {
+            const statusCard = document.getElementById('statusCard');
+            const statusIcon = document.getElementById('statusIcon');
+            const statusText = document.getElementById('statusText');
+            const statusDetail = document.getElementById('statusDetail');
+            const toggleBtn = document.getElementById('toggleBtn');
+            const nextBackupTime = document.getElementById('nextBackupTime');
+            const lastBackupTime = document.getElementById('lastBackupTime');
+
+            if (info.isRunning) {
+                statusCard.className = 'status-card';
+                statusIcon.className = 'fas fa-check-circle me-2';
+                statusText.textContent = 'Sistema de Backup Ativo';
+                statusDetail.textContent = `Backup automático a cada ${info.config.backupInterval / 60000} minutos`;
+                toggleBtn.innerHTML = '<i class="fas fa-pause me-1"></i> Pausar';
+            } else {
+                statusCard.className = 'status-card warning';
+                statusIcon.className = 'fas fa-exclamation-triangle me-2';
+                statusText.textContent = 'Sistema de Backup Pausado';
+                statusDetail.textContent = 'Backup automático desativado';
+                toggleBtn.innerHTML = '<i class="fas fa-play me-1"></i> Ativar';
+            }
+
+            // Próximo backup
+            if (info.nextBackup) {
+                nextBackupTime.textContent = new Date(info.nextBackup).toLocaleString('pt-BR');
+            } else {
+                nextBackupTime.textContent = 'Desativado';
+            }
+
+            // Último backup
+            if (info.lastBackup) {
+                lastBackupTime.textContent = new Date(info.lastBackup.timestamp).toLocaleString('pt-BR');
+            } else {
+                lastBackupTime.textContent = 'Nunca';
+            }
+        }
+
+        function updateStats(info, backupList) {
+            document.getElementById('totalBackups').textContent = info.backupCount;
+            document.getElementById('totalSize').textContent = formatFileSize(info.totalSize);
+            
+            // Calcular itens protegidos
+            let totalItems = 0;
+            if (info.lastBackup) {
+                totalItems = info.lastBackup.totalItems || 0;
+            }
+            document.getElementById('totalItems').textContent = totalItems;
+            
+            // Verificar integridade (simulado)
+            const integrity = window.autoBackup.verifyDataIntegrity() ? 100 : 85;
+            document.getElementById('dataIntegrity').textContent = integrity + '%';
+        }
+
+        function updateBackupList(backupList) {
+            const container = document.getElementById('backupList');
+            
+            if (backupList.length === 0) {
+                container.innerHTML = '<div class="text-center text-muted p-4">Nenhum backup encontrado</div>';
+                return;
+            }
+
+            container.innerHTML = backupList.map(backup => `
+                <div class="backup-item ${backup.type}" onclick="showBackupDetails('${backup.id}')">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-${getBackupIcon(backup.type)} me-2"></i>
+                                <div>
+                                    <strong>${backup.description || backup.id}</strong>
+                                    <br>
+                                    <small class="text-muted">
+                                        ${backup.dateFormatted} • ${backup.sizeFormatted} • ${backup.totalItems} itens
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <span class="badge bg-secondary">${backup.ageFormatted}</span>
+                            <div class="btn-group btn-group-sm mt-2">
+                                <button class="btn btn-outline-primary" onclick="event.stopPropagation(); showBackupDetails('${backup.id}')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-outline-success" onclick="event.stopPropagation(); exportBackup('${backup.id}')">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                                <button class="btn btn-outline-danger" onclick="event.stopPropagation(); deleteBackup('${backup.id}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getBackupIcon(type) {
+            const icons = {
+                'automatic': 'clock',
+                'manual': 'hand-paper',
+                'imported': 'file-import'
+            };
+            return icons[type] || 'database';
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function toggleAutoBackup() {
+            if (!window.autoBackup) return;
+
+            const info = window.autoBackup.getBackupInfo();
+            
+            if (info.isRunning) {
+                window.autoBackup.stopAutoBackup();
+                addLog('Backup automático pausado pelo usuário', 'warning');
+            } else {
+                window.autoBackup.startAutoBackup();
+                addLog('Backup automático reativado pelo usuário', 'success');
+            }
+            
+            updateInterface();
+        }
+
+        function forceBackup() {
+            if (!window.autoBackup) return;
+
+            addLog('Iniciando backup manual...', 'info');
+            
+            window.autoBackup.createManualBackup('Backup forçado pelo usuário')
+                .then(() => {
+                    addLog('Backup manual concluído com sucesso', 'success');
+                    updateInterface();
+                })
+                .catch(error => {
+                    addLog(`Erro no backup manual: ${error.message}`, 'error');
+                });
+        }
+
+        function createManualBackup() {
+            if (!window.autoBackup) return;
+
+            const description = prompt('Descrição do backup (opcional):') || 'Backup manual';
+            
+            addLog(`Criando backup manual: ${description}`, 'info');
+            
+            window.autoBackup.createManualBackup(description)
+                .then(() => {
+                    addLog('Backup manual criado com sucesso', 'success');
+                    updateInterface();
+                })
+                .catch(error => {
+                    addLog(`Erro ao criar backup: ${error.message}`, 'error');
+                });
+        }
+
+        function updateBackupConfig() {
+            if (!window.autoBackup) return;
+
+            const interval = parseInt(document.getElementById('backupInterval').value) * 60 * 1000;
+            const maxBackups = parseInt(document.getElementById('maxBackups').value);
+            const notifications = document.getElementById('enableNotifications').checked;
+            const compression = document.getElementById('enableCompression').checked;
+
+            const newConfig = {
+                backupInterval: interval,
+                maxBackups: maxBackups,
+                notificationsEnabled: notifications,
+                compressionEnabled: compression
+            };
+
+            window.autoBackup.updateConfig(newConfig);
+            addLog('Configurações atualizadas', 'success');
+            updateInterface();
+        }
+
+        function showBackupDetails(backupId) {
+            selectedBackupId = backupId;
+            
+            const backupList = window.autoBackup.getBackupList();
+            const backup = backupList.find(b => b.id === backupId);
+            
+            if (!backup) return;
+
+            const content = document.getElementById('backupDetailsContent');
+            content.innerHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Informações Gerais</h6>
+                        <table class="table table-sm">
+                            <tr><td><strong>ID:</strong></td><td>${backup.id}</td></tr>
+                            <tr><td><strong>Tipo:</strong></td><td>${backup.type}</td></tr>
+                            <tr><td><strong>Data:</strong></td><td>${backup.dateFormatted}</td></tr>
+                            <tr><td><strong>Tamanho:</strong></td><td>${backup.sizeFormatted}</td></tr>
+                            <tr><td><strong>Versão:</strong></td><td>${backup.version}</td></tr>
+                            <tr><td><strong>Itens:</strong></td><td>${backup.totalItems}</td></tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Detalhes Técnicos</h6>
+                        <table class="table table-sm">
+                            <tr><td><strong>Checksum:</strong></td><td><code>${backup.checksum || 'N/A'}</code></td></tr>
+                            <tr><td><strong>Idade:</strong></td><td>${backup.ageFormatted}</td></tr>
+                            ${backup.description ? `<tr><td><strong>Descrição:</strong></td><td>${backup.description}</td></tr>` : ''}
+                            ${backup.originalFile ? `<tr><td><strong>Arquivo:</strong></td><td>${backup.originalFile}</td></tr>` : ''}
+                        </table>
+                    </div>
+                </div>
+                
+                ${backup.description ? `
+                <div class="mt-3">
+                    <h6>Descrição</h6>
+                    <p class="text-muted">${backup.description}</p>
+                </div>
+                ` : ''}
+            `;
+
+            new bootstrap.Modal(document.getElementById('backupDetailsModal')).show();
+        }
+
+        function restoreSelectedBackup() {
+            if (!selectedBackupId || !window.autoBackup) return;
+
+            if (confirm('⚠️ Tem certeza que deseja restaurar este backup? Os dados atuais serão substituídos!')) {
+                addLog(`Restaurando backup: ${selectedBackupId}`, 'warning');
+                
+                window.autoBackup.restoreBackup(selectedBackupId, { autoReload: true })
+                    .then(() => {
+                        addLog('Backup restaurado com sucesso', 'success');
+                        bootstrap.Modal.getInstance(document.getElementById('backupDetailsModal')).hide();
+                    })
+                    .catch(error => {
+                        addLog(`Erro na restauração: ${error.message}`, 'error');
+                    });
+            }
+        }
+
+        function exportSelectedBackup() {
+            if (!selectedBackupId || !window.autoBackup) return;
+            
+            window.autoBackup.exportBackup(selectedBackupId);
+            addLog(`Backup exportado: ${selectedBackupId}`, 'success');
+            bootstrap.Modal.getInstance(document.getElementById('backupDetailsModal')).hide();
+        }
+
+        function exportBackup(backupId) {
+            if (!window.autoBackup) return;
+            
+            window.autoBackup.exportBackup(backupId);
+            addLog(`Backup exportado: ${backupId}`, 'success');
+        }
+
+        function deleteBackup(backupId) {
+            if (!window.autoBackup) return;
+
+            if (confirm('🗑️ Tem certeza que deseja deletar este backup?')) {
+                window.autoBackup.deleteBackup(backupId);
+                addLog(`Backup deletado: ${backupId}`, 'info');
+                updateInterface();
+            }
+        }
+
+        function handleFileImport(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            if (!window.autoBackup) {
+                alert('Sistema de backup não encontrado!');
+                return;
+            }
+
+            addLog(`Importando backup: ${file.name}`, 'info');
+            
+            window.autoBackup.importBackup(file)
+                .then(backupInfo => {
+                    addLog(`Backup importado com sucesso: ${backupInfo.id}`, 'success');
+                    updateInterface();
+                })
+                .catch(error => {
+                    addLog(`Erro na importação: ${error.message}`, 'error');
+                })
+                .finally(() => {
+                    input.value = ''; // Limpar input
+                });
+        }
+
+        function exportAllBackups() {
+            if (!window.autoBackup) return;
+
+            const backupList = window.autoBackup.getBackupList();
+            
+            if (backupList.length === 0) {
+                alert('Nenhum backup para exportar!');
+                return;
+            }
+
+            if (confirm(`Exportar todos os ${backupList.length} backups?`)) {
+                backupList.forEach(backup => {
+                    setTimeout(() => {
+                        window.autoBackup.exportBackup(backup.id);
+                    }, 500); // Delay para não sobrecarregar
+                });
+                
+                addLog(`Exportando ${backupList.length} backups...`, 'info');
+            }
+        }
+
+        function cleanupOldBackups() {
+            if (!window.autoBackup) return;
+
+            if (confirm('🧹 Limpar backups antigos automaticamente?')) {
+                window.autoBackup.cleanupOldBackups();
+                addLog('Limpeza de backups antigos concluída', 'success');
+                updateInterface();
+            }
+        }
+
+        function showErrorState() {
+            const statusCard = document.getElementById('statusCard');
+            statusCard.className = 'status-card danger';
+            statusCard.innerHTML = `
+                <div class="text-center">
+                    <i class="fas fa-exclamation-triangle fa-2x mb-2"></i>
+                    <h5>Sistema de Backup Não Encontrado</h5>
+                    <p>O sistema de backup não foi carregado corretamente.</p>
+                    <button class="btn btn-light" onclick="window.location.reload()">
+                        <i class="fas fa-sync me-1"></i> Recarregar Página
+                    </button>
+                </div>
+            `;
+        }
+
+        function addLog(message, type = 'info') {
+            const logArea = document.getElementById('logArea');
+            const timestamp = new Date().toLocaleTimeString('pt-BR');
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry log-${type}`;
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            
+            logArea.appendChild(logEntry);
+            logArea.scrollTop = logArea.scrollHeight;
+            
+            // Limitar número de logs
+            const entries = logArea.querySelectorAll('.log-entry');
+            if (entries.length > 100) {
+                entries[0].remove();
+            }
+        }
+
+        // Adicionar logs de exemplo
+        setTimeout(() => {
+            addLog('Interface de gerenciamento carregada', 'success');
+            addLog('Monitorando sistema de backup...', 'info');
+        }, 1000);
+    </script>
+</body>
+</html>

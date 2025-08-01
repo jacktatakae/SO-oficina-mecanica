@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📱 Inventário Mobile - VRS</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #f8f9fa;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            padding: 0;
+        }
+
+        .mobile-header {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .quick-add {
+            background: white;
+            border-radius: 15px;
+            margin: 1rem;
+            padding: 1rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .montadora-tabs {
+            display: flex;
+            overflow-x: auto;
+            padding: 0.5rem 1rem;
+            background: white;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .montadora-tab {
+            min-width: 80px;
+            padding: 0.5rem 1rem;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 20px;
+            margin-right: 0.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .montadora-tab.active {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+        .tanque-card {
+            background: white;
+            border-radius: 10px;
+            margin: 0.5rem 1rem;
+            padding: 1rem;
+            border-left: 4px solid #007bff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .tanque-info {
+            flex: 1;
+        }
+
+        .tanque-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-round {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .qty-input {
+            width: 60px;
+            text-align: center;
+            border: 2px solid #007bff;
+            border-radius: 8px;
+            padding: 0.3rem;
+        }
+
+        .floating-stats {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+        }
+
+        .voice-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            margin-left: 1rem;
+        }
+
+        .form-control-lg {
+            font-size: 1.1rem;
+            padding: 0.8rem;
+        }
+
+        .suggestions {
+            background: #e3f2fd;
+            border-radius: 10px;
+            padding: 0.5rem;
+            margin: 0.5rem 1rem;
+        }
+
+        .suggestion-chip {
+            display: inline-block;
+            background: white;
+            border: 1px solid #007bff;
+            border-radius: 15px;
+            padding: 0.3rem 0.8rem;
+            margin: 0.2rem;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .suggestion-chip:hover {
+            background: #007bff;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .quick-add {
+                margin: 0.5rem;
+                padding: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Mobile -->
+    <div class="mobile-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h5 class="m-0">
+                    <i class="fas fa-boxes me-2"></i>Inventário VRS
+                </h5>
+                <small>Tanques de Radiador</small>
+            </div>
+            <div class="text-end">
+                <div class="fw-bold" id="totalDisplay">0 itens</div>
+                <small id="variantesDisplay">0 variantes</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Abas de Montadoras -->
+    <div class="montadora-tabs" id="montadoraTabs">
+        <div class="montadora-tab active" data-montadora="">TODAS</div>
+        <div class="montadora-tab" data-montadora="volkswagen">VW</div>
+        <div class="montadora-tab" data-montadora="chevrolet">GM</div>
+        <div class="montadora-tab" data-montadora="fiat">FIAT</div>
+        <div class="montadora-tab" data-montadora="ford">FORD</div>
+        <div class="montadora-tab" data-montadora="toyota">TOYOTA</div>
+        <div class="montadora-tab" data-montadora="honda">HONDA</div>
+        <div class="montadora-tab" data-montadora="outros">OUTROS</div>
+    </div>
+
+    <!-- Formulário de Adição Rápida -->
+    <div class="quick-add">
+        <div class="row g-2">
+            <div class="col-5">
+                <input type="text" class="form-control form-control-lg" id="modeloInput" 
+                       placeholder="Modelo (ex: Gol)" autocomplete="off">
+            </div>
+            <div class="col-3">
+                <select class="form-select form-control-lg" id="tipoSelect">
+                    <option value="superior">Superior</option>
+                    <option value="inferior">Inferior</option>
+                    <option value="completo">Completo</option>
+                    <option value="kit">Kit</option>
+                </select>
+            </div>
+            <div class="col-2">
+                <input type="number" class="form-control form-control-lg" id="qtyInput" 
+                       value="1" min="1" max="999">
+            </div>
+            <div class="col-2">
+                <button class="btn btn-primary btn-lg w-100" onclick="adicionarRapido()">
+                    <i class="fas fa-plus"></i>
+                </button>
+                <button class="voice-btn mt-1" onclick="iniciarReconhecimentoVoz()" title="Falar">
+                    <i class="fas fa-microphone"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sugestões Inteligentes -->
+    <div class="suggestions" id="suggestions" style="display: none;">
+        <small class="text-muted">Sugestões:</small>
+        <div id="suggestionChips"></div>
+    </div>
+
+    <!-- Lista de Tanques -->
+    <div id="tanquesList">
+        <!-- Será preenchido dinamicamente -->
+    </div>
+
+    <!-- Estatísticas Flutuantes -->
+    <div class="floating-stats" onclick="mostrarEstatisticas()">
+        <div class="text-center">
+            <div class="fw-bold" id="floatingTotal">0</div>
+            <small style="font-size: 0.7rem;">Total</small>
+        </div>
+    </div>
+
+    <!-- Modal de Estatísticas -->
+    <div class="modal fade" id="statsModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">📊 Estatísticas do Inventário</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="statsContent">
+                    <!-- Conteúdo será preenchido dinamicamente -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" onclick="exportarDados()">
+                        <i class="fas fa-download"></i> Exportar CSV
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Estado da aplicação
+        let inventario = JSON.parse(localStorage.getItem('inventario_mobile') || '[]');
+        let montadoraAtiva = '';
+
+        // Sugestões inteligentes baseadas no catálogo Zelukar
+        const sugestoes = {
+            'gol': ['Gol G5/G6', 'Gol G7', 'Gol G4'],
+            'onix': ['Onix 1ª Geração', 'Onix Plus', 'Onix Joy'],
+            'uno': ['Uno Vivace', 'Uno Way', 'Uno Fire'],
+            'ka': ['Ka 2ª Geração', 'Ka Sedan'],
+            'corolla': ['Corolla GLi', 'Corolla XEi', 'Corolla Altis'],
+            'civic': ['Civic 10ª Geração', 'Civic Sport'],
+            'hb20': ['HB20 1ª Geração', 'HB20S'],
+            'march': ['March 1ª Geração'],
+            'fox': ['Fox 1.0', 'Fox 1.6'],
+            'prisma': ['Prisma 1ª Geração', 'Prisma Joy']
+        };
+
+        // Inicializar aplicação
+        document.addEventListener('DOMContentLoaded', function() {
+            atualizarInterface();
+            configurarEventos();
+            document.getElementById('modeloInput').focus();
+        });
+
+        // Configurar eventos
+        function configurarEventos() {
+            // Eventos das abas
+            document.querySelectorAll('.montadora-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.montadora-tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    montadoraAtiva = this.dataset.montadora;
+                    atualizarLista();
+                });
+            });
+
+            // Auto-sugestões
+            document.getElementById('modeloInput').addEventListener('input', function() {
+                mostrarSugestoes(this.value);
+            });
+
+            // Atalho Enter
+            document.getElementById('modeloInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    adicionarRapido();
+                }
+            });
+
+            // Prevenir zoom no iOS
+            document.addEventListener('touchstart', function(e) {
+                if (e.touches.length > 1) {
+                    e.preventDefault();
+                }
+            });
+        }
+
+        // Adicionar tanque rapidamente
+        function adicionarRapido() {
+            const modelo = document.getElementById('modeloInput').value.trim();
+            const tipo = document.getElementById('tipoSelect').value;
+            const quantidade = parseInt(document.getElementById('qtyInput').value) || 1;
+
+            if (!modelo) {
+                vibrar();
+                document.getElementById('modeloInput').style.borderColor = '#dc3545';
+                setTimeout(() => {
+                    document.getElementById('modeloInput').style.borderColor = '';
+                }, 2000);
+                return;
+            }
+
+            // Determinar montadora automaticamente
+            const montadora = detectarMontadora(modelo);
+
+            const novoTanque = {
+                id: Date.now(),
+                modelo: modelo,
+                tipo: tipo,
+                quantidade: quantidade,
+                montadora: montadora,
+                timestamp: new Date().toISOString()
+            };
+
+            inventario.push(novoTanque);
+            salvarDados();
+            atualizarInterface();
+            limparFormulario();
+
+            // Feedback tátil
+            vibrar(50);
+            
+            // Feedback visual
+            const btn = document.querySelector('.btn-primary');
+            btn.style.backgroundColor = '#28a745';
+            setTimeout(() => {
+                btn.style.backgroundColor = '';
+            }, 500);
+        }
+
+        // Detectar montadora pelo modelo
+        function detectarMontadora(modelo) {
+            const modeloLower = modelo.toLowerCase();
+            
+            if (modeloLower.includes('gol') || modeloLower.includes('fox') || modeloLower.includes('voyage') || modeloLower.includes('polo')) {
+                return 'volkswagen';
+            } else if (modeloLower.includes('onix') || modeloLower.includes('prisma') || modeloLower.includes('corsa') || modeloLower.includes('celta')) {
+                return 'chevrolet';
+            } else if (modeloLower.includes('uno') || modeloLower.includes('palio') || modeloLower.includes('siena') || modeloLower.includes('doblo')) {
+                return 'fiat';
+            } else if (modeloLower.includes('ka') || modeloLower.includes('fiesta') || modeloLower.includes('focus')) {
+                return 'ford';
+            } else if (modeloLower.includes('corolla') || modeloLower.includes('etios') || modeloLower.includes('yaris')) {
+                return 'toyota';
+            } else if (modeloLower.includes('civic') || modeloLower.includes('fit') || modeloLower.includes('city')) {
+                return 'honda';
+            } else if (modeloLower.includes('hb20') || modeloLower.includes('creta')) {
+                return 'hyundai';
+            } else if (modeloLower.includes('march') || modeloLower.includes('versa')) {
+                return 'nissan';
+            }
+            
+            return 'outros';
+        }
+
+        // Mostrar sugestões
+        function mostrarSugestoes(texto) {
+            const container = document.getElementById('suggestions');
+            const chipsContainer = document.getElementById('suggestionChips');
+            
+            if (!texto || texto.length < 2) {
+                container.style.display = 'none';
+                return;
+            }
+
+            const textoLower = texto.toLowerCase();
+            const sugestoesEncontradas = [];
+
+            // Buscar sugestões
+            Object.keys(sugestoes).forEach(key => {
+                if (key.includes(textoLower)) {
+                    sugestoesEncontradas.push(...sugestoes[key]);
+                }
+            });
+
+            if (sugestoesEncontradas.length > 0) {
+                chipsContainer.innerHTML = sugestoesEncontradas
+                    .slice(0, 5)
+                    .map(sugestao => `
+                        <span class="suggestion-chip" onclick="usarSugestao('${sugestao}')">
+                            ${sugestao}
+                        </span>
+                    `).join('');
+                container.style.display = 'block';
+            } else {
+                container.style.display = 'none';
+            }
+        }
+
+        // Usar sugestão
+        function usarSugestao(modelo) {
+            document.getElementById('modeloInput').value = modelo;
+            document.getElementById('suggestions').style.display = 'none';
+            document.getElementById('qtyInput').focus();
+        }
+
+        // Limpar formulário
+        function limparFormulario() {
+            document.getElementById('modeloInput').value = '';
+            document.getElementById('qtyInput').value = '1';
+            document.getElementById('suggestions').style.display = 'none';
+            document.getElementById('modeloInput').focus();
+        }
+
+        // Atualizar interface
+        function atualizarInterface() {
+            atualizarEstatisticas();
+            atualizarLista();
+        }
+
+        // Atualizar estatísticas
+        function atualizarEstatisticas() {
+            const total = inventario.reduce((sum, item) => sum + item.quantidade, 0);
+            const variantes = inventario.length;
+
+            document.getElementById('totalDisplay').textContent = `${total} itens`;
+            document.getElementById('variantesDisplay').textContent = `${variantes} variantes`;
+            document.getElementById('floatingTotal').textContent = total;
+        }
+
+        // Atualizar lista
+        function atualizarLista() {
+            const container = document.getElementById('tanquesList');
+            let itens = inventario;
+
+            // Filtrar por montadora
+            if (montadoraAtiva) {
+                itens = inventario.filter(item => item.montadora === montadoraAtiva);
+            }
+
+            // Agrupar por modelo
+            const grupos = {};
+            itens.forEach(item => {
+                const chave = `${item.modelo}-${item.tipo}`;
+                if (!grupos[chave]) {
+                    grupos[chave] = { ...item, indices: [] };
+                }
+                grupos[chave].quantidade += item.quantidade;
+                grupos[chave].indices.push(inventario.indexOf(item));
+            });
+
+            container.innerHTML = '';
+
+            Object.values(grupos).forEach(grupo => {
+                const card = document.createElement('div');
+                card.className = 'tanque-card';
+                card.innerHTML = `
+                    <div class="tanque-info">
+                        <div class="fw-bold">${grupo.modelo}</div>
+                        <small class="text-muted">${grupo.tipo.toUpperCase()} • ${grupo.montadora.toUpperCase()}</small>
+                    </div>
+                    <div class="tanque-actions">
+                        <button class="btn btn-outline-danger btn-round" onclick="diminuirQuantidade('${grupo.modelo}', '${grupo.tipo}')">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <input type="number" class="qty-input" value="${grupo.quantidade}" 
+                               onchange="alterarQuantidade('${grupo.modelo}', '${grupo.tipo}', this.value)">
+                        <button class="btn btn-outline-success btn-round" onclick="aumentarQuantidade('${grupo.modelo}', '${grupo.tipo}')">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+            if (Object.keys(grupos).length === 0) {
+                container.innerHTML = `
+                    <div class="text-center p-4 text-muted">
+                        <i class="fas fa-boxes fa-3x mb-3"></i>
+                        <p>Nenhum tanque registrado ainda</p>
+                        <p>Comece adicionando o primeiro item!</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Alterar quantidade
+        function alterarQuantidade(modelo, tipo, novaQuantidade) {
+            const quantidade = Math.max(0, parseInt(novaQuantidade) || 0);
+            const item = inventario.find(i => i.modelo === modelo && i.tipo === tipo);
+            
+            if (item) {
+                if (quantidade === 0) {
+                    removerItem(modelo, tipo);
+                } else {
+                    item.quantidade = quantidade;
+                    salvarDados();
+                    atualizarInterface();
+                }
+            }
+        }
+
+        // Aumentar quantidade
+        function aumentarQuantidade(modelo, tipo) {
+            const item = inventario.find(i => i.modelo === modelo && i.tipo === tipo);
+            if (item) {
+                item.quantidade++;
+                salvarDados();
+                atualizarInterface();
+                vibrar(25);
+            }
+        }
+
+        // Diminuir quantidade
+        function diminuirQuantidade(modelo, tipo) {
+            const item = inventario.find(i => i.modelo === modelo && i.tipo === tipo);
+            if (item && item.quantidade > 1) {
+                item.quantidade--;
+                salvarDados();
+                atualizarInterface();
+                vibrar(25);
+            } else if (item && item.quantidade === 1) {
+                if (confirm('Remover este item do inventário?')) {
+                    removerItem(modelo, tipo);
+                }
+            }
+        }
+
+        // Remover item
+        function removerItem(modelo, tipo) {
+            inventario = inventario.filter(i => !(i.modelo === modelo && i.tipo === tipo));
+            salvarDados();
+            atualizarInterface();
+        }
+
+        // Mostrar estatísticas detalhadas
+        function mostrarEstatisticas() {
+            const stats = calcularEstatisticas();
+            const modal = new bootstrap.Modal(document.getElementById('statsModal'));
+            
+            document.getElementById('statsContent').innerHTML = `
+                <div class="row g-3">
+                    <div class="col-6">
+                        <div class="card bg-primary text-white">
+                            <div class="card-body text-center">
+                                <h4>${stats.totalTanques}</h4>
+                                <small>Total de Tanques</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="card bg-success text-white">
+                            <div class="card-body text-center">
+                                <h4>${stats.totalVariantes}</h4>
+                                <small>Variantes</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <h6>Por Montadora:</h6>
+                    ${Object.entries(stats.porMontadora)
+                        .map(([montadora, dados]) => `
+                            <div class="d-flex justify-content-between">
+                                <span>${montadora.toUpperCase()}:</span>
+                                <strong>${dados.quantidade} tanques (${dados.variantes} variantes)</strong>
+                            </div>
+                        `).join('')}
+                </div>
+            `;
+            
+            modal.show();
+        }
+
+        // Calcular estatísticas
+        function calcularEstatisticas() {
+            const porMontadora = {};
+            let totalTanques = 0;
+
+            inventario.forEach(item => {
+                totalTanques += item.quantidade;
+                
+                if (!porMontadora[item.montadora]) {
+                    porMontadora[item.montadora] = { quantidade: 0, variantes: 0 };
+                }
+                porMontadora[item.montadora].quantidade += item.quantidade;
+                porMontadora[item.montadora].variantes++;
+            });
+
+            return {
+                totalTanques,
+                totalVariantes: inventario.length,
+                porMontadora
+            };
+        }
+
+        // Exportar dados
+        function exportarDados() {
+            const csv = [
+                'Modelo,Tipo,Quantidade,Montadora,Data',
+                ...inventario.map(item => 
+                    `"${item.modelo}","${item.tipo}",${item.quantidade},"${item.montadora}","${new Date(item.timestamp).toLocaleDateString()}"`
+                )
+            ].join('\n');
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `inventario_tanques_${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
+        }
+
+        // Salvar dados
+        function salvarDados() {
+            localStorage.setItem('inventario_mobile', JSON.stringify(inventario));
+        }
+
+        // Vibração (se suportado)
+        function vibrar(duracao = 100) {
+            if (navigator.vibrate) {
+                navigator.vibrate(duracao);
+            }
+        }
+
+        // Reconhecimento de voz (experimental)
+        function iniciarReconhecimentoVoz() {
+            if (!('webkitSpeechRecognition' in window)) {
+                alert('Reconhecimento de voz não suportado neste navegador');
+                return;
+            }
+
+            const recognition = new webkitSpeechRecognition();
+            recognition.lang = 'pt-BR';
+            recognition.continuous = false;
+            recognition.interimResults = false;
+
+            recognition.onresult = function(event) {
+                const texto = event.results[0][0].transcript;
+                document.getElementById('modeloInput').value = texto;
+                mostrarSugestoes(texto);
+            };
+
+            recognition.onerror = function(event) {
+                console.error('Erro no reconhecimento:', event.error);
+            };
+
+            recognition.start();
+            vibrar(50);
+        }
+    </script>
+</body>
+</html>

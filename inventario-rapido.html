@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📋 Inventário Rápido de Tanques - VRS</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 1rem;
+        }
+
+        .inventario-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .quick-form {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border-left: 5px solid #2196F3;
+        }
+
+        .montadora-section {
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: #fafafa;
+        }
+
+        .montadora-section.active {
+            border-color: #2196F3;
+            background: #e3f2fd;
+        }
+
+        .tanque-item {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tanque-item:hover {
+            border-color: #2196F3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .tanque-info {
+            flex: 1;
+        }
+
+        .quantidade-input {
+            width: 80px;
+            text-align: center;
+        }
+
+        .btn-quick {
+            border-radius: 10px;
+            padding: 0.5rem 1.5rem;
+            font-weight: 600;
+            margin: 0.2rem;
+        }
+
+        .stats-card {
+            background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            margin: 0.5rem;
+        }
+
+        .zelukar-code {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 0.5rem;
+            font-family: monospace;
+            font-weight: bold;
+            color: #856404;
+        }
+
+        .progress-bar-custom {
+            height: 8px;
+            border-radius: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .inventario-container {
+                padding: 1rem;
+            }
+            
+            .tanque-item {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .quantidade-input {
+                margin-top: 0.5rem;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="inventario-container">
+        <!-- Header -->
+        <div class="text-center mb-4">
+            <i class="fas fa-boxes text-primary" style="font-size: 3rem;"></i>
+            <h2 class="mt-3">📋 Inventário Rápido de Tanques</h2>
+            <p class="text-muted">Registro eficiente por montadora - VRS</p>
+        </div>
+
+        <!-- Estatísticas Rápidas -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <h3 id="totalTanques">0</h3>
+                    <small>Total de Tanques</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <h3 id="totalVariantes">0</h3>
+                    <small>Variantes Diferentes</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <h3 id="montadorasAtivas">0</h3>
+                    <small>Montadoras</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <h3 id="progressoPercent">0%</h3>
+                    <small>Concluído</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulário Rápido -->
+        <div class="quick-form">
+            <h5><i class="fas fa-plus-circle me-2"></i>Registro Rápido</h5>
+            <div class="row">
+                <div class="col-md-3">
+                    <label class="form-label">Montadora</label>
+                    <select class="form-select" id="quickMontadora">
+                        <option value="">Selecione...</option>
+                        <option value="volkswagen">Volkswagen</option>
+                        <option value="chevrolet">Chevrolet</option>
+                        <option value="fiat">Fiat</option>
+                        <option value="ford">Ford</option>
+                        <option value="toyota">Toyota</option>
+                        <option value="honda">Honda</option>
+                        <option value="hyundai">Hyundai</option>
+                        <option value="nissan">Nissan</option>
+                        <option value="renault">Renault</option>
+                        <option value="peugeot">Peugeot</option>
+                        <option value="outros">Outros</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Modelo/Aplicação</label>
+                    <input type="text" class="form-control" id="quickModelo" placeholder="Ex: Gol G5/G6">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Tipo</label>
+                    <select class="form-select" id="quickTipo">
+                        <option value="superior">Superior</option>
+                        <option value="inferior">Inferior</option>
+                        <option value="completo">Completo</option>
+                        <option value="kit">Kit</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Quantidade</label>
+                    <input type="number" class="form-control" id="quickQuantidade" min="0" value="1">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">&nbsp;</label>
+                    <button class="btn btn-primary btn-quick w-100" onclick="adicionarRapido()">
+                        <i class="fas fa-plus"></i> Adicionar
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Código Zelukar (Opcional) -->
+            <div class="row mt-3">
+                <div class="col-md-4">
+                    <label class="form-label">Código Zelukar (opcional)</label>
+                    <input type="text" class="form-control" id="quickCodigo" placeholder="Ex: VW-001, FI-123">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Fabricante</label>
+                    <select class="form-select" id="quickFabricante">
+                        <option value="">Não especificado</option>
+                        <option value="Valeo">Valeo</option>
+                        <option value="Behr">Behr</option>
+                        <option value="Denso">Denso</option>
+                        <option value="Magneti Marelli">Magneti Marelli</option>
+                        <option value="Calsonic">Calsonic</option>
+                        <option value="Mobis">Mobis</option>
+                        <option value="Visconde">Visconde</option>
+                        <option value="Nacional">Nacional</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Observações</label>
+                    <input type="text" class="form-control" id="quickObs" placeholder="Ex: Usado, novo, danificado">
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista por Montadoras -->
+        <div id="montadorasList">
+            <!-- Será preenchido dinamicamente -->
+        </div>
+
+        <!-- Botões de Ação -->
+        <div class="text-center mt-4">
+            <button class="btn btn-primary btn-lg me-2" onclick="abrirScanner()">
+                <i class="fas fa-camera me-1"></i> Scanner Visual
+            </button>
+            <button class="btn btn-success btn-lg me-2" onclick="gerarRelatorio()">
+                <i class="fas fa-file-excel me-1"></i> Gerar Relatório Excel
+            </button>
+            <button class="btn btn-info btn-lg me-2" onclick="exportarJSON()">
+                <i class="fas fa-download me-1"></i> Backup JSON
+            </button>
+            <button class="btn btn-warning btn-lg me-2" onclick="importarDados()">
+                <i class="fas fa-upload me-1"></i> Importar Dados
+            </button>
+            <button class="btn btn-secondary btn-lg me-2" onclick="abrirGerenciadorBackup()">
+                <i class="fas fa-database me-1"></i> Gerenciar Backups
+            </button>
+            <button class="btn btn-secondary btn-lg" onclick="limparTudo()">
+                <i class="fas fa-trash me-1"></i> Limpar Tudo
+            </button>
+        </div>
+
+        <!-- Status do Auto Backup -->
+        <div class="alert alert-info mt-4" id="backupStatus">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-shield-alt me-2"></i>
+                <div class="flex-grow-1">
+                    <strong>🔄 Sistema de Auto Backup Ativo</strong>
+                    <br>
+                    <small id="backupStatusText">Seus dados estão sendo protegidos automaticamente</small>
+                </div>
+                <button class="btn btn-sm btn-outline-primary" onclick="forceBackupNow()">
+                    <i class="fas fa-sync"></i> Backup Agora
+                </button>
+            </div>
+        </div>
+
+        <!-- Progresso do Inventário -->
+        <div class="mt-4">
+            <h6>Progresso do Inventário</h6>
+            <div class="progress">
+                <div class="progress-bar progress-bar-custom bg-success" id="progressBar" style="width: 0%"></div>
+            </div>
+            <small class="text-muted">Meta: 100 variantes catalogadas</small>
+        </div>
+
+        <!-- Sugestões Baseadas no Catálogo Zelukar -->
+        <div class="mt-4">
+            <h6><i class="fas fa-lightbulb me-2"></i>Sugestões Baseadas no Catálogo Zelukar</h6>
+            <div id="sugestoes" class="row">
+                <!-- Será preenchido dinamicamente -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Edição -->
+    <div class="modal fade" id="editModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Editar Tanque</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="editIndex">
+                    <div class="mb-3">
+                        <label class="form-label">Modelo/Aplicação</label>
+                        <input type="text" class="form-control" id="editModelo">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tipo</label>
+                        <select class="form-select" id="editTipo">
+                            <option value="superior">Superior</option>
+                            <option value="inferior">Inferior</option>
+                            <option value="completo">Completo</option>
+                            <option value="kit">Kit</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Quantidade</label>
+                        <input type="number" class="form-control" id="editQuantidade" min="0">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Código Zelukar</label>
+                        <input type="text" class="form-control" id="editCodigo">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Fabricante</label>
+                        <input type="text" class="form-control" id="editFabricante">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Observações</label>
+                        <input type="text" class="form-control" id="editObs">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="salvarEdicao()">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="auto-backup-system.js"></script>
+    <script>
+        // Banco de dados do inventário
+        let inventario = {
+            tanques: [],
+            criado: new Date().toISOString(),
+            atualizado: new Date().toISOString()
+        };
+
+        // Sugestões baseadas no catálogo Zelukar
+        const sugestoesZelukar = [
+            { codigo: 'VW-001', modelo: 'Gol G5/G6', tipo: 'superior', fabricante: 'Valeo' },
+            { codigo: 'VW-002', modelo: 'Gol G5/G6', tipo: 'inferior', fabricante: 'Valeo' },
+            { codigo: 'GM-123', modelo: 'Onix 1ª Geração', tipo: 'superior', fabricante: 'Behr' },
+            { codigo: 'GM-124', modelo: 'Onix 1ª Geração', tipo: 'inferior', fabricante: 'Behr' },
+            { codigo: 'FI-001', modelo: 'Doblô', tipo: 'superior', fabricante: 'Magneti Marelli' },
+            { codigo: 'FI-002', modelo: 'Doblô', tipo: 'inferior', fabricante: 'Magneti Marelli' },
+            { codigo: 'FI-010', modelo: 'Uno Vivace', tipo: 'superior', fabricante: 'Magneti Marelli' },
+            { codigo: 'FD-050', modelo: 'Ka 2ª Geração', tipo: 'superior', fabricante: 'Denso' },
+            { codigo: 'TO-100', modelo: 'Corolla', tipo: 'superior', fabricante: 'Denso' },
+            { codigo: 'HY-200', modelo: 'HB20', tipo: 'superior', fabricante: 'Mobis' }
+        ];
+
+        // Carregar dados salvos
+        function carregarDados() {
+            const dadosSalvos = localStorage.getItem('inventario_tanques');
+            if (dadosSalvos) {
+                inventario = JSON.parse(dadosSalvos);
+            }
+            atualizarInterface();
+        }
+
+        // Salvar dados
+        function salvarDados() {
+            inventario.atualizado = new Date().toISOString();
+            localStorage.setItem('inventario_tanques', JSON.stringify(inventario));
+        }
+
+        // Adicionar tanque rapidamente
+        function adicionarRapido() {
+            const montadora = document.getElementById('quickMontadora').value;
+            const modelo = document.getElementById('quickModelo').value;
+            const tipo = document.getElementById('quickTipo').value;
+            const quantidade = parseInt(document.getElementById('quickQuantidade').value) || 0;
+            const codigo = document.getElementById('quickCodigo').value;
+            const fabricante = document.getElementById('quickFabricante').value;
+            const obs = document.getElementById('quickObs').value;
+
+            if (!montadora || !modelo) {
+                alert('Por favor, preencha pelo menos a montadora e o modelo!');
+                return;
+            }
+
+            const novoTanque = {
+                id: Date.now(),
+                montadora,
+                modelo,
+                tipo,
+                quantidade,
+                codigo: codigo || '',
+                fabricante: fabricante || 'Não especificado',
+                observacoes: obs || '',
+                dataRegistro: new Date().toISOString()
+            };
+
+            inventario.tanques.push(novoTanque);
+            salvarDados();
+            atualizarInterface();
+            limparFormulario();
+
+            // Feedback visual
+            document.getElementById('quickModelo').style.borderColor = '#28a745';
+            setTimeout(() => {
+                document.getElementById('quickModelo').style.borderColor = '';
+            }, 1000);
+        }
+
+        // Limpar formulário
+        function limparFormulario() {
+            document.getElementById('quickMontadora').value = '';
+            document.getElementById('quickModelo').value = '';
+            document.getElementById('quickTipo').value = 'superior';
+            document.getElementById('quickQuantidade').value = '1';
+            document.getElementById('quickCodigo').value = '';
+            document.getElementById('quickFabricante').value = '';
+            document.getElementById('quickObs').value = '';
+        }
+
+        // Atualizar interface
+        function atualizarInterface() {
+            atualizarEstatisticas();
+            atualizarListaMontadoras();
+            atualizarSugestoes();
+        }
+
+        // Atualizar estatísticas
+        function atualizarEstatisticas() {
+            const total = inventario.tanques.reduce((sum, t) => sum + t.quantidade, 0);
+            const variantes = inventario.tanques.length;
+            const montadoras = new Set(inventario.tanques.map(t => t.montadora)).size;
+            const progresso = Math.min(100, (variantes / 100) * 100);
+
+            document.getElementById('totalTanques').textContent = total;
+            document.getElementById('totalVariantes').textContent = variantes;
+            document.getElementById('montadorasAtivas').textContent = montadoras;
+            document.getElementById('progressoPercent').textContent = Math.round(progresso) + '%';
+            document.getElementById('progressBar').style.width = progresso + '%';
+        }
+
+        // Atualizar lista por montadoras
+        function atualizarListaMontadoras() {
+            const container = document.getElementById('montadorasList');
+            const montadoras = {};
+
+            // Agrupar por montadora
+            inventario.tanques.forEach(tanque => {
+                if (!montadoras[tanque.montadora]) {
+                    montadoras[tanque.montadora] = [];
+                }
+                montadoras[tanque.montadora].push(tanque);
+            });
+
+            container.innerHTML = '';
+
+            Object.keys(montadoras).sort().forEach(montadora => {
+                const section = document.createElement('div');
+                section.className = 'montadora-section';
+                
+                const totalQuantidade = montadoras[montadora].reduce((sum, t) => sum + t.quantidade, 0);
+                
+                section.innerHTML = `
+                    <h5>
+                        <i class="fas fa-car me-2"></i>${montadora.toUpperCase()}
+                        <span class="badge bg-primary ms-2">${montadoras[montadora].length} variantes</span>
+                        <span class="badge bg-success ms-1">${totalQuantidade} tanques</span>
+                    </h5>
+                    <div class="tanques-lista">
+                        ${montadoras[montadora].map((tanque, index) => `
+                            <div class="tanque-item" onclick="editarTanque(${inventario.tanques.indexOf(tanque)})">
+                                <div class="tanque-info">
+                                    <strong>${tanque.modelo}</strong> - ${tanque.tipo}
+                                    ${tanque.codigo ? `<div class="zelukar-code mt-1">${tanque.codigo}</div>` : ''}
+                                    <small class="text-muted d-block">
+                                        ${tanque.fabricante} | ${tanque.observacoes || 'Sem observações'}
+                                    </small>
+                                </div>
+                                <div class="quantidade-badge">
+                                    <span class="badge bg-info fs-6">${tanque.quantidade}</span>
+                                    <button class="btn btn-sm btn-outline-danger ms-2" onclick="event.stopPropagation(); removerTanque(${inventario.tanques.indexOf(tanque)})">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                
+                container.appendChild(section);
+            });
+        }
+
+        // Editar tanque
+        function editarTanque(index) {
+            const tanque = inventario.tanques[index];
+            
+            document.getElementById('editIndex').value = index;
+            document.getElementById('editModelo').value = tanque.modelo;
+            document.getElementById('editTipo').value = tanque.tipo;
+            document.getElementById('editQuantidade').value = tanque.quantidade;
+            document.getElementById('editCodigo').value = tanque.codigo;
+            document.getElementById('editFabricante').value = tanque.fabricante;
+            document.getElementById('editObs').value = tanque.observacoes;
+            
+            new bootstrap.Modal(document.getElementById('editModal')).show();
+        }
+
+        // Salvar edição
+        function salvarEdicao() {
+            const index = parseInt(document.getElementById('editIndex').value);
+            const tanque = inventario.tanques[index];
+            
+            tanque.modelo = document.getElementById('editModelo').value;
+            tanque.tipo = document.getElementById('editTipo').value;
+            tanque.quantidade = parseInt(document.getElementById('editQuantidade').value) || 0;
+            tanque.codigo = document.getElementById('editCodigo').value;
+            tanque.fabricante = document.getElementById('editFabricante').value;
+            tanque.observacoes = document.getElementById('editObs').value;
+            
+            salvarDados();
+            atualizarInterface();
+            bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
+        }
+
+        // Remover tanque
+        function removerTanque(index) {
+            if (confirm('Tem certeza que deseja remover este tanque?')) {
+                inventario.tanques.splice(index, 1);
+                salvarDados();
+                atualizarInterface();
+            }
+        }
+
+        // Atualizar sugestões
+        function atualizarSugestoes() {
+            const container = document.getElementById('sugestoes');
+            container.innerHTML = '';
+
+            sugestoesZelukar.slice(0, 6).forEach(sugestao => {
+                const col = document.createElement('div');
+                col.className = 'col-md-4 mb-2';
+                col.innerHTML = `
+                    <div class="card h-100">
+                        <div class="card-body p-2">
+                            <h6 class="card-title">${sugestao.codigo}</h6>
+                            <p class="card-text small">${sugestao.modelo} - ${sugestao.tipo}</p>
+                            <button class="btn btn-sm btn-outline-primary" onclick="usarSugestao('${sugestao.codigo}', '${sugestao.modelo}', '${sugestao.tipo}', '${sugestao.fabricante}')">
+                                <i class="fas fa-plus"></i> Usar
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(col);
+            });
+        }
+
+        // Usar sugestão
+        function usarSugestao(codigo, modelo, tipo, fabricante) {
+            document.getElementById('quickCodigo').value = codigo;
+            document.getElementById('quickModelo').value = modelo;
+            document.getElementById('quickTipo').value = tipo;
+            document.getElementById('quickFabricante').value = fabricante;
+            
+            // Determinar montadora pelo código
+            if (codigo.startsWith('VW-')) document.getElementById('quickMontadora').value = 'volkswagen';
+            else if (codigo.startsWith('GM-')) document.getElementById('quickMontadora').value = 'chevrolet';
+            else if (codigo.startsWith('FI-')) document.getElementById('quickMontadora').value = 'fiat';
+            else if (codigo.startsWith('FD-')) document.getElementById('quickMontadora').value = 'ford';
+            else if (codigo.startsWith('TO-')) document.getElementById('quickMontadora').value = 'toyota';
+            else if (codigo.startsWith('HY-')) document.getElementById('quickMontadora').value = 'hyundai';
+        }
+
+        // Gerar relatório Excel
+        function gerarRelatorio() {
+            const dados = inventario.tanques.map(tanque => ({
+                'Montadora': tanque.montadora,
+                'Modelo': tanque.modelo,
+                'Tipo': tanque.tipo,
+                'Quantidade': tanque.quantidade,
+                'Código Zelukar': tanque.codigo,
+                'Fabricante': tanque.fabricante,
+                'Observações': tanque.observacoes,
+                'Data Registro': new Date(tanque.dataRegistro).toLocaleDateString('pt-BR')
+            }));
+
+            // Simular download CSV
+            const csv = [
+                Object.keys(dados[0] || {}).join(','),
+                ...dados.map(row => Object.values(row).join(','))
+            ].join('\n');
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `inventario_tanques_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Exportar JSON
+        function exportarJSON() {
+            const dados = JSON.stringify(inventario, null, 2);
+            const blob = new Blob([dados], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `backup_inventario_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Importar dados
+        function importarDados() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        try {
+                            const dados = JSON.parse(e.target.result);
+                            if (confirm('Deseja substituir os dados atuais pelos importados?')) {
+                                inventario = dados;
+                                salvarDados();
+                                atualizarInterface();
+                                alert('Dados importados com sucesso!');
+                            }
+                        } catch (error) {
+                            alert('Erro ao importar arquivo: ' + error.message);
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            };
+            input.click();
+        }
+
+        // Limpar tudo
+        function limparTudo() {
+            if (confirm('Tem certeza que deseja limpar todo o inventário? Esta ação não pode ser desfeita!')) {
+                inventario.tanques = [];
+                salvarDados();
+                atualizarInterface();
+            }
+        }
+
+        // Atalhos de teclado
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'Enter') {
+                adicionarRapido();
+            }
+        });
+
+        // Abrir scanner visual
+        function abrirScanner() {
+            window.open('scanner-visual.html', '_blank');
+        }
+
+        // Abrir gerenciador de backup
+        function abrirGerenciadorBackup() {
+            window.open('gerenciador-backup.html', '_blank');
+        }
+
+        // Forçar backup imediato
+        function forceBackupNow() {
+            if (window.autoBackup) {
+                window.autoBackup.createManualBackup('Backup manual do inventário')
+                    .then(() => {
+                        showBackupNotification('Backup criado com sucesso!', 'success');
+                        updateBackupStatus();
+                    })
+                    .catch(error => {
+                        showBackupNotification('Erro no backup: ' + error.message, 'error');
+                    });
+            } else {
+                showBackupNotification('Sistema de backup não disponível', 'warning');
+            }
+        }
+
+        // Mostrar notificação de backup
+        function showBackupNotification(message, type) {
+            const toast = document.createElement('div');
+            toast.className = `toast position-fixed top-0 end-0 m-3`;
+            toast.style.zIndex = '9999';
+            
+            const bgClass = {
+                'success': 'bg-success',
+                'error': 'bg-danger',
+                'warning': 'bg-warning'
+            }[type] || 'bg-info';
+            
+            toast.innerHTML = `
+                <div class="toast-header ${bgClass} text-white">
+                    <strong class="me-auto">💾 Auto Backup</strong>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+                </div>
+                <div class="toast-body">
+                    ${message}
+                </div>
+            `;
+            
+            document.body.appendChild(toast);
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+            
+            setTimeout(() => {
+                if (document.body.contains(toast)) {
+                    document.body.removeChild(toast);
+                }
+            }, 5000);
+        }
+
+        // Atualizar status do backup
+        function updateBackupStatus() {
+            const statusElement = document.getElementById('backupStatusText');
+            
+            if (window.autoBackup) {
+                const info = window.autoBackup.getBackupInfo();
+                
+                if (info.isRunning) {
+                    statusElement.innerHTML = `
+                        Backup automático ativo • 
+                        ${info.backupCount} backups • 
+                        Próximo: ${info.nextBackup ? new Date(info.nextBackup).toLocaleTimeString('pt-BR') : 'Calculando...'}
+                    `;
+                    document.getElementById('backupStatus').className = 'alert alert-success mt-4';
+                } else {
+                    statusElement.innerHTML = 'Backup automático pausado - Clique em "Gerenciar Backups" para ativar';
+                    document.getElementById('backupStatus').className = 'alert alert-warning mt-4';
+                }
+            } else {
+                statusElement.innerHTML = 'Sistema de backup não carregado - Recarregue a página';
+                document.getElementById('backupStatus').className = 'alert alert-danger mt-4';
+            }
+        }
+
+        // Verificar se há dados do scanner
+        function verificarDadosScanner() {
+            // Escutar mudanças no localStorage de outros sistemas
+            window.addEventListener('storage', function(e) {
+                if (e.key === 'inventario_tanques') {
+                    atualizarInterface();
+                }
+            });
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            carregarDados();
+            verificarDadosScanner();
+            
+            // Auto-focus no campo modelo
+            document.getElementById('quickModelo').focus();
+            
+            // Configurar sistema de backup
+            setTimeout(() => {
+                updateBackupStatus();
+                
+                // Atualizar status do backup a cada minuto
+                setInterval(updateBackupStatus, 60000);
+                
+                // Escutar eventos de backup
+                if (window.autoBackup) {
+                    // Backup bem-sucedido
+                    window.addEventListener('storage', function(e) {
+                        if (e.key === 'backup_history') {
+                            updateBackupStatus();
+                        }
+                    });
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

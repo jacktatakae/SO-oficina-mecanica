@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📷 Scan Visual de Tanques - VRS</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #673AB7 0%, #9C27B0 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 1rem;
+        }
+
+        .scanner-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .camera-area {
+            background: #f8f9fa;
+            border: 3px dashed #673AB7;
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            margin: 1.5rem 0;
+            position: relative;
+            min-height: 300px;
+            overflow: hidden;
+        }
+
+        .camera-preview {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .analysis-results {
+            background: #e8f5e8;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-left: 5px solid #4CAF50;
+        }
+
+        .measurement-card {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .compatibility-item {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 0.8rem;
+            margin: 0.5rem 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .confidence-bar {
+            height: 6px;
+            border-radius: 3px;
+            background: #e0e0e0;
+            overflow: hidden;
+            margin: 0.3rem 0;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .btn-camera {
+            background: linear-gradient(135deg, #673AB7 0%, #9C27B0 100%);
+            border: none;
+            color: white;
+            border-radius: 50px;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-camera:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(103, 58, 183, 0.3);
+            color: white;
+        }
+
+        .processing-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(103, 58, 183, 0.9);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 15px;
+        }
+
+        .measurement-overlay {
+            position: absolute;
+            border: 2px solid #FF4444;
+            background: rgba(255, 68, 68, 0.1);
+            color: #FF4444;
+            font-weight: bold;
+            font-size: 0.8rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            pointer-events: none;
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin: 1rem 0;
+        }
+
+        .step {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            color: #666;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 0.5rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .step.active {
+            background: #673AB7;
+            color: white;
+        }
+
+        .step.completed {
+            background: #4CAF50;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .scanner-container {
+                padding: 1rem;
+            }
+            
+            .camera-area {
+                padding: 1rem;
+                min-height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="scanner-container">
+        <!-- Header -->
+        <div class="text-center mb-4">
+            <i class="fas fa-camera-retro" style="font-size: 3rem; color: #673AB7;"></i>
+            <h2 class="mt-3">📷 Scan Visual de Tanques</h2>
+            <p class="text-muted">Identifique automaticamente por foto - VRS</p>
+        </div>
+
+        <!-- Indicador de Passos -->
+        <div class="step-indicator">
+            <div class="step active" id="step1">1</div>
+            <div class="step" id="step2">2</div>
+            <div class="step" id="step3">3</div>
+            <div class="step" id="step4">4</div>
+        </div>
+        
+        <div class="text-center mb-3">
+            <small class="text-muted">
+                <span id="stepText">Passo 1: Fotografar a caixa</span>
+            </small>
+        </div>
+
+        <!-- Área da Câmera -->
+        <div class="camera-area" id="cameraArea">
+            <div id="cameraPlaceholder">
+                <i class="fas fa-camera fa-3x text-muted mb-3"></i>
+                <h5>Tire uma foto da caixa do radiador</h5>
+                <p class="text-muted">
+                    📋 Dicas para melhor resultado:<br>
+                    • Boa iluminação<br>
+                    • Caixa centralizada na foto<br>
+                    • Mostra etiquetas e códigos visíveis<br>
+                    • Foto nítida e sem tremor
+                </p>
+            </div>
+
+            <!-- Preview da imagem -->
+            <div id="imagePreview" style="display: none;">
+                <img id="capturedImage" class="camera-preview" alt="Foto capturada">
+                <div id="measurementOverlays"></div>
+            </div>
+
+            <!-- Overlay de processamento -->
+            <div id="processingOverlay" class="processing-overlay" style="display: none;">
+                <div class="spinner-border mb-3" role="status"></div>
+                <h6 id="processingText">Analisando imagem...</h6>
+                <p id="processingDetail">Detectando dimensões e características</p>
+            </div>
+        </div>
+
+        <!-- Botões de Controle -->
+        <div class="text-center mb-4">
+            <button class="btn btn-camera" onclick="abrirCamera()" id="btnCamera">
+                <i class="fas fa-camera me-2"></i>Tirar Foto
+            </button>
+            <button class="btn btn-camera" onclick="uploadFoto()" id="btnUpload">
+                <i class="fas fa-upload me-2"></i>Enviar Foto
+            </button>
+            <button class="btn btn-camera" onclick="analisarImagem()" id="btnAnalyze" style="display: none;">
+                <i class="fas fa-search me-2"></i>Analisar
+            </button>
+            <button class="btn btn-camera" onclick="novaFoto()" id="btnNew" style="display: none;">
+                <i class="fas fa-redo me-2"></i>Nova Foto
+            </button>
+        </div>
+
+        <!-- Resultados da Análise -->
+        <div id="analysisResults" style="display: none;">
+            <div class="analysis-results">
+                <h5><i class="fas fa-search me-2"></i>Resultados da Análise</h5>
+                
+                <!-- Medidas Detectadas -->
+                <div class="mt-3">
+                    <h6>📏 Dimensões Detectadas:</h6>
+                    <div id="detectedMeasurements">
+                        <!-- Será preenchido dinamicamente -->
+                    </div>
+                </div>
+
+                <!-- Características Visuais -->
+                <div class="mt-3">
+                    <h6>🔍 Características Identificadas:</h6>
+                    <div id="visualFeatures">
+                        <!-- Será preenchido dinamicamente -->
+                    </div>
+                </div>
+
+                <!-- Compatibilidades Encontradas -->
+                <div class="mt-3">
+                    <h6>🚗 Compatibilidades Prováveis:</h6>
+                    <div id="compatibilities">
+                        <!-- Será preenchido dinamicamente -->
+                    </div>
+                </div>
+
+                <!-- Botões de Ação -->
+                <div class="text-center mt-4">
+                    <button class="btn btn-success btn-lg me-2" onclick="confirmarIdentificacao()">
+                        <i class="fas fa-check me-1"></i>Confirmar e Adicionar
+                    </button>
+                    <button class="btn btn-warning btn-lg me-2" onclick="editarManualmente()">
+                        <i class="fas fa-edit me-1"></i>Editar Manualmente
+                    </button>
+                    <button class="btn btn-info btn-lg" onclick="buscarMaisInfo()">
+                        <i class="fas fa-globe me-1"></i>Buscar Mais Info
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Base de Conhecimento -->
+        <div class="mt-4">
+            <h6><i class="fas fa-database me-2"></i>Base de Conhecimento Ativa</h6>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <i class="fas fa-book text-primary fa-2x mb-2"></i>
+                            <h6>Catálogo Zelukar</h6>
+                            <small class="text-muted" id="zelukarCount">120+ modelos</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <i class="fas fa-brain text-success fa-2x mb-2"></i>
+                            <h6>IA Visual</h6>
+                            <small class="text-muted">Análise automática</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <i class="fas fa-globe text-warning fa-2x mb-2"></i>
+                            <h6>Busca Online</h6>
+                            <small class="text-muted">Verificação cruzada</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Edição Manual -->
+    <div class="modal fade" id="editModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">✏️ Edição Manual</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>📷 Imagem Analisada:</h6>
+                            <img id="modalImage" class="img-fluid rounded mb-3" alt="Imagem analisada">
+                        </div>
+                        <div class="col-md-6">
+                            <h6>📝 Correções:</h6>
+                            <div class="mb-3">
+                                <label class="form-label">Montadora</label>
+                                <select class="form-select" id="editMontadora">
+                                    <option value="volkswagen">Volkswagen</option>
+                                    <option value="chevrolet">Chevrolet</option>
+                                    <option value="fiat">Fiat</option>
+                                    <option value="ford">Ford</option>
+                                    <option value="toyota">Toyota</option>
+                                    <option value="honda">Honda</option>
+                                    <option value="hyundai">Hyundai</option>
+                                    <option value="nissan">Nissan</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Modelo</label>
+                                <input type="text" class="form-control" id="editModelo" placeholder="Ex: Gol G5/G6">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Tipo</label>
+                                <select class="form-select" id="editTipo">
+                                    <option value="superior">Caixa Superior</option>
+                                    <option value="inferior">Caixa Inferior</option>
+                                    <option value="completo">Radiador Completo</option>
+                                    <option value="kit">Kit Completo</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Dimensões (mm)</label>
+                                <div class="row">
+                                    <div class="col-4">
+                                        <input type="number" class="form-control" id="editLargura" placeholder="Largura">
+                                    </div>
+                                    <div class="col-4">
+                                        <input type="number" class="form-control" id="editAltura" placeholder="Altura">
+                                    </div>
+                                    <div class="col-4">
+                                        <input type="number" class="form-control" id="editProfundidade" placeholder="Prof.">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Quantidade</label>
+                                <input type="number" class="form-control" id="editQuantidade" value="1" min="1">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="salvarEdicaoManual()">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="ia-visual-radiadores.js"></script>
+    <script src="auto-backup-system.js"></script>
+    <script>
+        // Estado da aplicação
+        let currentImage = null;
+        let analysisData = null;
+        let currentStep = 1;
+        let iaVisual = null;
+
+        // Inicializar IA
+        document.addEventListener('DOMContentLoaded', function() {
+            iaVisual = new RadiadorVisualAI();
+            console.log('🤖 IA Visual inicializada');
+            console.log('📊 Catálogo carregado:', Object.keys(iaVisual.catalogoZelukar).length, 'montadoras');
+        });
+
+        // Base de dados de referência (simulando catálogo Zelukar)
+        const catalogoReferencia = {
+            'volkswagen': {
+                'gol': {
+                    'superior': { dimensoes: [480, 335, 26], codigo: 'VW-001', fabricante: 'Valeo' },
+                    'inferior': { dimensoes: [480, 335, 26], codigo: 'VW-002', fabricante: 'Valeo' }
+                },
+                'fox': {
+                    'superior': { dimensoes: [460, 320, 26], codigo: 'VW-010', fabricante: 'Valeo' },
+                    'inferior': { dimensoes: [460, 320, 26], codigo: 'VW-011', fabricante: 'Valeo' }
+                }
+            },
+            'chevrolet': {
+                'onix': {
+                    'superior': { dimensoes: [485, 340, 26], codigo: 'GM-123', fabricante: 'Behr' },
+                    'inferior': { dimensoes: [485, 340, 26], codigo: 'GM-124', fabricante: 'Behr' }
+                },
+                'prisma': {
+                    'superior': { dimensoes: [485, 340, 26], codigo: 'GM-130', fabricante: 'Behr' },
+                    'inferior': { dimensoes: [485, 340, 26], codigo: 'GM-131', fabricante: 'Behr' }
+                }
+            },
+            'fiat': {
+                'uno': {
+                    'superior': { dimensoes: [440, 315, 26], codigo: 'FI-010', fabricante: 'Magneti Marelli' },
+                    'inferior': { dimensoes: [440, 315, 26], codigo: 'FI-011', fabricante: 'Magneti Marelli' }
+                },
+                'doblo': {
+                    'superior': { dimensoes: [450, 325, 26], codigo: 'FI-001', fabricante: 'Magneti Marelli' },
+                    'inferior': { dimensoes: [450, 325, 26], codigo: 'FI-002', fabricante: 'Magneti Marelli' }
+                }
+            }
+        };
+
+        // Abrir câmera
+        async function abrirCamera() {
+            try {
+                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                    const stream = await navigator.mediaDevices.getUserMedia({ 
+                        video: { 
+                            facingMode: 'environment',
+                            width: { ideal: 1920 },
+                            height: { ideal: 1080 }
+                        } 
+                    });
+                    
+                    const video = document.createElement('video');
+                    video.srcObject = stream;
+                    video.autoplay = true;
+                    video.playsInline = true;
+                    video.style.width = '100%';
+                    video.style.maxHeight = '400px';
+                    video.style.borderRadius = '10px';
+                    
+                    document.getElementById('cameraPlaceholder').style.display = 'none';
+                    document.getElementById('cameraArea').appendChild(video);
+                    
+                    // Botão para capturar
+                    setTimeout(() => {
+                        const captureBtn = document.createElement('button');
+                        captureBtn.className = 'btn btn-success mt-3';
+                        captureBtn.innerHTML = '<i class="fas fa-camera"></i> Capturar';
+                        captureBtn.onclick = () => capturarFoto(video, stream);
+                        document.getElementById('cameraArea').appendChild(captureBtn);
+                    }, 1000);
+                    
+                } else {
+                    alert('Câmera não disponível. Use o botão "Enviar Foto" para selecionar uma imagem.');
+                }
+            } catch (error) {
+                console.error('Erro ao acessar câmera:', error);
+                alert('Erro ao acessar a câmera. Tente usar "Enviar Foto".');
+            }
+        }
+
+        // Capturar foto da câmera
+        function capturarFoto(video, stream) {
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0);
+            
+            // Parar stream
+            stream.getTracks().forEach(track => track.stop());
+            
+            // Converter para imagem
+            canvas.toBlob(blob => {
+                const imageUrl = URL.createObjectURL(blob);
+                mostrarImagemCapturada(imageUrl);
+                currentImage = blob;
+            }, 'image/jpeg', 0.8);
+        }
+
+        // Upload de foto
+        function uploadFoto() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.capture = 'environment'; // Força usar câmera traseira
+            
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const imageUrl = URL.createObjectURL(file);
+                    mostrarImagemCapturada(imageUrl);
+                    currentImage = file;
+                }
+            };
+            
+            input.click();
+        }
+
+        // Mostrar imagem capturada
+        function mostrarImagemCapturada(imageUrl) {
+            // Limpar área da câmera
+            document.getElementById('cameraArea').innerHTML = `
+                <div id="imagePreview">
+                    <img id="capturedImage" src="${imageUrl}" class="camera-preview" alt="Foto capturada">
+                    <div id="measurementOverlays"></div>
+                </div>
+            `;
+            
+            // Atualizar controles
+            document.getElementById('btnCamera').style.display = 'none';
+            document.getElementById('btnUpload').style.display = 'none';
+            document.getElementById('btnAnalyze').style.display = 'inline-block';
+            document.getElementById('btnNew').style.display = 'inline-block';
+            
+            atualizarPasso(2);
+        }
+
+        // Analisar imagem
+        async function analisarImagem() {
+            if (!currentImage) {
+                alert('Nenhuma imagem selecionada!');
+                return;
+            }
+
+            if (!iaVisual) {
+                alert('Sistema de IA não inicializado!');
+                return;
+            }
+
+            atualizarPasso(3);
+            mostrarProcessamento('Iniciando análise...', 'Carregando módulos de IA');
+
+            try {
+                // Usar IA avançada para análise
+                const resultadoIA = await iaVisual.analisarImagem(currentImage);
+                
+                // Processar resultados
+                analysisData = {
+                    dimensoes: resultadoIA.dimensoes,
+                    caracteristicas: resultadoIA.caracteristicas,
+                    fabricante: resultadoIA.fabricante,
+                    compatibilidades: resultadoIA.correspondencias,
+                    confianca: resultadoIA.confianca,
+                    relatorio: iaVisual.gerarRelatorioDetalhado(resultadoIA),
+                    metadata: resultadoIA.metadata
+                };
+                
+                // Mostrar resultados
+                mostrarResultados();
+                
+                atualizarPasso(4);
+                
+                console.log('✅ Análise concluída:', analysisData);
+                
+            } catch (error) {
+                console.error('❌ Erro na análise:', error);
+                alert('Erro ao analisar a imagem: ' + error.message);
+                esconderProcessamento();
+            }
+        }
+
+        // Simular análise com IA
+        async function simularAnaliseIA() {
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    // Dados simulados da análise
+                    analysisData = {
+                        dimensoes: {
+                            largura: 480 + Math.random() * 10 - 5, // Simula variação
+                            altura: 335 + Math.random() * 10 - 5,
+                            profundidade: 26 + Math.random() * 2 - 1
+                        },
+                        caracteristicas: {
+                            formato: 'retangular',
+                            material: 'plástico',
+                            cor: 'preto/cinza',
+                            conexoes: 2,
+                            marca_visivel: Math.random() > 0.5 ? 'Valeo' : null
+                        },
+                        confianca: 0.85 + Math.random() * 0.1
+                    };
+                    resolve();
+                }, 2000);
+            });
+        }
+
+        // Buscar no catálogo
+        async function buscarNoCatalogo() {
+            mostrarProcessamento('Buscando no catálogo...', 'Comparando com base de dados Zelukar');
+            
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    const compatibilidades = [];
+                    
+                    // Buscar correspondências por dimensão
+                    Object.keys(catalogoReferencia).forEach(montadora => {
+                        Object.keys(catalogoReferencia[montadora]).forEach(modelo => {
+                            Object.keys(catalogoReferencia[montadora][modelo]).forEach(tipo => {
+                                const ref = catalogoReferencia[montadora][modelo][tipo];
+                                const score = calcularSimilaridade(analysisData.dimensoes, ref.dimensoes);
+                                
+                                if (score > 0.7) {
+                                    compatibilidades.push({
+                                        montadora,
+                                        modelo,
+                                        tipo,
+                                        score,
+                                        codigo: ref.codigo,
+                                        fabricante: ref.fabricante,
+                                        dimensoes: ref.dimensoes
+                                    });
+                                }
+                            });
+                        });
+                    });
+                    
+                    // Ordenar por score
+                    analysisData.compatibilidades = compatibilidades
+                        .sort((a, b) => b.score - a.score)
+                        .slice(0, 5);
+                    
+                    resolve();
+                }, 1500);
+            });
+        }
+
+        // Calcular similaridade entre dimensões
+        function calcularSimilaridade(dimensoes1, dimensoes2) {
+            const d1 = [dimensoes1.largura, dimensoes1.altura, dimensoes1.profundidade];
+            const d2 = dimensoes2;
+            
+            let totalDiff = 0;
+            for (let i = 0; i < 3; i++) {
+                const diff = Math.abs(d1[i] - d2[i]) / d2[i];
+                totalDiff += diff;
+            }
+            
+            return Math.max(0, 1 - (totalDiff / 3));
+        }
+
+        // Mostrar processamento
+        function mostrarProcessamento(titulo, detalhe) {
+            document.getElementById('processingOverlay').style.display = 'flex';
+            document.getElementById('processingText').textContent = titulo;
+            document.getElementById('processingDetail').textContent = detalhe;
+        }
+
+        // Esconder processamento
+        function esconderProcessamento() {
+            document.getElementById('processingOverlay').style.display = 'none';
+        }
+
+        // Mostrar resultados
+        function mostrarResultados() {
+            esconderProcessamento();
+            
+            // Dimensões detectadas
+            const measurementsHtml = `
+                <div class="measurement-card">
+                    <div>
+                        <strong>Largura:</strong> ${analysisData.dimensoes.largura}mm
+                        <small class="text-muted">(±${Math.round((1 - analysisData.dimensoes.confianca) * 10)}mm)</small>
+                    </div>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill bg-success" style="width: ${analysisData.dimensoes.confianca * 100}%"></div>
+                    </div>
+                </div>
+                <div class="measurement-card">
+                    <div>
+                        <strong>Altura:</strong> ${analysisData.dimensoes.altura}mm
+                        <small class="text-muted">(±${Math.round((1 - analysisData.dimensoes.confianca) * 10)}mm)</small>
+                    </div>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill bg-success" style="width: ${analysisData.dimensoes.confianca * 100}%"></div>
+                    </div>
+                </div>
+                <div class="measurement-card">
+                    <div>
+                        <strong>Profundidade:</strong> ${analysisData.dimensoes.profundidade}mm
+                        <small class="text-muted">(±${Math.round((1 - analysisData.dimensoes.confianca) * 2)}mm)</small>
+                    </div>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill bg-success" style="width: ${analysisData.dimensoes.confianca * 100}%"></div>
+                    </div>
+                </div>
+                <div class="measurement-card">
+                    <div>
+                        <small><strong>Método:</strong> ${analysisData.dimensoes.metodo} | <strong>Qualidade:</strong> ${analysisData.relatorio.detalhes_tecnicos.qualidade_analise}</small>
+                    </div>
+                </div>
+            `;
+            
+            // Características visuais avançadas
+            const featuresHtml = `
+                <div class="measurement-card">
+                    <div><strong>Material:</strong> ${analysisData.caracteristicas.detalhes.material}</div>
+                </div>
+                <div class="measurement-card">
+                    <div><strong>Cor:</strong> ${analysisData.caracteristicas.detalhes.cor}</div>
+                </div>
+                <div class="measurement-card">
+                    <div><strong>Acabamento:</strong> ${analysisData.caracteristicas.detalhes.acabamento}</div>
+                </div>
+                <div class="measurement-card">
+                    <div><strong>Bocais detectados:</strong> ${analysisData.caracteristicas.detalhes.bocais}</div>
+                </div>
+                <div class="measurement-card">
+                    <div><strong>Sensores:</strong> ${analysisData.caracteristicas.detalhes.sensores}</div>
+                </div>
+                <div class="measurement-card">
+                    <div>
+                        <strong>Fabricante detectado:</strong> ${analysisData.fabricante.nome}
+                        <div class="confidence-bar mt-1">
+                            <div class="confidence-fill bg-warning" style="width: ${analysisData.fabricante.confianca * 100}%"></div>
+                        </div>
+                        <small class="text-muted">Método: ${analysisData.fabricante.metodo}</small>
+                    </div>
+                </div>
+            `;
+            
+            // Compatibilidades avançadas
+            const compatibilitiesHtml = analysisData.compatibilidades.length > 0 
+                ? analysisData.compatibilidades.map(comp => `
+                    <div class="compatibility-item">
+                        <div>
+                            <strong>${comp.montadora.toUpperCase()} ${comp.modelo.toUpperCase()}</strong> ${comp.variante ? '- ' + comp.variante : ''}<br>
+                            <strong>Tipo:</strong> ${comp.tipo} | <strong>Código:</strong> ${comp.codigo}<br>
+                            <strong>Fabricante:</strong> ${comp.fabricante} | <strong>Anos:</strong> ${comp.anos}<br>
+                            <small>Dimensões originais: ${comp.dimensoes.join('x')}mm</small><br>
+                            <small>Motor: ${comp.motor}</small>
+                            <div class="mt-1">
+                                <small class="text-muted">
+                                    Scores: Dimensão(${Math.round(comp.detalhes_score.dimensao * 100)}%) 
+                                    Fabricante(${Math.round(comp.detalhes_score.fabricante * 100)}%) 
+                                    Características(${Math.round(comp.detalhes_score.caracteristicas * 100)}%)
+                                </small>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <div class="badge ${comp.score > 0.8 ? 'bg-success' : comp.score > 0.6 ? 'bg-warning' : 'bg-secondary'}">
+                                ${Math.round(comp.score * 100)}% match
+                            </div>
+                        </div>
+                    </div>
+                `).join('')
+                : '<p class="text-muted">Nenhuma correspondência encontrada no catálogo</p>';
+            
+            // Adicionar informações técnicas
+            const techInfoHtml = `
+                <div class="mt-3 p-3 bg-light rounded">
+                    <h6><i class="fas fa-cog me-2"></i>Informações Técnicas</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <small><strong>Modelo IA:</strong> ${analysisData.metadata.modelo_usado}</small><br>
+                            <small><strong>Tempo:</strong> ${analysisData.metadata.tempo_processamento}</small><br>
+                            <small><strong>Confiança geral:</strong> ${Math.round(analysisData.confianca * 100)}%</small>
+                        </div>
+                        <div class="col-md-6">
+                            <small><strong>Qualidade:</strong> ${analysisData.relatorio.detalhes_tecnicos.qualidade_analise}</small><br>
+                            <small><strong>Timestamp:</strong> ${new Date(analysisData.metadata.timestamp).toLocaleTimeString()}</small>
+                        </div>
+                    </div>
+                    ${analysisData.relatorio.recomendacoes.length > 0 ? `
+                        <div class="mt-2">
+                            <strong>Recomendações:</strong>
+                            <ul class="mb-0">
+                                ${analysisData.relatorio.recomendacoes.map(rec => `<li><small>${rec}</small></li>`).join('')}
+                            </ul>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            // Atualizar interface
+            document.getElementById('detectedMeasurements').innerHTML = measurementsHtml;
+            document.getElementById('visualFeatures').innerHTML = featuresHtml;
+            document.getElementById('compatibilities').innerHTML = compatibilitiesHtml + techInfoHtml;
+            document.getElementById('analysisResults').style.display = 'block';
+        }
+
+        // Confirmar identificação
+        function confirmarIdentificacao() {
+            if (!analysisData.compatibilidades.length) {
+                alert('Nenhuma correspondência encontrada. Use "Editar Manualmente".');
+                return;
+            }
+            
+            const melhorMatch = analysisData.compatibilidades[0];
+            
+            // Adicionar ao inventário
+            const novoTanque = {
+                id: Date.now(),
+                montadora: melhorMatch.montadora,
+                modelo: melhorMatch.modelo,
+                tipo: melhorMatch.tipo,
+                quantidade: 1,
+                codigo: melhorMatch.codigo,
+                fabricante: melhorMatch.fabricante,
+                dimensoes: `${Math.round(analysisData.dimensoes.largura)}x${Math.round(analysisData.dimensoes.altura)}x${Math.round(analysisData.dimensoes.profundidade)}mm`,
+                confianca: Math.round(melhorMatch.score * 100),
+                metodo: 'scan_visual',
+                dataRegistro: new Date().toISOString()
+            };
+            
+            // Salvar no inventário
+            const inventario = JSON.parse(localStorage.getItem('inventario_tanques') || '{"tanques":[]}');
+            inventario.tanques.push(novoTanque);
+            localStorage.setItem('inventario_tanques', JSON.stringify(inventario));
+            
+            alert(`✅ Tanque adicionado com sucesso!\n\n${melhorMatch.montadora.toUpperCase()} ${melhorMatch.modelo.toUpperCase()} - ${melhorMatch.tipo}\nCódigo: ${melhorMatch.codigo}\nConfiança: ${Math.round(melhorMatch.score * 100)}%`);
+            
+            // Resetar para nova análise
+            novaFoto();
+        }
+
+        // Editar manualmente
+        function editarManualmente() {
+            const modal = new bootstrap.Modal(document.getElementById('editModal'));
+            
+            // Preencher com dados detectados
+            if (analysisData.compatibilidades.length > 0) {
+                const melhor = analysisData.compatibilidades[0];
+                document.getElementById('editMontadora').value = melhor.montadora;
+                document.getElementById('editModelo').value = melhor.modelo;
+                document.getElementById('editTipo').value = melhor.tipo;
+            }
+            
+            document.getElementById('editLargura').value = Math.round(analysisData.dimensoes.largura);
+            document.getElementById('editAltura').value = Math.round(analysisData.dimensoes.altura);
+            document.getElementById('editProfundidade').value = Math.round(analysisData.dimensoes.profundidade);
+            
+            // Mostrar imagem no modal
+            const imgSrc = document.getElementById('capturedImage').src;
+            document.getElementById('modalImage').src = imgSrc;
+            
+            modal.show();
+        }
+
+        // Salvar edição manual
+        function salvarEdicaoManual() {
+            const novoTanque = {
+                id: Date.now(),
+                montadora: document.getElementById('editMontadora').value,
+                modelo: document.getElementById('editModelo').value,
+                tipo: document.getElementById('editTipo').value,
+                quantidade: parseInt(document.getElementById('editQuantidade').value) || 1,
+                codigo: '', // Será determinado depois
+                fabricante: 'A determinar',
+                dimensoes: `${document.getElementById('editLargura').value}x${document.getElementById('editAltura').value}x${document.getElementById('editProfundidade').value}mm`,
+                metodo: 'scan_visual_editado',
+                dataRegistro: new Date().toISOString()
+            };
+            
+            // Salvar no inventário
+            const inventario = JSON.parse(localStorage.getItem('inventario_tanques') || '{"tanques":[]}');
+            inventario.tanques.push(novoTanque);
+            localStorage.setItem('inventario_tanques', JSON.stringify(inventario));
+            
+            alert('✅ Tanque adicionado com sucesso (edição manual)!');
+            
+            // Fechar modal e resetar
+            bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
+            novaFoto();
+        }
+
+        // Buscar mais informações online
+        function buscarMaisInfo() {
+            const dimensoes = `${Math.round(analysisData.dimensoes.largura)}x${Math.round(analysisData.dimensoes.altura)}x${Math.round(analysisData.dimensoes.profundidade)}`;
+            const query = `radiador caixa dimensões ${dimensoes}mm`;
+            
+            // Simular busca online
+            alert(`🔍 Buscando online por:\n"${query}"\n\nEm um sistema real, isso abriria uma busca automática em sites de autopeças.`);
+        }
+
+        // Nova foto
+        function novaFoto() {
+            // Resetar estado
+            currentImage = null;
+            analysisData = null;
+            
+            // Resetar interface
+            document.getElementById('cameraArea').innerHTML = `
+                <div id="cameraPlaceholder">
+                    <i class="fas fa-camera fa-3x text-muted mb-3"></i>
+                    <h5>Tire uma foto da caixa do radiador</h5>
+                    <p class="text-muted">
+                        📋 Dicas para melhor resultado:<br>
+                        • Boa iluminação<br>
+                        • Caixa centralizada na foto<br>
+                        • Mostra etiquetas e códigos visíveis<br>
+                        • Foto nítida e sem tremor
+                    </p>
+                </div>
+            `;
+            
+            // Resetar botões
+            document.getElementById('btnCamera').style.display = 'inline-block';
+            document.getElementById('btnUpload').style.display = 'inline-block';
+            document.getElementById('btnAnalyze').style.display = 'none';
+            document.getElementById('btnNew').style.display = 'none';
+            
+            // Esconder resultados
+            document.getElementById('analysisResults').style.display = 'none';
+            
+            atualizarPasso(1);
+        }
+
+        // Atualizar indicador de passos
+        function atualizarPasso(passo) {
+            currentStep = passo;
+            
+            const passos = ['Fotografar a caixa', 'Imagem capturada', 'Analisando...', 'Resultados'];
+            document.getElementById('stepText').textContent = `Passo ${passo}: ${passos[passo - 1]}`;
+            
+            // Atualizar indicadores visuais
+            for (let i = 1; i <= 4; i++) {
+                const stepEl = document.getElementById(`step${i}`);
+                stepEl.classList.remove('active', 'completed');
+                
+                if (i < passo) {
+                    stepEl.classList.add('completed');
+                } else if (i === passo) {
+                    stepEl.classList.add('active');
+                }
+            }
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🎯 Scanner Visual de Tanques inicializado');
+            
+            // Verificar se há inventário existente
+            const inventario = JSON.parse(localStorage.getItem('inventario_tanques') || '{"tanques":[]}');
+            console.log(`📊 Inventário atual: ${inventario.tanques.length} itens`);
+        });
+    </script>
+</body>
+</html>

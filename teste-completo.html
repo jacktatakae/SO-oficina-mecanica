@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 TESTE COMPLETO - Sistema de Catalogação</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 0;
+            text-align: center;
+        }
+        
+        .feature-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            height: 100%;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+        
+        .btn-system {
+            border-radius: 25px;
+            padding: 15px 30px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary-custom {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            border: none;
+            color: white;
+        }
+        
+        .btn-success-custom {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            border: none;
+            color: white;
+        }
+        
+        .btn-warning-custom {
+            background: linear-gradient(45deg, #ffc107, #fd7e14);
+            border: none;
+            color: #212529;
+        }
+        
+        .btn-info-custom {
+            background: linear-gradient(45deg, #17a2b8, #6f42c1);
+            border: none;
+            color: white;
+        }
+
+        .btn-purple {
+            background: linear-gradient(45deg, #6f42c1, #9c27b0);
+            border: none;
+            color: white;
+        }
+        
+        .stats-section {
+            background: #f8f9fa;
+            padding: 40px 0;
+            margin: 40px 0;
+            border-radius: 15px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #007bff;
+        }
+        
+        .workflow-step {
+            position: relative;
+            padding: 30px;
+            margin: 20px 0;
+            background: white;
+            border-left: 5px solid #007bff;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .workflow-number {
+            position: absolute;
+            top: -15px;
+            left: 30px;
+            background: #007bff;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .demo-data {
+            background: #e3f2fd;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .alert-custom {
+            border-radius: 10px;
+            border: none;
+            padding: 20px;
+        }
+
+        .navigation-grid {
+            gap: 30px;
+            margin: 40px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="hero-section">
+        <div class="container">
+            <h1 class="display-4 mb-4">
+                <i class="fas fa-cogs"></i>
+                Sistema Completo de Catalogação
+            </h1>
+            <p class="lead mb-4">
+                Teste todas as funcionalidades do seu sistema de gestão de tanques de radiador
+            </p>
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="alert alert-light alert-custom">
+                        <i class="fas fa-lightbulb text-warning"></i>
+                        <strong>Ambiente de Testes:</strong> Todos os dados aqui são simulados e seguros para experimentação
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container my-5">
+        <!-- Estatísticas do Sistema -->
+        <div class="stats-section">
+            <div class="container">
+                <h2 class="text-center mb-5">📊 Status do Sistema</h2>
+                <div class="row">
+                    <div class="col-md-3 stat-item">
+                        <div class="stat-number" id="totalItens">0</div>
+                        <div class="text-muted">Itens Cadastrados</div>
+                    </div>
+                    <div class="col-md-3 stat-item">
+                        <div class="stat-number">120+</div>
+                        <div class="text-muted">Modelos no Catálogo</div>
+                    </div>
+                    <div class="col-md-3 stat-item">
+                        <div class="stat-number">85%</div>
+                        <div class="text-muted">Precisão da IA</div>
+                    </div>
+                    <div class="col-md-3 stat-item">
+                        <div class="stat-number">3s</div>
+                        <div class="text-muted">Tempo de Análise</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grid de Navegação Principal -->
+        <div class="row navigation-grid">
+            <div class="col-lg-6">
+                <div class="card feature-card">
+                    <div class="card-body text-center p-5">
+                        <div class="mb-4">
+                            <i class="fas fa-tachometer-alt fa-4x text-primary"></i>
+                        </div>
+                        <h3 class="card-title">📋 Inventário Rápido</h3>
+                        <p class="card-text text-muted mb-4">
+                            Sistema principal de catalogação com entrada rápida, 
+                            organização por montadora e exportação para Excel.
+                        </p>
+                        <button class="btn btn-primary-custom btn-system" onclick="abrirSistema('inventario-rapido.html')">
+                            <i class="fas fa-rocket"></i> Acessar Sistema
+                        </button>
+                        <div class="mt-3">
+                            <small class="text-muted">
+                                <i class="fas fa-clock"></i> Mais usado • 
+                                <i class="fas fa-users"></i> Para todos os usuários
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="card feature-card">
+                    <div class="card-body text-center p-5">
+                        <div class="mb-4">
+                            <i class="fas fa-camera fa-4x text-success"></i>
+                        </div>
+                        <h3 class="card-title">📷 Scanner Visual IA</h3>
+                        <p class="card-text text-muted mb-4">
+                            Tecnologia de ponta para identificar tanques por foto,
+                            com análise automática de dimensões e características.
+                        </p>
+                        <button class="btn btn-success-custom btn-system" onclick="abrirSistema('scanner-visual.html')">
+                            <i class="fas fa-brain"></i> Scanner IA
+                        </button>
+                        <div class="mt-3">
+                            <small class="text-muted">
+                                <i class="fas fa-star"></i> Novidade • 
+                                <i class="fas fa-magic"></i> Tecnologia IA
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="card feature-card">
+                    <div class="card-body text-center p-5">
+                        <div class="mb-4">
+                            <i class="fas fa-qrcode fa-4x text-warning"></i>
+                        </div>
+                        <h3 class="card-title">🏷️ Gerador QR Code</h3>
+                        <p class="card-text text-muted mb-4">
+                            Crie etiquetas QR personalizadas para organização
+                            física do estoque com códigos únicos.
+                        </p>
+                        <button class="btn btn-warning-custom btn-system" onclick="abrirSistema('qr-catalogacao.html')">
+                            <i class="fas fa-qrcode"></i> Gerar QR Codes
+                        </button>
+                        <div class="mt-3">
+                            <small class="text-muted">
+                                <i class="fas fa-print"></i> Imprimível • 
+                                <i class="fas fa-tags"></i> Organização física
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="card feature-card">
+                    <div class="card-body text-center p-5">
+                        <div class="mb-4">
+                            <i class="fas fa-mobile-alt fa-4x text-info"></i>
+                        </div>
+                        <h3 class="card-title">📱 Interface Mobile</h3>
+                        <p class="card-text text-muted mb-4">
+                            Versão otimizada para celular com reconhecimento
+                            de voz e interface touch amigável.
+                        </p>
+                        <button class="btn btn-info-custom btn-system" onclick="abrirSistema('inventario-mobile.html')">
+                            <i class="fas fa-mobile-alt"></i> Versão Mobile
+                        </button>
+                        <div class="mt-3">
+                            <small class="text-muted">
+                                <i class="fas fa-microphone"></i> Voz • 
+                                <i class="fas fa-hand-pointer"></i> Touch otimizado
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="card feature-card">
+                    <div class="card-body text-center p-5">
+                        <div class="mb-4">
+                            <i class="fas fa-database fa-4x text-secondary"></i>
+                        </div>
+                        <h3 class="card-title">💾 Gerenciador de Backup</h3>
+                        <p class="card-text text-muted mb-4">
+                            Sistema completo de backup automático com
+                            proteção, restauração e histórico de versões.
+                        </p>
+                        <button class="btn btn-dark btn-system" onclick="abrirSistema('gerenciador-backup.html')">
+                            <i class="fas fa-shield-alt"></i> Gerenciar Backups
+                        </button>
+                        <div class="mt-3">
+                            <small class="text-muted">
+                                <i class="fas fa-clock"></i> Auto backup • 
+                                <i class="fas fa-shield-alt"></i> Proteção total
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="card feature-card">
+                    <div class="card-body text-center p-5">
+                        <div class="mb-4">
+                            <i class="fas fa-chart-line fa-4x text-purple"></i>
+                        </div>
+                        <h3 class="card-title">📊 Central de Sistemas</h3>
+                        <p class="card-text text-muted mb-4">
+                            Painel centralizado para monitoramento e
+                            administração de todos os módulos do sistema.
+                        </p>
+                        <button class="btn btn-purple btn-system" onclick="abrirSistema('central-sistemas.html')">
+                            <i class="fas fa-tachometer-alt"></i> Central Sistemas
+                        </button>
+                        <div class="mt-3">
+                            <small class="text-muted">
+                                <i class="fas fa-chart-bar"></i> Analytics • 
+                                <i class="fas fa-cogs"></i> Administração
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Workflow de Uso -->
+        <div class="my-5">
+            <h2 class="text-center mb-5">🔄 Como Usar o Sistema</h2>
+            
+            <div class="workflow-step">
+                <div class="workflow-number">1</div>
+                <h4>📸 Capturar ou Identificar</h4>
+                <p class="mb-2">
+                    <strong>Opção A - Scanner IA:</strong> Tire foto da caixa com o celular
+                    <br>
+                    <strong>Opção B - Entrada Manual:</strong> Digite os dados conhecidos
+                </p>
+                <div class="demo-data">
+                    <strong>Exemplo:</strong> Foto de caixa Valeo 480x335x26mm → IA detecta automaticamente
+                </div>
+            </div>
+
+            <div class="workflow-step">
+                <div class="workflow-number">2</div>
+                <h4>🔍 Análise e Busca</h4>
+                <p class="mb-2">
+                    O sistema busca correspondências no catálogo Zelukar e sugere veículos compatíveis
+                </p>
+                <div class="demo-data">
+                    <strong>Resultado:</strong> "Toyota Corolla 2009-2014 - Match 87% - Código ZEL-R4280"
+                </div>
+            </div>
+
+            <div class="workflow-step">
+                <div class="workflow-number">3</div>
+                <h4>✅ Validar e Salvar</h4>
+                <p class="mb-2">
+                    Confirme os dados sugeridos, faça ajustes se necessário, e adicione ao inventário
+                </p>
+                <div class="demo-data">
+                    <strong>Salvo como:</strong> Item #001 - Toyota Corolla - Tanque Superior - A1-Prateleira-03
+                </div>
+            </div>
+
+            <div class="workflow-step">
+                <div class="workflow-number">4</div>
+                <h4>🏷️ Organizar (Opcional)</h4>
+                <p class="mb-2">
+                    Gere QR Code para etiqueta física e organize fisicamente no estoque
+                </p>
+                <div class="demo-data">
+                    <strong>QR Code:</strong> Etiqueta impressa com localização "A1-Prateleira-03"
+                </div>
+            </div>
+        </div>
+
+        <!-- Dados de Demonstração -->
+        <div class="alert alert-info alert-custom">
+            <h4><i class="fas fa-database"></i> Dados de Demonstração</h4>
+            <p class="mb-3">O sistema inclui dados simulados para testes:</p>
+            <div class="row">
+                <div class="col-md-6">
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-check text-success"></i> <strong>20 itens</strong> de exemplo já cadastrados</li>
+                        <li><i class="fas fa-check text-success"></i> <strong>8 fabricantes</strong> principais (Valeo, Behr, Denso...)</li>
+                        <li><i class="fas fa-check text-success"></i> <strong>120+ modelos</strong> no catálogo simulado</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-check text-success"></i> <strong>Análise IA</strong> com 85% de precisão simulada</li>
+                        <li><i class="fas fa-check text-success"></i> <strong>QR Codes</strong> funcionais para teste</li>
+                        <li><i class="fas fa-check text-success"></i> <strong>Exportação</strong> Excel/CSV habilitada</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Guias e Documentação -->
+        <div class="card mt-5">
+            <div class="card-header bg-dark text-white">
+                <h4 class="mb-0"><i class="fas fa-book"></i> Documentação e Guias</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <h5><i class="fas fa-rocket text-primary"></i> Começar Rápido</h5>
+                        <ul class="list-unstyled">
+                            <li><a href="#" onclick="window.open('LEIA-ME-PRIMEIRO.md')">📖 Leia-me Primeiro</a></li>
+                            <li><a href="#" onclick="window.open('GUIA-INVENTARIO-RAPIDO.md')">⚡ Guia Inventário Rápido</a></li>
+                            <li><a href="#" onclick="window.open('COMO-USAR-IDENTIFICACAO.md')">🔍 Como Usar Identificação</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-4">
+                        <h5><i class="fas fa-brain text-success"></i> Scanner Visual</h5>
+                        <ul class="list-unstyled">
+                            <li><a href="#" onclick="window.open('GUIA-SCANNER-VISUAL.md')">📷 Guia Scanner Visual</a></li>
+                            <li><a href="#" onclick="window.open('SOLUCAO-QR-CELULAR.md')">📱 Solução QR Celular</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-4">
+                        <h5><i class="fas fa-cogs text-warning"></i> Avançado</h5>
+                        <ul class="list-unstyled">
+                            <li><a href="#" onclick="window.open('STATUS_FUNCIONALIDADES.md')">⚙️ Status Funcionalidades</a></li>
+                            <li><a href="#" onclick="window.open('INTEGRACAO-ZELUKAR.md')">🔗 Integração Zelukar</a></li>
+                            <li><a href="#" onclick="window.open('SISTEMA-BACKUP-DOCUMENTACAO.md')">💾 Sistema Backup</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botões de Ação -->
+        <div class="text-center my-5">
+            <div class="btn-group" role="group">
+                <button class="btn btn-outline-primary" onclick="limparDados()">
+                    <i class="fas fa-trash"></i> Limpar Dados de Teste
+                </button>
+                <button class="btn btn-outline-success" onclick="carregarDadosDemo()">
+                    <i class="fas fa-download"></i> Carregar Dados Demo
+                </button>
+                <button class="btn btn-outline-info" onclick="exportarTudo()">
+                    <i class="fas fa-file-export"></i> Exportar Tudo
+                </button>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center text-muted mt-5 pt-5 border-top">
+            <p>
+                <i class="fas fa-tools"></i> 
+                Sistema de Catalogação de Tanques de Radiador v2.0
+                <br>
+                <small>Desenvolvido para otimizar a gestão de estoque automotivo</small>
+            </p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="auto-backup-system.js"></script>
+    <script>
+        // Função para abrir sistemas
+        function abrirSistema(arquivo) {
+            window.open(arquivo, '_blank');
+        }
+
+        // Carregar estatísticas
+        function carregarEstatisticas() {
+            const inventario = JSON.parse(localStorage.getItem('inventarioRapido') || '[]');
+            document.getElementById('totalItens').textContent = inventario.length;
+        }
+
+        // Carregar dados demonstrativos
+        function carregarDadosDemo() {
+            const dadosDemo = [
+                {
+                    id: "DEMO001",
+                    montadora: "Toyota",
+                    modelo: "Corolla 2009-2014",
+                    posicao: "Superior",
+                    dimensoes: "480x335x26mm",
+                    localizacao: "A1-Prateleira-03",
+                    observacoes: "Valeo, Plástico preto, 2 bocais",
+                    dataAdicao: new Date().toLocaleString()
+                },
+                {
+                    id: "DEMO002", 
+                    montadora: "Volkswagen",
+                    modelo: "Golf 2013-2017",
+                    posicao: "Inferior",
+                    dimensoes: "450x320x24mm",
+                    localizacao: "B2-Prateleira-01",
+                    observacoes: "Behr, Plástico cinza, 1 bocal + sensor",
+                    dataAdicao: new Date().toLocaleString()
+                },
+                {
+                    id: "DEMO003",
+                    montadora: "Ford",
+                    modelo: "Focus 2014-2018",
+                    posicao: "Superior",
+                    dimensoes: "465x345x28mm", 
+                    localizacao: "C1-Prateleira-02",
+                    observacoes: "Denso, Plástico preto, 2 bocais",
+                    dataAdicao: new Date().toLocaleString()
+                }
+            ];
+
+            localStorage.setItem('inventarioRapido', JSON.stringify(dadosDemo));
+            
+            // Mostrar confirmação
+            const toast = document.createElement('div');
+            toast.className = 'position-fixed top-0 end-0 p-3';
+            toast.style.zIndex = '9999';
+            toast.innerHTML = `
+                <div class="toast show" role="alert">
+                    <div class="toast-header bg-success text-white">
+                        <strong class="me-auto">✅ Sucesso</strong>
+                    </div>
+                    <div class="toast-body">
+                        Dados demonstrativos carregados! (${dadosDemo.length} itens)
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                document.body.removeChild(toast);
+                carregarEstatisticas();
+            }, 3000);
+        }
+
+        // Limpar dados
+        function limparDados() {
+            if (confirm('🗑️ Tem certeza que deseja limpar todos os dados de teste?')) {
+                localStorage.removeItem('inventarioRapido');
+                localStorage.removeItem('qrCodes');
+                
+                const toast = document.createElement('div');
+                toast.className = 'position-fixed top-0 end-0 p-3';
+                toast.style.zIndex = '9999';
+                toast.innerHTML = `
+                    <div class="toast show" role="alert">
+                        <div class="toast-header bg-warning text-dark">
+                            <strong class="me-auto">🗑️ Limpeza</strong>
+                        </div>
+                        <div class="toast-body">
+                            Todos os dados foram removidos!
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(toast);
+                
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                    carregarEstatisticas();
+                }, 3000);
+            }
+        }
+
+        // Exportar tudo
+        function exportarTudo() {
+            const inventario = JSON.parse(localStorage.getItem('inventarioRapido') || '[]');
+            
+            if (inventario.length === 0) {
+                alert('📋 Nenhum dado para exportar. Carregue dados demo primeiro!');
+                return;
+            }
+
+            const dados = inventario.map(item => ({
+                ID: item.id,
+                Montadora: item.montadora,
+                Modelo: item.modelo,
+                Posição: item.posicao,
+                Dimensões: item.dimensoes,
+                Localização: item.localizacao,
+                Observações: item.observacoes,
+                'Data Adição': item.dataAdicao
+            }));
+
+            const csv = [
+                Object.keys(dados[0]).join(','),
+                ...dados.map(item => Object.values(item).map(v => `"${v}"`).join(','))
+            ].join('\n');
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `inventario_completo_${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
+        }
+
+        // Inicializar página
+        document.addEventListener('DOMContentLoaded', function() {
+            carregarEstatisticas();
+            
+            // Configurar sistema de backup
+            setTimeout(() => {
+                if (window.autoBackup) {
+                    // Adicionar configurações específicas para o teste
+                    window.autoBackup.updateConfig({
+                        backupInterval: 5 * 60 * 1000, // 5 minutos para testes
+                        maxBackups: 25,
+                        notificationsEnabled: true
+                    });
+                    
+                    console.log('🔄 Sistema de backup configurado para ambiente de teste');
+                }
+            }, 1000);
+            
+            // Carregar dados demo automaticamente se não houver dados
+            const inventario = JSON.parse(localStorage.getItem('inventarioRapido') || '[]');
+            if (inventario.length === 0) {
+                setTimeout(() => {
+                    if (confirm('📋 Nenhum dado encontrado. Deseja carregar dados demonstrativos?')) {
+                        carregarDadosDemo();
+                    }
+                }, 1000);
+            }
+        });
+    </script>
+</body>
+</html>

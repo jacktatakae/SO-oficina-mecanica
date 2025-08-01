@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📱 Catalogação com QR Code - VRS</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #673AB7 0%, #3F51B5 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 1rem;
+        }
+
+        .qr-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .step-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-left: 5px solid #673AB7;
+        }
+
+        .qr-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .qr-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .qr-card:hover {
+            border-color: #673AB7;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .qr-code {
+            background: white;
+            padding: 10px;
+            border-radius: 10px;
+            margin: 1rem auto;
+            display: inline-block;
+        }
+
+        .etiqueta-preview {
+            background: #fff;
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 1rem 0;
+            text-align: center;
+            font-family: monospace;
+        }
+
+        .btn-action {
+            border-radius: 10px;
+            padding: 0.8rem 2rem;
+            font-weight: 600;
+            margin: 0.5rem;
+        }
+
+        .montadora-icon {
+            width: 40px;
+            height: 40px;
+            background: #673AB7;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin: 0 auto 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .qr-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .qr-container {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="qr-container">
+        <!-- Header -->
+        <div class="text-center mb-4">
+            <i class="fas fa-qrcode text-primary" style="font-size: 3rem; color: #673AB7 !important;"></i>
+            <h2 class="mt-3">📱 Catalogação com QR Code</h2>
+            <p class="text-muted">Sistema de etiquetas para acelerar o inventário</p>
+        </div>
+
+        <!-- Explicação do Sistema -->
+        <div class="step-card">
+            <h5><i class="fas fa-lightbulb me-2"></i>Como Funciona</h5>
+            <ol>
+                <li><strong>Gere QR codes</strong> para cada tipo de tanque comum</li>
+                <li><strong>Imprima as etiquetas</strong> e cole nas caixas correspondentes</li>
+                <li><strong>Escaneie com o celular</strong> para registrar rapidamente</li>
+                <li><strong>Digite apenas a quantidade</strong> - o resto é automático!</li>
+            </ol>
+            <div class="alert alert-info mt-3">
+                <i class="fas fa-info-circle me-2"></i>
+                <strong>Vantagem:</strong> Você só precisa escanear e informar quantidades. Sem digitar marca, modelo ou tipo!
+            </div>
+        </div>
+
+        <!-- Gerador de QR Codes -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="step-card">
+                    <h5><i class="fas fa-cogs me-2"></i>Gerar QR Code Personalizado</h5>
+                    <div class="mb-3">
+                        <label class="form-label">Montadora</label>
+                        <select class="form-select" id="qrMontadora">
+                            <option value="volkswagen">Volkswagen</option>
+                            <option value="chevrolet">Chevrolet</option>
+                            <option value="fiat">Fiat</option>
+                            <option value="ford">Ford</option>
+                            <option value="toyota">Toyota</option>
+                            <option value="honda">Honda</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Modelo</label>
+                        <input type="text" class="form-control" id="qrModelo" placeholder="Ex: Gol G5/G6">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tipo</label>
+                        <select class="form-select" id="qrTipo">
+                            <option value="superior">Caixa Superior</option>
+                            <option value="inferior">Caixa Inferior</option>
+                            <option value="completo">Radiador Completo</option>
+                            <option value="kit">Kit Completo</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary btn-action" onclick="gerarQRPersonalizado()">
+                        <i class="fas fa-qrcode me-1"></i> Gerar QR Code
+                    </button>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="step-card">
+                    <h5><i class="fas fa-eye me-2"></i>Preview da Etiqueta</h5>
+                    <div class="etiqueta-preview" id="etiquetaPreview">
+                        <div style="font-size: 0.9rem; font-weight: bold;">VRS - RADIADORES</div>
+                        <div id="previewQR" style="margin: 10px 0;">
+                            <!-- QR Code aparecerá aqui -->
+                        </div>
+                        <div id="previewTexto" style="font-size: 0.8rem;">
+                            Selecione uma opção acima
+                        </div>
+                        <div style="font-size: 0.7rem; color: #666; margin-top: 10px;">
+                            Escaneie para catalogar
+                        </div>
+                    </div>
+                    <button class="btn btn-success btn-action" onclick="imprimirEtiqueta()" id="btnImprimir" disabled>
+                        <i class="fas fa-print me-1"></i> Imprimir Etiqueta
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- QR Codes Pré-definidos -->
+        <div class="mt-4">
+            <h5><i class="fas fa-list me-2"></i>QR Codes Mais Usados</h5>
+            <div class="qr-grid" id="qrGrid">
+                <!-- Será preenchido dinamicamente -->
+            </div>
+        </div>
+
+        <!-- Formulário de Registro Rápido -->
+        <div class="step-card mt-4" id="formRegistro" style="display: none;">
+            <h5><i class="fas fa-plus me-2"></i>Registro Rápido por QR Code</h5>
+            <div class="row align-items-end">
+                <div class="col-md-8">
+                    <label class="form-label">URL do QR Code Escaneado</label>
+                    <input type="text" class="form-control" id="urlEscaneada" placeholder="Cole aqui a URL que o QR code abriu">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Quantidade</label>
+                    <input type="number" class="form-control" id="quantidadeEscaneada" min="1" value="1">
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-success w-100" onclick="registrarPorQR()">
+                        <i class="fas fa-check"></i> Registrar
+                    </button>
+                </div>
+            </div>
+            <div class="mt-3">
+                <div id="infoEscaneada" class="alert alert-info" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- Botões de Ação -->
+        <div class="text-center mt-4">
+            <button class="btn btn-primary btn-action" onclick="abrirFormRegistro()">
+                <i class="fas fa-mobile-alt me-1"></i> Registrar por QR
+            </button>
+            <button class="btn btn-success btn-action" onclick="gerarTodasEtiquetas()">
+                <i class="fas fa-print me-1"></i> Imprimir Todas
+            </button>
+            <button class="btn btn-info btn-action" onclick="abrirInventario()">
+                <i class="fas fa-boxes me-1"></i> Ver Inventário
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Definições dos QR codes mais comuns
+        const qrComuns = [
+            { id: 'vw_gol_sup', montadora: 'volkswagen', modelo: 'Gol G5/G6', tipo: 'superior', icon: 'VW' },
+            { id: 'vw_gol_inf', montadora: 'volkswagen', modelo: 'Gol G5/G6', tipo: 'inferior', icon: 'VW' },
+            { id: 'gm_onix_sup', montadora: 'chevrolet', modelo: 'Onix', tipo: 'superior', icon: 'GM' },
+            { id: 'gm_onix_inf', montadora: 'chevrolet', modelo: 'Onix', tipo: 'inferior', icon: 'GM' },
+            { id: 'fi_uno_sup', montadora: 'fiat', modelo: 'Uno Vivace', tipo: 'superior', icon: 'FI' },
+            { id: 'fi_uno_inf', montadora: 'fiat', modelo: 'Uno Vivace', tipo: 'inferior', icon: 'FI' },
+            { id: 'fd_ka_sup', montadora: 'ford', modelo: 'Ka', tipo: 'superior', icon: 'FD' },
+            { id: 'fd_ka_inf', montadora: 'ford', modelo: 'Ka', tipo: 'inferior', icon: 'FD' },
+            { id: 'to_corolla_sup', montadora: 'toyota', modelo: 'Corolla', tipo: 'superior', icon: 'TO' },
+            { id: 'to_corolla_inf', montadora: 'toyota', modelo: 'Corolla', tipo: 'inferior', icon: 'TO' },
+            { id: 'ho_civic_sup', montadora: 'honda', modelo: 'Civic', tipo: 'superior', icon: 'HO' },
+            { id: 'ho_civic_inf', montadora: 'honda', modelo: 'Civic', tipo: 'inferior', icon: 'HO' }
+        ];
+
+        // Gerar QR codes comuns
+        function gerarQRsComuns() {
+            const grid = document.getElementById('qrGrid');
+            grid.innerHTML = '';
+
+            qrComuns.forEach(item => {
+                const url = gerarURLParametros(item.montadora, item.modelo, item.tipo);
+                const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(url)}`;
+                
+                const card = document.createElement('div');
+                card.className = 'qr-card';
+                card.innerHTML = `
+                    <div class="montadora-icon">${item.icon}</div>
+                    <div class="qr-code">
+                        <img src="${qrUrl}" alt="QR Code" style="width: 100px; height: 100px;">
+                    </div>
+                    <h6>${item.modelo}</h6>
+                    <small>${item.tipo.toUpperCase()}</small>
+                    <div class="mt-2">
+                        <button class="btn btn-sm btn-outline-primary" onclick="imprimirQR('${item.id}')">
+                            <i class="fas fa-print"></i> Imprimir
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Gerar URL com parâmetros
+        function gerarURLParametros(montadora, modelo, tipo) {
+            const baseUrl = window.location.origin + window.location.pathname.replace('qr-catalogacao.html', 'inventario-rapido.html');
+            return `${baseUrl}?m=${encodeURIComponent(montadora)}&mo=${encodeURIComponent(modelo)}&t=${encodeURIComponent(tipo)}&auto=1`;
+        }
+
+        // Gerar QR personalizado
+        function gerarQRPersonalizado() {
+            const montadora = document.getElementById('qrMontadora').value;
+            const modelo = document.getElementById('qrModelo').value;
+            const tipo = document.getElementById('qrTipo').value;
+
+            if (!modelo) {
+                alert('Por favor, informe o modelo!');
+                return;
+            }
+
+            const url = gerarURLParametros(montadora, modelo, tipo);
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(url)}`;
+            
+            // Atualizar preview
+            document.getElementById('previewQR').innerHTML = `
+                <img src="${qrUrl}" alt="QR Code" style="width: 120px; height: 120px;">
+            `;
+            
+            document.getElementById('previewTexto').innerHTML = `
+                <strong>${montadora.toUpperCase()}</strong><br>
+                ${modelo}<br>
+                <em>${tipo.charAt(0).toUpperCase() + tipo.slice(1)}</em>
+            `;
+
+            document.getElementById('btnImprimir').disabled = false;
+        }
+
+        // Imprimir etiqueta
+        function imprimirEtiqueta() {
+            const preview = document.getElementById('etiquetaPreview').cloneNode(true);
+            const novaJanela = window.open('', '_blank');
+            novaJanela.document.write(`
+                <html>
+                <head>
+                    <title>Etiqueta QR Code</title>
+                    <style>
+                        body { margin: 20px; font-family: Arial, sans-serif; }
+                        .etiqueta { 
+                            border: 2px solid #000; 
+                            padding: 15px; 
+                            text-align: center; 
+                            width: 200px;
+                            margin: 0 auto;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="etiqueta">${preview.innerHTML}</div>
+                    <script>window.print();</script>
+                </body>
+                </html>
+            `);
+        }
+
+        // Imprimir QR específico
+        function imprimirQR(id) {
+            const item = qrComuns.find(q => q.id === id);
+            if (!item) return;
+
+            const url = gerarURLParametros(item.montadora, item.modelo, item.tipo);
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(url)}`;
+            
+            const novaJanela = window.open('', '_blank');
+            novaJanela.document.write(`
+                <html>
+                <head>
+                    <title>Etiqueta - ${item.modelo}</title>
+                    <style>
+                        body { margin: 20px; font-family: Arial, sans-serif; }
+                        .etiqueta { 
+                            border: 2px solid #000; 
+                            padding: 15px; 
+                            text-align: center; 
+                            width: 200px;
+                            margin: 0 auto;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="etiqueta">
+                        <div style="font-weight: bold;">VRS - RADIADORES</div>
+                        <img src="${qrUrl}" style="width: 120px; height: 120px; margin: 10px 0;">
+                        <div style="font-weight: bold;">${item.montadora.toUpperCase()}</div>
+                        <div>${item.modelo}</div>
+                        <div style="font-style: italic;">${item.tipo.charAt(0).toUpperCase() + item.tipo.slice(1)}</div>
+                        <div style="font-size: 0.8rem; margin-top: 10px;">Escaneie para catalogar</div>
+                    </div>
+                    <script>window.print();</script>
+                </body>
+                </html>
+            `);
+        }
+
+        // Gerar todas as etiquetas
+        function gerarTodasEtiquetas() {
+            const novaJanela = window.open('', '_blank');
+            let html = `
+                <html>
+                <head>
+                    <title>Todas as Etiquetas QR</title>
+                    <style>
+                        body { margin: 20px; font-family: Arial, sans-serif; }
+                        .etiqueta { 
+                            border: 2px solid #000; 
+                            padding: 15px; 
+                            text-align: center; 
+                            width: 180px;
+                            margin: 10px;
+                            display: inline-block;
+                            vertical-align: top;
+                        }
+                        @media print {
+                            .etiqueta { page-break-inside: avoid; }
+                        }
+                    </style>
+                </head>
+                <body>
+            `;
+
+            qrComuns.forEach(item => {
+                const url = gerarURLParametros(item.montadora, item.modelo, item.tipo);
+                const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(url)}`;
+                
+                html += `
+                    <div class="etiqueta">
+                        <div style="font-weight: bold; font-size: 0.9rem;">VRS - RADIADORES</div>
+                        <img src="${qrUrl}" style="width: 100px; height: 100px; margin: 8px 0;">
+                        <div style="font-weight: bold; font-size: 0.8rem;">${item.montadora.toUpperCase()}</div>
+                        <div style="font-size: 0.8rem;">${item.modelo}</div>
+                        <div style="font-style: italic; font-size: 0.7rem;">${item.tipo.charAt(0).toUpperCase() + item.tipo.slice(1)}</div>
+                        <div style="font-size: 0.6rem; margin-top: 5px;">Escaneie para catalogar</div>
+                    </div>
+                `;
+            });
+
+            html += `
+                    <script>window.print();</script>
+                </body>
+                </html>
+            `;
+
+            novaJanela.document.write(html);
+        }
+
+        // Abrir formulário de registro
+        function abrirFormRegistro() {
+            document.getElementById('formRegistro').style.display = 'block';
+            document.getElementById('urlEscaneada').focus();
+        }
+
+        // Registrar por QR
+        function registrarPorQR() {
+            const url = document.getElementById('urlEscaneada').value;
+            const quantidade = parseInt(document.getElementById('quantidadeEscaneada').value) || 1;
+
+            if (!url) {
+                alert('Por favor, cole a URL do QR code escaneado!');
+                return;
+            }
+
+            try {
+                const urlParams = new URLSearchParams(new URL(url).search);
+                const montadora = urlParams.get('m');
+                const modelo = urlParams.get('mo');
+                const tipo = urlParams.get('t');
+
+                if (!montadora || !modelo || !tipo) {
+                    alert('QR code inválido! Não contém as informações necessárias.');
+                    return;
+                }
+
+                // Mostrar informações
+                document.getElementById('infoEscaneada').style.display = 'block';
+                document.getElementById('infoEscaneada').innerHTML = `
+                    <strong>Dados detectados:</strong><br>
+                    Montadora: ${montadora}<br>
+                    Modelo: ${modelo}<br>
+                    Tipo: ${tipo}<br>
+                    Quantidade: ${quantidade}
+                `;
+
+                // Simular redirecionamento para o inventário
+                setTimeout(() => {
+                    alert(`Tanque registrado com sucesso!\n\nMontadora: ${montadora}\nModelo: ${modelo}\nTipo: ${tipo}\nQuantidade: ${quantidade}`);
+                    document.getElementById('urlEscaneada').value = '';
+                    document.getElementById('quantidadeEscaneada').value = '1';
+                    document.getElementById('infoEscaneada').style.display = 'none';
+                }, 1000);
+
+            } catch (error) {
+                alert('Erro ao processar URL: ' + error.message);
+            }
+        }
+
+        // Abrir inventário
+        function abrirInventario() {
+            window.open('inventario-rapido.html', '_blank');
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            gerarQRsComuns();
+        });
+    </script>
+</body>
+</html>
