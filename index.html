@@ -2,8 +2,33 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🚗 Sistema de Peças Automotivas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, minimum-scale=1.0, maximum-scale=5.0">
+    <title>🚗 VRS - Sistema Universal de Catalogação</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Meta tags para PWA -->
+    <meta name="theme-color" content="#2c3e50">
+    <meta name="background-color" content="#2c3e50">
+    <meta name="display" content="standalone">
+    <meta name="orientation" content="portrait-primary">
+    
+    <!-- Meta tags para mobile -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="VRS Catalogo">
+    
+    <!-- Ícones para diferentes plataformas -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE5IDdWNWgtMlYwaC0ydjVIN1YwSDV2NUgzdjJoMlYxMmgtMlYxOWgydjVoMnYtNUgxMnY1aDJ2LTVoMnYtMmgtMlY3aDJaTTcgN0gxMlYxMkg3VjdaIiBmaWxsPSIjMmMzZTUwIi8+Cjwvc3ZnPg==">
+    <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgwIiBoZWlnaHQ9IjE4MCIgdmlld0JveD0iMCAwIDE4MCAxODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxODAiIGhlaWdodD0iMTgwIiByeD0iMjAiIGZpbGw9IiMyYzNlNTAiLz4KPHN2ZyB4PSI0NSIgeT0iNDUiIHdpZHRoPSI5MCIgaGVpZ2h0PSI5MCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJ3aGl0ZSI+CjxwYXRoIGQ9Ik0xOSA3VjVoLTJWMGgtMnY1SDdWMEg1djVIM3YyaDJWMTJoLTJWMTloMnY1aDJ2LTVIMTJ2NWgydi01aDJ2LTJoLTJWN2gyWk03IDdIMTJWMTJIN1Y3WiIvPgo8L3N2Zz4KPC9zdmc+">
+    
+    <!-- Meta tags para SEO e compartilhamento -->
+    <meta name="description" content="Sistema completo de catalogação de tanques de radiador com IA visual, backup automático e compatibilidade total entre plataformas">
+    <meta name="keywords" content="radiador, catalogação, inventário, automotivo, IA, visual, scanner, backup">
+    <meta name="author" content="VRS - Vinícius Radiadores Solutions">
+    
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
@@ -1513,9 +1538,195 @@
             }
         }
 
+        // ===== PWA FUNCTIONALITY =====
+        let deferredPrompt;
+        let serviceWorkerRegistration;
+
+        // Inicializar PWA
+        function initPWA() {
+            // Registrar Service Worker
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(registration => {
+                        serviceWorkerRegistration = registration;
+                        console.log('✅ Service Worker registrado:', registration);
+                        
+                        // Escutar atualizações
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    showUpdateNotification();
+                                }
+                            });
+                        });
+                    })
+                    .catch(error => {
+                        console.error('❌ Erro ao registrar Service Worker:', error);
+                    });
+            }
+
+            // Escutar evento de instalação PWA
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                showInstallBanner();
+            });
+
+            // PWA instalado
+            window.addEventListener('appinstalled', () => {
+                console.log('✅ PWA instalado com sucesso');
+                hideInstallBanner();
+                showToast('Aplicativo instalado com sucesso! 🎉', 'success');
+            });
+
+            // Detectar modo standalone
+            if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+                console.log('📱 Executando como PWA');
+                document.body.classList.add('pwa-mode');
+            }
+        }
+
+        // Mostrar banner de instalação
+        function showInstallBanner() {
+            const existingBanner = document.getElementById('installBanner');
+            if (existingBanner) return;
+
+            const banner = document.createElement('div');
+            banner.id = 'installBanner';
+            banner.className = 'alert alert-info position-fixed bottom-0 start-50 translate-middle-x mb-3 shadow';
+            banner.style.zIndex = '9999';
+            banner.style.maxWidth = '400px';
+            banner.innerHTML = `
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <strong><i class="fas fa-download me-2"></i>Instalar VRS</strong>
+                        <br>
+                        <small>Adicione à tela inicial para acesso rápido!</small>
+                    </div>
+                    <button class="btn btn-primary btn-sm ms-2" onclick="installPWA()">
+                        Instalar
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm ms-1" onclick="hideInstallBanner()">
+                        ✕
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(banner);
+        }
+
+        // Esconder banner de instalação
+        function hideInstallBanner() {
+            const banner = document.getElementById('installBanner');
+            if (banner) {
+                banner.remove();
+            }
+        }
+
+        // Instalar PWA
+        async function installPWA() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                
+                if (outcome === 'accepted') {
+                    console.log('✅ Usuário aceitou instalar PWA');
+                } else {
+                    console.log('❌ Usuário recusou instalar PWA');
+                }
+                
+                deferredPrompt = null;
+                hideInstallBanner();
+            }
+        }
+
+        // Mostrar notificação de atualização
+        function showUpdateNotification() {
+            const notification = document.createElement('div');
+            notification.className = 'alert alert-warning position-fixed top-0 start-50 translate-middle-x mt-3 shadow';
+            notification.style.zIndex = '9999';
+            notification.innerHTML = `
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <strong><i class="fas fa-sync me-2"></i>Atualização Disponível</strong>
+                        <br>
+                        <small>Nova versão do sistema está pronta.</small>
+                    </div>
+                    <button class="btn btn-warning btn-sm ms-2" onclick="updateApp()">
+                        Atualizar
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm ms-1" onclick="this.parentElement.parentElement.remove()">
+                        ✕
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+        }
+
+        // Atualizar aplicativo
+        function updateApp() {
+            if (serviceWorkerRegistration && serviceWorkerRegistration.waiting) {
+                serviceWorkerRegistration.waiting.postMessage({ type: 'SKIP_WAITING' });
+                window.location.reload();
+            }
+        }
+
+        // Mostrar toast universal
+        function showToast(message, type = 'info', duration = 5000) {
+            const toast = document.createElement('div');
+            toast.className = 'toast position-fixed top-0 end-0 m-3';
+            toast.style.zIndex = '9999';
+            
+            const bgClass = {
+                'success': 'bg-success',
+                'error': 'bg-danger',
+                'warning': 'bg-warning',
+                'info': 'bg-info'
+            }[type] || 'bg-info';
+            
+            toast.innerHTML = `
+                <div class="toast-header ${bgClass} text-white">
+                    <strong class="me-auto">🌐 Sistema VRS</strong>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+                </div>
+                <div class="toast-body">
+                    ${message}
+                </div>
+            `;
+            
+            document.body.appendChild(toast);
+            const bsToast = new bootstrap.Toast(toast, { delay: duration });
+            bsToast.show();
+            
+            setTimeout(() => {
+                if (document.body.contains(toast)) {
+                    document.body.removeChild(toast);
+                }
+            }, duration + 1000);
+        }
+
+        // Event listeners para conectividade
+        window.addEventListener('online', () => {
+            showToast('🟢 Conexão restaurada!', 'success');
+        });
+
+        window.addEventListener('offline', () => {
+            showToast('🔴 Sem conexão - Funcionando offline', 'warning');
+        });
+
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
             loadStats();
+            initPWA();
+            
+            // Verificar atualizações periodicamente
+            setInterval(() => {
+                if (serviceWorkerRegistration) {
+                    serviceWorkerRegistration.update();
+                }
+            }, 60000); // A cada minuto
         });
     </script>
 </body>

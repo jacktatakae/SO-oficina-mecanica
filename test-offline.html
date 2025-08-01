@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Teste Offline VRS</title>
+    <link rel="manifest" href="manifest.json">
+</head>
+<body>
+    <h1>Sistema VRS - Teste Offline</h1>
+    <p>Se você está vendo esta página, o sistema pode funcionar offline!</p>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js')
+                .then(() => console.log('✅ Service Worker funcionando'))
+                .catch(() => console.log('❌ Erro no Service Worker'));
+        }
+    </script>
+</body>
+</html>

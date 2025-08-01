@@ -1,0 +1,98 @@
+{
+  "name": "VRS - Sistema de Catalogação de Radiadores",
+  "short_name": "VRS Catalogo",
+  "description": "Sistema completo de catalogação e inventário de tanques de radiador com IA visual",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#2196F3",
+  "theme_color": "#1976D2",
+  "orientation": "portrait-primary",
+  "scope": "./",
+  "lang": "pt-BR",
+  "categories": ["business", "productivity", "utilities"],
+  "icons": [
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMjQiIGZpbGw9IiMyMTk2RjMiLz4KPHN2ZyB4PSI0OCIgeT0iNDgiIHdpZHRoPSI5NiIgaGVpZ2h0PSI5NiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJ3aGl0ZSI+CjxwYXRoIGQ9Ik0xOSA3VjVoLTJWMGgtMnY1SDdWMEg1djVIM3YyaDJWMTJoLTJWMTloMnY1aDJ2LTVIMTJ2NWgydi01aDJ2LTJoLTJWN2gyWk03IDdIMTJWMTJIN1Y3WiIvPgo8L3N2Zz4KPC9zdmc+",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgdmlld0JveD0iMCAwIDUxMiA1MTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiByeD0iNjQiIGZpbGw9IiMyMTk2RjMiLz4KPHN2ZyB4PSIxMjgiIHk9IjEyOCIgd2lkdGg9IjI1NiIgaGVpZ2h0PSIyNTYiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0id2hpdGUiPgo8cGF0aCBkPSJNMTkgN1Y1aC0yVjBoLTJ2NUg3VjBINXY1SDN2MmgydjdoLTJWMTloMnY1aDJ2LTVIMTJ2NWgydi01aDJ2LTJoLTJWN2gyWk03IDdIMTJWMTJIN1Y3WiIvPgo8L3N2Zz4KPC9zdmc+",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI4MCIgaGVpZ2h0PSI3MjAiIHZpZXdCb3g9IjAgMCAxMjgwIDcyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjEyODAiIGhlaWdodD0iNzIwIiBmaWxsPSIjRjVGNUY1Ii8+Cjx0ZXh0IHg9IjY0MCIgeT0iMzYwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMjE5NkYzIiBmb250LXNpemU9IjQ4Ij5TaXN0ZW1hIFZSUyAtIERlc2t0b3A8L3RleHQ+Cjwvc3ZnPg==",
+      "sizes": "1280x720",
+      "type": "image/svg+xml",
+      "form_factor": "wide",
+      "label": "Interface Desktop do Sistema VRS"
+    },
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNzUwIiBoZWlnaHQ9IjEzMzQiIHZpZXdCb3g9IjAgMCA3NTAgMTMzNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9Ijc1MCIgaGVpZ2h0PSIxMzM0IiBmaWxsPSIjRjVGNUY1Ii8+Cjx0ZXh0IHg9IjM3NSIgeT0iNjY3IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMjE5NkYzIiBmb250LXNpemU9IjM2Ij5TaXN0ZW1hIFZSUyAtIE1vYmlsZTwvdGV4dD4KPC9zdmc+",
+      "sizes": "750x1334",
+      "type": "image/svg+xml",
+      "form_factor": "narrow",
+      "label": "Interface Mobile do Sistema VRS"
+    }
+  ],
+  "features": [
+    "Cross Platform",
+    "Offline Storage",
+    "Visual AI Scanner",
+    "Auto Backup",
+    "QR Code Generator",
+    "Export/Import"
+  ],
+  "shortcuts": [
+    {
+      "name": "Inventário Rápido",
+      "short_name": "Inventário",
+      "description": "Acesso direto ao sistema de inventário",
+      "url": "./inventario-rapido.html",
+      "icons": [
+        {
+          "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOTYiIGhlaWdodD0iOTYiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDJMMTMuMDkgOC4yNkwyMCA5TDEzLjA5IDE1Ljc0TDEyIDIyTDEwLjkxIDE1Ljc0TDQgOUwxMC45MSA4LjI2TDEyIDJaIiBmaWxsPSIjMjE5NkYzIi8+Cjwvc3ZnPg==",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Scanner Visual",
+      "short_name": "Scanner",
+      "description": "Scanner IA para identificação automática",
+      "url": "./scanner-visual.html",
+      "icons": [
+        {
+          "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOTYiIGhlaWdodD0iOTYiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDEyTTkgOVYzSDNWOUg5Wk0yMSA5VjNIMTVWOUgyMVpNMjEgMjFWMTVIMTVWMjFIMjFaTTkgMjFWMTVIM1YyMUg5WiIgZmlsbD0iIzI4QTc0NSIvPgo8L3N2Zz4=",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Gerenciar Backups",
+      "short_name": "Backup",
+      "description": "Sistema de backup e restauração",
+      "url": "./gerenciador-backup.html",
+      "icons": [
+        {
+          "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOTYiIGhlaWdodD0iOTYiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE0IDJIMTZWMTRIMTRGMTI0VjJaTTYgMkg4VjNINlYyWk0xMCA0SDhWM0gxMFY0Wk0xNiAyMlYxNkgxNFYyMkgxNloiIGZpbGw9IiM2RjQyQzEiLz4KPC9zdmc+",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "protocol_handlers": [
+    {
+      "protocol": "web+vrs",
+      "url": "./index.html?action=%s"
+    }
+  ]
+}
