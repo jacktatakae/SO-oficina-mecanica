@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, minimum-scale=1.0, maximum-scale=3.0">
+    <title>🐙 GitHub Sync - VRS Mobile</title>
+    
+    <!-- Meta tags PWA -->
+    <meta name="theme-color" content="#2196F3">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 0;
+            margin: 0;
+        }
+
+        .mobile-container {
+            background: white;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+            color: white;
+            padding: 2rem 1rem 1rem;
+            text-align: center;
+            border-radius: 0 0 30px 30px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(33, 150, 243, 0.3);
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .header p {
+            opacity: 0.9;
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        .config-section {
+            padding: 0 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .step-card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            border: 2px solid #f0f0f0;
+            transition: all 0.3s ease;
+        }
+
+        .step-card.active {
+            border-color: #2196F3;
+            box-shadow: 0 8px 25px rgba(33, 150, 243, 0.15);
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .step-number {
+            background: linear-gradient(45deg, #2196F3, #1976D2);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .step-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+            margin: 0;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #2196F3;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+        }
+
+        .form-label i {
+            margin-right: 0.5rem;
+        }
+
+        .form-control {
+            font-size: 16px !important; /* Evita zoom no iOS */
+            min-height: 56px;
+            padding: 1rem 1.25rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            background: #fafafa;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #2196F3;
+            box-shadow: 0 0 0 4px rgba(33, 150, 243, 0.1);
+            background: white;
+            outline: none;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-group .btn {
+            min-height: 56px;
+            border: 2px solid #e0e0e0;
+            border-left: none;
+            border-radius: 0 12px 12px 0;
+            background: #f5f5f5;
+        }
+
+        .btn-mobile {
+            min-height: 56px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 12px;
+            padding: 1rem 2rem;
+            border: none;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin: 0.5rem 0;
+        }
+
+        .btn-primary-mobile {
+            background: linear-gradient(45deg, #2196F3, #1976D2);
+            color: white;
+            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+        }
+
+        .btn-primary-mobile:hover, .btn-primary-mobile:active {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4);
+        }
+
+        .btn-success-mobile {
+            background: linear-gradient(45deg, #4CAF50, #388E3C);
+            color: white;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .btn-outline-mobile {
+            background: white;
+            color: #2196F3;
+            border: 2px solid #2196F3;
+        }
+
+        .status-card {
+            border-radius: 12px;
+            padding: 1rem;
+            margin: 1rem 0;
+            font-weight: 500;
+            display: none;
+        }
+
+        .status-card.show {
+            display: block;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        .status-info {
+            background: #E3F2FD;
+            color: #1976D2;
+            border: 2px solid #BBDEFB;
+        }
+
+        .status-success {
+            background: #E8F5E8;
+            color: #2E7D32;
+            border: 2px solid #C8E6C9;
+        }
+
+        .status-warning {
+            background: #FFF8E1;
+            color: #F57C00;
+            border: 2px solid #FFECB3;
+        }
+
+        .status-danger {
+            background: #FFEBEE;
+            color: #C62828;
+            border: 2px solid #FFCDD2;
+        }
+
+        .quick-actions {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 1rem;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+            border-radius: 20px 20px 0 0;
+        }
+
+        .quick-actions .btn-group {
+            width: 100%;
+        }
+
+        .quick-actions .btn {
+            border-radius: 12px;
+            margin: 0 0.25rem;
+            min-height: 50px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .alert-mobile {
+            border-radius: 12px;
+            padding: 1rem;
+            margin: 1rem 0;
+            border: none;
+            font-size: 0.9rem;
+        }
+
+        .alert-info-mobile {
+            background: linear-gradient(45deg, #E3F2FD, #BBDEFB);
+            color: #1976D2;
+        }
+
+        .spinner {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Ajustes para telas muito pequenas */
+        @media (max-width: 360px) {
+            .header {
+                padding: 1.5rem 0.75rem 0.75rem;
+            }
+            
+            .config-section {
+                padding: 0 0.75rem;
+            }
+            
+            .step-card {
+                padding: 1rem;
+            }
+        }
+
+        /* Espaçamento inferior para os botões fixos */
+        .content-with-fixed-bottom {
+            padding-bottom: 100px;
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-container">
+        <div class="header">
+            <h1><i class="fab fa-github me-2"></i>GitHub Sync</h1>
+            <p>Backup automático na nuvem para seus dados VRS</p>
+        </div>
+
+        <div class="config-section content-with-fixed-bottom">
+            <!-- Passo 1: Informações -->
+            <div class="step-card">
+                <div class="step-header">
+                    <div class="step-number">ℹ️</div>
+                    <h3 class="step-title">Por que usar GitHub?</h3>
+                </div>
+                <div class="alert-mobile alert-info-mobile">
+                    <strong>✅ Vantagens do GitHub Sync:</strong>
+                    <ul class="mt-2 mb-0">
+                        <li><strong>Sincronização</strong> entre celular e computador</li>
+                        <li><strong>Backup automático</strong> na nuvem</li>
+                        <li><strong>Histórico</strong> de todas as alterações</li>
+                        <li><strong>Acesso</strong> de qualquer lugar</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Passo 2: Configuração -->
+            <div class="step-card active">
+                <div class="step-header">
+                    <div class="step-number">1</div>
+                    <h3 class="step-title">Configurar Token</h3>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-key"></i>Token do GitHub
+                    </label>
+                    <div class="input-group">
+                        <input type="password" class="form-control" id="githubToken" 
+                               placeholder="ghp_xxxxxxxxxxxx" 
+                               autocomplete="off">
+                        <button class="btn btn-outline-secondary" type="button" onclick="toggleToken()">
+                            <i class="fas fa-eye" id="eyeIcon"></i>
+                        </button>
+                    </div>
+                    <small class="text-muted mt-2 d-block">
+                        <a href="https://github.com/settings/tokens" target="_blank" class="btn btn-outline-mobile btn-sm mt-2">
+                            <i class="fas fa-external-link-alt me-1"></i>Criar Token GitHub
+                        </a>
+                    </small>
+                </div>
+
+                <div class="row">
+                    <div class="col-12 mb-3">
+                        <label class="form-label">
+                            <i class="fas fa-user"></i>Usuário GitHub
+                        </label>
+                        <input type="text" class="form-control" id="githubOwner" 
+                               value="jacktatakae" readonly>
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label class="form-label">
+                            <i class="fas fa-folder"></i>Repositório
+                        </label>
+                        <input type="text" class="form-control" id="githubRepo" 
+                               value="vrs-inventario-backup" readonly>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary-mobile" onclick="testarConexao()">
+                    <i class="fas fa-plug me-2"></i>Testar Conexão
+                </button>
+
+                <div id="statusMessage" class="status-card"></div>
+            </div>
+
+            <!-- Passo 3: Ações -->
+            <div class="step-card" id="actionsCard" style="display: none;">
+                <div class="step-header">
+                    <div class="step-number">2</div>
+                    <h3 class="step-title">Sincronização</h3>
+                </div>
+                
+                <div class="row">
+                    <div class="col-6">
+                        <button class="btn btn-success-mobile" onclick="ativarSync()">
+                            <i class="fas fa-check me-1"></i>Ativar Sync
+                        </button>
+                    </div>
+                    <div class="col-6">
+                        <button class="btn btn-outline-mobile" onclick="baixarBackup()">
+                            <i class="fas fa-download me-1"></i>Baixar
+                        </button>
+                    </div>
+                </div>
+                
+                <button class="btn btn-outline-mobile" onclick="enviarBackup()">
+                    <i class="fas fa-upload me-2"></i>Enviar Backup Agora
+                </button>
+
+                <div id="syncStatus" class="status-card"></div>
+            </div>
+
+            <!-- Status Atual -->
+            <div class="step-card">
+                <div class="step-header">
+                    <div class="step-number">📊</div>
+                    <h3 class="step-title">Status Atual</h3>
+                </div>
+                <div id="currentStatus" class="alert-mobile alert-info-mobile">
+                    <i class="fas fa-info-circle me-2"></i>Carregando status...
+                </div>
+            </div>
+        </div>
+
+        <!-- Botões de ação rápida -->
+        <div class="quick-actions">
+            <div class="btn-group w-100" role="group">
+                <button type="button" class="btn btn-outline-primary" onclick="voltarInventario()">
+                    <i class="fas fa-arrow-left me-1"></i>Voltar
+                </button>
+                <button type="button" class="btn btn-primary" onclick="atualizarStatus()">
+                    <i class="fas fa-sync-alt me-1"></i>Atualizar
+                </button>
+                <button type="button" class="btn btn-success" onclick="testarTudo()" id="testAllBtn">
+                    <i class="fas fa-check-double me-1"></i>Testar Tudo
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="auto-backup-system.js"></script>
+    <script src="github-sync.js"></script>
+    <script>
+        let backupSystem;
+        let isConfigured = false;
+
+        // Inicializar quando página carregar
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // Aguardar sistemas carregarem
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                backupSystem = window.autoBackupSystem || new AutoBackupSystem();
+                
+                // Carregar configurações salvas
+                carregarConfiguracoes();
+                atualizarStatus();
+                
+            } catch (error) {
+                console.error('Erro ao inicializar:', error);
+                showStatus('Erro ao carregar sistema', 'danger');
+            }
+        });
+
+        function carregarConfiguracoes() {
+            try {
+                const config = backupSystem?.config || {};
+                
+                if (config.githubToken) {
+                    document.getElementById('githubToken').value = config.githubToken;
+                }
+                
+                if (config.githubOwner) {
+                    document.getElementById('githubOwner').value = config.githubOwner;
+                }
+                
+                if (config.githubRepo) {
+                    document.getElementById('githubRepo').value = config.githubRepo;
+                }
+                
+                isConfigured = config.githubSyncEnabled && config.githubToken;
+                
+            } catch (error) {
+                console.error('Erro ao carregar configurações:', error);
+            }
+        }
+
+        function toggleToken() {
+            const input = document.getElementById('githubToken');
+            const icon = document.getElementById('eyeIcon');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fas fa-eye-slash';
+            } else {
+                input.type = 'password';
+                icon.className = 'fas fa-eye';
+            }
+        }
+
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('statusMessage');
+            statusDiv.className = `status-card status-${type} show`;
+            statusDiv.innerHTML = `<i class="fas fa-info-circle me-2"></i>${message}`;
+            
+            // Auto-hide depois de 5 segundos se não for erro
+            if (type !== 'danger') {
+                setTimeout(() => {
+                    statusDiv.classList.remove('show');
+                }, 5000);
+            }
+        }
+
+        function showSyncStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('syncStatus');
+            statusDiv.className = `status-card status-${type} show`;
+            statusDiv.innerHTML = `<i class="fas fa-sync-alt me-2"></i>${message}`;
+        }
+
+        async function testarConexao() {
+            const token = document.getElementById('githubToken').value.trim();
+            const owner = document.getElementById('githubOwner').value.trim();
+            const repo = document.getElementById('githubRepo').value.trim();
+
+            if (!token) {
+                showStatus('Por favor, insira o token do GitHub', 'warning');
+                return;
+            }
+
+            showStatus('<span class="spinner"><i class="fas fa-spinner"></i></span> Testando conexão...', 'info');
+
+            try {
+                // Configurar sistema de backup
+                backupSystem.config.githubToken = token;
+                backupSystem.config.githubOwner = owner;
+                backupSystem.config.githubRepo = repo;
+                
+                // Testar conexão
+                await backupSystem.testGitHubConnection();
+                
+                showStatus('✅ Conexão estabelecida com sucesso!', 'success');
+                
+                // Mostrar card de ações
+                document.getElementById('actionsCard').style.display = 'block';
+                isConfigured = true;
+                
+                // Salvar configurações
+                backupSystem.saveConfig();
+                
+            } catch (error) {
+                console.error('Erro na conexão:', error);
+                showStatus(`❌ Erro na conexão: ${error.message}`, 'danger');
+            }
+        }
+
+        async function ativarSync() {
+            try {
+                if (!isConfigured) {
+                    showSyncStatus('Configure o GitHub primeiro!', 'warning');
+                    return;
+                }
+
+                backupSystem.config.githubSyncEnabled = true;
+                backupSystem.saveConfig();
+                
+                showSyncStatus('✅ GitHub Sync ativado com sucesso!', 'success');
+                atualizarStatus();
+                
+            } catch (error) {
+                console.error('Erro ao ativar sync:', error);
+                showSyncStatus(`❌ Erro: ${error.message}`, 'danger');
+            }
+        }
+
+        async function baixarBackup() {
+            try {
+                if (!isConfigured) {
+                    showSyncStatus('Configure o GitHub primeiro!', 'warning');
+                    return;
+                }
+
+                showSyncStatus('<span class="spinner"><i class="fas fa-spinner"></i></span> Baixando backup...', 'info');
+                
+                const backups = await backupSystem.listGitHubBackups();
+                
+                if (backups.length === 0) {
+                    showSyncStatus('❌ Nenhum backup encontrado no GitHub', 'warning');
+                    return;
+                }
+
+                // Baixar o backup mais recente
+                const latestBackup = backups[0];
+                const data = await backupSystem.downloadFromGitHub(latestBackup.name);
+                
+                // Salvar dados localmente
+                localStorage.setItem('inventario_tanques', JSON.stringify(data.inventario_tanques || {tanques: []}));
+                localStorage.setItem('qrCodes', JSON.stringify(data.qrCodes || []));
+                
+                showSyncStatus(`✅ Backup baixado: ${(data.inventario_tanques?.tanques || []).length} tanques`, 'success');
+                
+            } catch (error) {
+                console.error('Erro ao baixar backup:', error);
+                showSyncStatus(`❌ Erro ao baixar: ${error.message}`, 'danger');
+            }
+        }
+
+        async function enviarBackup() {
+            try {
+                if (!isConfigured) {
+                    showSyncStatus('Configure o GitHub primeiro!', 'warning');
+                    return;
+                }
+
+                showSyncStatus('<span class="spinner"><i class="fas fa-spinner"></i></span> Enviando backup...', 'info');
+                
+                // Criar backup dos dados atuais
+                const backupData = backupSystem.createBackupData();
+                const backupInfo = backupSystem.createBackupInfo(backupData);
+                
+                // Enviar para GitHub
+                await backupSystem.syncToGitHub(backupInfo.id, backupData);
+                
+                showSyncStatus(`✅ Backup enviado: ${(backupData.inventario_tanques?.tanques || []).length} tanques`, 'success');
+                
+            } catch (error) {
+                console.error('Erro ao enviar backup:', error);
+                showSyncStatus(`❌ Erro ao enviar: ${error.message}`, 'danger');
+            }
+        }
+
+        function atualizarStatus() {
+            const statusDiv = document.getElementById('currentStatus');
+            
+            try {
+                const config = backupSystem?.config || {};
+                const hasToken = !!config.githubToken;
+                const isEnabled = config.githubSyncEnabled;
+                
+                let statusHTML = '';
+                let statusClass = 'alert-info-mobile';
+                
+                if (hasToken && isEnabled) {
+                    statusHTML = `
+                        <i class="fas fa-check-circle me-2 text-success"></i>
+                        <strong>GitHub Sync Ativo</strong><br>
+                        <small>Repositório: ${config.githubOwner}/${config.githubRepo}</small>
+                    `;
+                    statusClass = 'alert-success';
+                } else if (hasToken && !isEnabled) {
+                    statusHTML = `
+                        <i class="fas fa-pause-circle me-2 text-warning"></i>
+                        <strong>GitHub Configurado mas Inativo</strong><br>
+                        <small>Clique em "Ativar Sync" para habilitar</small>
+                    `;
+                    statusClass = 'alert-warning';
+                } else {
+                    statusHTML = `
+                        <i class="fas fa-times-circle me-2 text-danger"></i>
+                        <strong>GitHub Sync Não Configurado</strong><br>
+                        <small>Configure o token para começar</small>
+                    `;
+                    statusClass = 'alert-danger';
+                }
+                
+                statusDiv.className = `alert-mobile ${statusClass}`;
+                statusDiv.innerHTML = statusHTML;
+                
+            } catch (error) {
+                console.error('Erro ao atualizar status:', error);
+                statusDiv.className = 'alert-mobile alert-danger';
+                statusDiv.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>Erro ao verificar status';
+            }
+        }
+
+        async function testarTudo() {
+            const btn = document.getElementById('testAllBtn');
+            const originalText = btn.innerHTML;
+            
+            btn.innerHTML = '<span class="spinner"><i class="fas fa-spinner"></i></span> Testando...';
+            btn.disabled = true;
+            
+            try {
+                await testarConexao();
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                if (isConfigured) {
+                    await ativarSync();
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    await enviarBackup();
+                }
+                
+                showStatus('✅ Todos os testes concluídos!', 'success');
+                
+            } catch (error) {
+                console.error('Erro nos testes:', error);
+                showStatus(`❌ Erro nos testes: ${error.message}`, 'danger');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        function voltarInventario() {
+            // Verificar se existe página anterior
+            if (document.referrer && document.referrer.includes('inventario')) {
+                window.history.back();
+            } else {
+                // Redirecionar para página de inventário
+                window.location.href = 'inventario-rapido.html';
+            }
+        }
+    </script>
+</body>
+</html>

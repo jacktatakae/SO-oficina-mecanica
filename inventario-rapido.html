@@ -198,6 +198,66 @@
                 margin-bottom: 0.75rem;
             }
             
+            /* Otimizações para GitHub Modal no celular */
+            .modal-dialog {
+                margin: 0.5rem;
+            }
+            
+            .github-config-mobile .form-control-lg {
+                font-size: 16px !important;
+                min-height: 50px;
+                padding: 1rem;
+                border-width: 2px;
+            }
+            
+            .github-config-mobile .btn-lg {
+                min-height: 50px;
+                font-size: 16px;
+                font-weight: 600;
+                padding: 1rem;
+            }
+            
+            .github-config-mobile .input-group .btn {
+                min-height: 50px;
+                padding: 0 1rem;
+            }
+            
+            /* Melhor contraste e visibilidade */
+            .form-label {
+                font-weight: 600;
+                color: #2196F3;
+                margin-bottom: 0.5rem;
+            }
+            
+            .alert {
+                font-size: 14px;
+                padding: 1rem;
+                margin-bottom: 1rem;
+            }
+            
+            /* Botões de ação mais visíveis */
+            .btn-outline-info, .btn-outline-warning {
+                border-width: 2px;
+                font-weight: 600;
+            }
+            
+            /* Status do GitHub mais legível */
+            #githubCurrentStatus {
+                font-size: 14px;
+                padding: 1rem;
+                border-width: 2px;
+            }
+            
+            /* Lista de backups otimizada */
+            .list-group-item {
+                padding: 1rem;
+                font-size: 14px;
+                border-width: 2px;
+            }
+        }
+
+        /* Responsividade adicional */
+        @media (max-width: 768px) {
             .stats-card h3 {
                 font-size: 1.5rem;
             }
@@ -339,6 +399,10 @@
             <button class="btn btn-outline-primary btn-lg me-2" onclick="abrirConfigGitHub()">
                 <i class="fab fa-github me-1"></i> Config GitHub
             </button>
+            <!-- Botão específico para mobile -->
+            <button class="btn btn-outline-info btn-lg me-2 d-md-none" onclick="window.location.href='github-sync-mobile.html'">
+                <i class="fas fa-mobile-alt me-1"></i> GitHub Mobile
+            </button>
             <button class="btn btn-secondary btn-lg" onclick="limparTudo()">
                 <i class="fas fa-trash me-1"></i> Limpar Tudo
             </button>
@@ -384,68 +448,100 @@
 
     <!-- Modal para Configuração GitHub -->
     <div class="modal fade" id="githubModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title"><i class="fab fa-github me-2"></i>Configurar Sincronização GitHub</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title"><i class="fab fa-github me-2"></i>GitHub Sync</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <div class="alert alert-info">
                         <i class="fas fa-info-circle me-2"></i>
-                        <strong>Sincronize seus dados com GitHub para:</strong>
+                        <strong>Backup automático na nuvem:</strong>
                         <ul class="mb-0 mt-2">
-                            <li>✅ Backup automático na nuvem</li>
                             <li>✅ Sincronização entre dispositivos</li>
-                            <li>✅ Histórico de versões</li>
+                            <li>✅ Backup automático</li>
                             <li>✅ Acesso de qualquer lugar</li>
                         </ul>
                     </div>
                     
-                    <div class="mb-3">
-                        <label class="form-label">Token do GitHub</label>
-                        <input type="password" class="form-control" id="githubToken" placeholder="ghp_xxxxxxxxxxxx">
-                        <small class="text-muted">
-                            <a href="https://github.com/settings/tokens" target="_blank">
-                                <i class="fas fa-external-link-alt"></i> Criar token no GitHub
-                            </a> (repo permissions necessárias)
-                        </small>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label class="form-label">Usuário GitHub</label>
-                            <input type="text" class="form-control" id="githubOwner" placeholder="seu-usuario">
+                    <!-- Configuração Simplificada para Mobile -->
+                    <div class="github-config-mobile">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-key me-1"></i> Token GitHub
+                            </label>
+                            <div class="input-group">
+                                <input type="password" class="form-control form-control-lg" id="githubToken" 
+                                       placeholder="ghp_xxxxxxxxxxxx" 
+                                       style="font-size: 14px;">
+                                <button class="btn btn-outline-secondary" type="button" onclick="toggleTokenVisibility()">
+                                    <i class="fas fa-eye" id="toggleIcon"></i>
+                                </button>
+                            </div>
+                            <small class="text-muted">
+                                <a href="https://github.com/settings/tokens" target="_blank" class="btn btn-sm btn-outline-info mt-2">
+                                    <i class="fas fa-external-link-alt"></i> Criar Token
+                                </a>
+                            </small>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Repositório</label>
-                            <input type="text" class="form-control" id="githubRepo" placeholder="vrs-inventario-backup">
+                        
+                        <div class="row">
+                            <div class="col-12 col-md-6 mb-3">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-user me-1"></i> Usuário
+                                </label>
+                                <input type="text" class="form-control form-control-lg" id="githubOwner" 
+                                       placeholder="jacktatakae" value="jacktatakae">
+                            </div>
+                            <div class="col-12 col-md-6 mb-3">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-folder me-1"></i> Repositório
+                                </label>
+                                <input type="text" class="form-control form-control-lg" id="githubRepo" 
+                                       placeholder="vrs-inventario-backup" value="vrs-inventario-backup">
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div class="mt-3">
-                        <button class="btn btn-primary" onclick="testarConexaoGitHub()">
-                            <i class="fas fa-plug me-1"></i> Testar Conexão
-                        </button>
-                        <button class="btn btn-success" onclick="salvarConfigGitHub()">
-                            <i class="fas fa-save me-1"></i> Salvar e Ativar
-                        </button>
+                        
+                        <!-- Botões grandes para mobile -->
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-primary btn-lg" onclick="testarConexaoGitHub()">
+                                <i class="fas fa-plug me-2"></i> Testar Conexão
+                            </button>
+                            <button class="btn btn-success btn-lg" onclick="salvarConfigGitHub()">
+                                <i class="fas fa-save me-2"></i> Salvar e Ativar
+                            </button>
+                        </div>
+                        
+                        <!-- Ações rápidas -->
+                        <div class="row mt-3">
+                            <div class="col-6">
+                                <button class="btn btn-outline-info w-100" onclick="baixarBackupGitHub()">
+                                    <i class="fas fa-download me-1"></i> Baixar
+                                </button>
+                            </div>
+                            <div class="col-6">
+                                <button class="btn btn-outline-warning w-100" onclick="enviarBackupGitHub()">
+                                    <i class="fas fa-upload me-1"></i> Enviar
+                                </button>
+                            </div>
+                        </div>
                     </div>
                     
                     <div id="githubStatus" class="mt-3" style="display: none;"></div>
                     
                     <!-- Status atual -->
                     <div class="mt-4">
-                        <h6>Status Atual:</h6>
+                        <h6><i class="fas fa-info-circle me-2"></i>Status Atual:</h6>
                         <div id="githubCurrentStatus" class="alert alert-secondary">
-                            GitHub Sync não configurado
+                            <i class="fas fa-times-circle me-2"></i>GitHub Sync não configurado
                         </div>
                     </div>
                     
                     <!-- Lista de backups -->
                     <div id="githubBackups" style="display: none;">
-                        <h6>Backups no GitHub:</h6>
-                        <div id="backupsList"></div>
+                        <h6><i class="fas fa-cloud me-2"></i>Backups na Nuvem:</h6>
+                        <div id="backupsList" class="list-group"></div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -853,6 +949,78 @@
             updateGitHubStatus();
             new bootstrap.Modal(document.getElementById('githubModal')).show();
         }
+
+        // Toggle visibilidade do token
+        function toggleTokenVisibility() {
+            const tokenInput = document.getElementById('githubToken');
+            const toggleIcon = document.getElementById('toggleIcon');
+            
+            if (tokenInput.type === 'password') {
+                tokenInput.type = 'text';
+                toggleIcon.className = 'fas fa-eye-slash';
+            } else {
+                tokenInput.type = 'password';
+                toggleIcon.className = 'fas fa-eye';
+            }
+        }
+
+        // Baixar backup do GitHub (função simplificada para mobile)
+        async function baixarBackupGitHub() {
+            try {
+                if (!window.githubSync || !window.githubSync.isConfigured()) {
+                    showGitHubStatus('Configure o GitHub primeiro!', 'warning');
+                    return;
+                }
+
+                showGitHubStatus('📥 Buscando backups...', 'info');
+                
+                const backups = await window.githubSync.listBackups();
+                if (backups.length === 0) {
+                    showGitHubStatus('Nenhum backup encontrado no GitHub', 'warning');
+                    return;
+                }
+
+                // Pegar o backup mais recente
+                const latestBackup = backups[0];
+                const data = await window.githubSync.downloadBackup(latestBackup.name);
+                
+                if (data && data.tanques) {
+                    inventario = data;
+                    salvarDados();
+                    atualizarInterface();
+                    showGitHubStatus(`✅ Backup baixado: ${data.tanques.length} tanques`, 'success');
+                } else {
+                    showGitHubStatus('❌ Backup inválido', 'danger');
+                }
+                
+            } catch (error) {
+                console.error('Erro ao baixar backup:', error);
+                showGitHubStatus(`❌ Erro: ${error.message}`, 'danger');
+            }
+        }
+
+        // Enviar backup para GitHub (função simplificada para mobile)
+        async function enviarBackupGitHub() {
+            try {
+                if (!window.githubSync || !window.githubSync.isConfigured()) {
+                    showGitHubStatus('Configure o GitHub primeiro!', 'warning');
+                    return;
+                }
+
+                showGitHubStatus('📤 Enviando backup...', 'info');
+                
+                const result = await window.githubSync.uploadBackup(inventario);
+                if (result.success) {
+                    showGitHubStatus(`✅ Backup enviado: ${inventario.tanques.length} tanques`, 'success');
+                } else {
+                    showGitHubStatus(`❌ Falha no envio: ${result.error}`, 'danger');
+                }
+                
+            } catch (error) {
+                console.error('Erro ao enviar backup:', error);
+                showGitHubStatus(`❌ Erro: ${error.message}`, 'danger');
+            }
+        }
         
         // Testar conexão GitHub
         async function testarConexaoGitHub() {
@@ -865,7 +1033,7 @@
                 return;
             }
             
-            showGitHubStatus('Testando conexão...', 'info');
+            showGitHubStatus('🔍 Testando conexão...', 'info');
             
             try {
                 const tempSync = new GitHubSync();
