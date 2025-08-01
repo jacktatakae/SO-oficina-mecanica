@@ -2,8 +2,24 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📷 Scan Visual de Tanques - VRS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, minimum-scale=1.0, maximum-scale=5.0">
+    <title>📷 VRS Scanner Visual - Mobile</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Meta tags para PWA -->
+    <meta name="theme-color" content="#673AB7">
+    <meta name="background-color" content="#673AB7">
+    <meta name="display" content="standalone">
+    <meta name="orientation" content="portrait-primary">
+    
+    <!-- Meta tags para mobile -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="VRS Scanner">
+    
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -950,14 +966,193 @@
             }
         }
 
+        // ===== PWA FUNCTIONALITY =====
+        let deferredPrompt;
+        let serviceWorkerRegistration;
+
+        // Inicializar PWA
+        function initScannerPWA() {
+            // Registrar Service Worker
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(registration => {
+                        serviceWorkerRegistration = registration;
+                        console.log('✅ Service Worker registrado (Scanner):', registration);
+                        
+                        // Escutar atualizações
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    showScannerUpdateNotification();
+                                }
+                            });
+                        });
+                    })
+                    .catch(error => {
+                        console.error('❌ Erro ao registrar Service Worker (Scanner):', error);
+                    });
+            }
+
+            // Escutar evento de instalação PWA
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                showScannerInstallBanner();
+            });
+
+            // PWA instalado
+            window.addEventListener('appinstalled', () => {
+                console.log('✅ PWA Scanner instalado');
+                showScannerToast('📷 Scanner instalado com sucesso!', 'success');
+                hideScannerInstallBanner();
+            });
+
+            // Event listeners para conectividade
+            window.addEventListener('online', () => {
+                showScannerToast('📶 Scanner online - IA ativada!', 'success');
+            });
+
+            window.addEventListener('offline', () => {
+                showScannerToast('📵 Scanner offline - funcionalidade limitada', 'warning');
+            });
+        }
+
+        // Mostrar banner de instalação scanner
+        function showScannerInstallBanner() {
+            const existingBanner = document.getElementById('scannerInstallBanner');
+            if (existingBanner) return;
+
+            const banner = document.createElement('div');
+            banner.id = 'scannerInstallBanner';
+            banner.className = 'position-fixed bottom-0 start-0 end-0 bg-purple text-white p-3';
+            banner.style.zIndex = '9999';
+            banner.style.background = 'linear-gradient(135deg, #673AB7, #9C27B0)';
+            banner.innerHTML = `
+                <div class="container-fluid">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <strong><i class="fas fa-camera me-2"></i>Instalar Scanner VRS</strong>
+                            <br>
+                            <small>Scanner IA sempre disponível!</small>
+                        </div>
+                        <div class="col-auto">
+                            <button class="btn btn-light btn-sm me-2" onclick="installScannerPWA()">
+                                <i class="fas fa-download"></i> Instalar
+                            </button>
+                            <button class="btn btn-outline-light btn-sm" onclick="hideScannerInstallBanner()">
+                                ✕
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(banner);
+        }
+
+        // Esconder banner de instalação
+        function hideScannerInstallBanner() {
+            const banner = document.getElementById('scannerInstallBanner');
+            if (banner) {
+                banner.remove();
+            }
+        }
+
+        // Instalar PWA Scanner
+        async function installScannerPWA() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                
+                if (outcome === 'accepted') {
+                    console.log('✅ Usuário aceitou instalar PWA Scanner');
+                } else {
+                    console.log('❌ Usuário recusou instalar PWA Scanner');
+                }
+                
+                deferredPrompt = null;
+                hideScannerInstallBanner();
+            }
+        }
+
+        // Mostrar notificação de atualização scanner
+        function showScannerUpdateNotification() {
+            const notification = document.createElement('div');
+            notification.className = 'position-fixed top-0 start-0 end-0 bg-warning text-dark p-2';
+            notification.style.zIndex = '9999';
+            notification.innerHTML = `
+                <div class="container-fluid">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <small><strong><i class="fas fa-sync me-1"></i>Scanner atualizado</strong></small>
+                        </div>
+                        <div class="col-auto">
+                            <button class="btn btn-warning btn-sm" onclick="updateScannerApp()">
+                                Recarregar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+        }
+
+        // Atualizar aplicativo scanner
+        function updateScannerApp() {
+            if (serviceWorkerRegistration && serviceWorkerRegistration.waiting) {
+                serviceWorkerRegistration.waiting.postMessage({ type: 'SKIP_WAITING' });
+                window.location.reload();
+            }
+        }
+
+        // Toast scanner específico
+        function showScannerToast(message, type = 'info', duration = 3000) {
+            const toast = document.createElement('div');
+            toast.className = `alert alert-${type} position-fixed top-50 start-50 translate-middle`;
+            toast.style.zIndex = '9999';
+            toast.style.minWidth = '250px';
+            toast.style.textAlign = 'center';
+            toast.innerHTML = message;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                if (document.body.contains(toast)) {
+                    toast.style.opacity = '0';
+                    toast.style.transform = 'translate(-50%, -50%) scale(0.8)';
+                    toast.style.transition = 'all 0.3s ease';
+                    
+                    setTimeout(() => {
+                        if (document.body.contains(toast)) {
+                            document.body.removeChild(toast);
+                        }
+                    }, 300);
+                }
+            }, duration);
+        }
+
         // Inicializar
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🎯 Scanner Visual de Tanques inicializado');
             
+            // Inicializar PWA
+            initScannerPWA();
+            
             // Verificar se há inventário existente
             const inventario = JSON.parse(localStorage.getItem('inventario_tanques') || '{"tanques":[]}');
             console.log(`📊 Inventário atual: ${inventario.tanques.length} itens`);
+            
+            // Verificar atualizações periodicamente
+            setInterval(() => {
+                if (serviceWorkerRegistration) {
+                    serviceWorkerRegistration.update();
+                }
+            }, 60000);
         });
+
+        console.log('📷 VRS Scanner PWA inicializado');
     </script>
 </body>
 </html>

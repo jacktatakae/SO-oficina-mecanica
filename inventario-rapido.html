@@ -2,8 +2,24 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📋 Inventário Rápido de Tanques - VRS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, minimum-scale=1.0, maximum-scale=5.0">
+    <title>📋 VRS Inventário Rápido - Mobile</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Meta tags para PWA -->
+    <meta name="theme-color" content="#2196F3">
+    <meta name="background-color" content="#2196F3">
+    <meta name="display" content="standalone">
+    <meta name="orientation" content="portrait-primary">
+    
+    <!-- Meta tags para mobile -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="VRS Inventário">
+    
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -103,19 +119,87 @@
             border-radius: 10px;
         }
 
+        /* Melhorias para mobile */
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+
         @media (max-width: 768px) {
+            body {
+                padding: 0.5rem;
+            }
+            
             .inventario-container {
                 padding: 1rem;
+                border-radius: 15px;
             }
             
             .tanque-item {
                 flex-direction: column;
                 text-align: center;
+                padding: 0.75rem;
             }
             
             .quantidade-input {
                 margin-top: 0.5rem;
                 width: 100%;
+                max-width: 120px;
+            }
+            
+            .stats-card {
+                margin: 0.25rem;
+                padding: 1rem;
+            }
+            
+            .quick-form {
+                padding: 1rem;
+            }
+            
+            .btn-quick {
+                width: 100%;
+                margin: 0.25rem 0;
+            }
+            
+            .row .col-md-2, .row .col-md-3, .row .col-md-4 {
+                margin-bottom: 1rem;
+            }
+            
+            /* Melhor experiência touch */
+            .btn {
+                min-height: 44px;
+                padding: 0.75rem 1rem;
+            }
+            
+            .form-control, .form-select {
+                min-height: 44px;
+                font-size: 16px; /* Evita zoom no iOS */
+            }
+            
+            /* Botões de ação mobile */
+            .text-center .btn-lg {
+                width: 100%;
+                margin: 0.5rem 0;
+                font-size: 0.9rem;
+                padding: 0.75rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .inventario-container {
+                margin: 0;
+                border-radius: 0;
+                min-height: 100vh;
+            }
+            
+            .quick-form .row .col-md-3,
+            .quick-form .row .col-md-2,
+            .quick-form .row .col-md-4 {
+                width: 100%;
+                margin-bottom: 0.75rem;
+            }
+            
+            .stats-card h3 {
+                font-size: 1.5rem;
             }
         }
     </style>
@@ -782,7 +866,192 @@
                     });
                 }
             }, 1000);
+            
+            // Inicializar PWA
+            initInventarioPWA();
         });
+
+        // ===== PWA FUNCTIONALITY =====
+        let deferredPrompt;
+        let serviceWorkerRegistration;
+
+        // Inicializar PWA para Inventário
+        function initInventarioPWA() {
+            // Registrar Service Worker
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(registration => {
+                        serviceWorkerRegistration = registration;
+                        console.log('✅ Service Worker registrado (Inventário):', registration);
+                        
+                        // Escutar atualizações
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    showInventarioUpdateNotification();
+                                }
+                            });
+                        });
+                    })
+                    .catch(error => {
+                        console.error('❌ Erro ao registrar Service Worker (Inventário):', error);
+                    });
+            }
+
+            // Escutar evento de instalação PWA
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                showInventarioInstallBanner();
+            });
+
+            // PWA instalado
+            window.addEventListener('appinstalled', () => {
+                console.log('✅ PWA Inventário instalado');
+                showInventarioToast('📋 Inventário instalado com sucesso!', 'success');
+                hideInventarioInstallBanner();
+            });
+
+            // Event listeners para conectividade
+            window.addEventListener('online', () => {
+                showInventarioToast('📶 Inventário online - Backup ativo!', 'success');
+                updateBackupStatus();
+            });
+
+            window.addEventListener('offline', () => {
+                showInventarioToast('📵 Inventário offline - Dados seguros!', 'warning');
+            });
+            
+            // Verificar atualizações periodicamente
+            setInterval(() => {
+                if (serviceWorkerRegistration) {
+                    serviceWorkerRegistration.update();
+                }
+            }, 60000);
+        }
+
+        // Mostrar banner de instalação inventário
+        function showInventarioInstallBanner() {
+            const existingBanner = document.getElementById('inventarioInstallBanner');
+            if (existingBanner) return;
+
+            const banner = document.createElement('div');
+            banner.id = 'inventarioInstallBanner';
+            banner.className = 'position-fixed bottom-0 start-0 end-0 text-white p-3';
+            banner.style.zIndex = '9999';
+            banner.style.background = 'linear-gradient(135deg, #2196F3, #1976D2)';
+            banner.innerHTML = `
+                <div class="container-fluid">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <strong><i class="fas fa-boxes me-2"></i>Instalar Inventário VRS</strong>
+                            <br>
+                            <small>Catalogação sempre à mão!</small>
+                        </div>
+                        <div class="col-auto">
+                            <button class="btn btn-light btn-sm me-2" onclick="installInventarioPWA()">
+                                <i class="fas fa-download"></i> Instalar
+                            </button>
+                            <button class="btn btn-outline-light btn-sm" onclick="hideInventarioInstallBanner()">
+                                ✕
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(banner);
+        }
+
+        // Esconder banner de instalação
+        function hideInventarioInstallBanner() {
+            const banner = document.getElementById('inventarioInstallBanner');
+            if (banner) {
+                banner.remove();
+            }
+        }
+
+        // Instalar PWA Inventário
+        async function installInventarioPWA() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                
+                if (outcome === 'accepted') {
+                    console.log('✅ Usuário aceitou instalar PWA Inventário');
+                } else {
+                    console.log('❌ Usuário recusou instalar PWA Inventário');
+                }
+                
+                deferredPrompt = null;
+                hideInventarioInstallBanner();
+            }
+        }
+
+        // Mostrar notificação de atualização inventário
+        function showInventarioUpdateNotification() {
+            const notification = document.createElement('div');
+            notification.className = 'position-fixed top-0 start-0 end-0 bg-warning text-dark p-2';
+            notification.style.zIndex = '9999';
+            notification.innerHTML = `
+                <div class="container-fluid">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <small><strong><i class="fas fa-sync me-1"></i>Inventário atualizado</strong></small>
+                        </div>
+                        <div class="col-auto">
+                            <button class="btn btn-warning btn-sm" onclick="updateInventarioApp()">
+                                Recarregar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+        }
+
+        // Atualizar aplicativo inventário
+        function updateInventarioApp() {
+            if (serviceWorkerRegistration && serviceWorkerRegistration.waiting) {
+                serviceWorkerRegistration.waiting.postMessage({ type: 'SKIP_WAITING' });
+                window.location.reload();
+            }
+        }
+
+        // Toast inventário específico
+        function showInventarioToast(message, type = 'info', duration = 3000) {
+            const toast = document.createElement('div');
+            toast.className = `alert alert-${type} position-fixed top-50 start-50 translate-middle`;
+            toast.style.zIndex = '9999';
+            toast.style.minWidth = '280px';
+            toast.style.textAlign = 'center';
+            toast.innerHTML = message;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                if (document.body.contains(toast)) {
+                    toast.style.opacity = '0';
+                    toast.style.transform = 'translate(-50%, -50%) scale(0.8)';
+                    toast.style.transition = 'all 0.3s ease';
+                    
+                    setTimeout(() => {
+                        if (document.body.contains(toast)) {
+                            document.body.removeChild(toast);
+                        }
+                    }, 300);
+                }
+            }, duration);
+        }
+
+        // Prevenir zoom indesejado em mobile
+        document.addEventListener('gesturestart', function (e) {
+            e.preventDefault();
+        });
+
+        console.log('📋 VRS Inventário PWA inicializado');
     </script>
 </body>
 </html>
