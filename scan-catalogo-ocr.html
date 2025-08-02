@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📖 Scan de Catálogo OCR - VRS</title>
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .scan-container {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 1rem auto;
+            max-width: 800px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .camera-area {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 1.5rem 0;
+            text-align: center;
+            border: 3px dashed #dee2e6;
+            transition: all 0.3s ease;
+        }
+
+        .camera-area:hover {
+            border-color: #007bff;
+            background: #e3f2fd;
+        }
+
+        .camera-preview {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .btn-scan {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            margin: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-scan:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin: 2rem 0;
+        }
+
+        .step {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #dee2e6;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 1rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .step.active {
+            background: #007bff;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .step.completed {
+            background: #28a745;
+            color: white;
+        }
+
+        .ocr-results {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-left: 5px solid #28a745;
+        }
+
+        .text-detected {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            font-family: monospace;
+        }
+
+        .info-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-left: 5px solid #007bff;
+        }
+
+        .processing-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 15px;
+            z-index: 10;
+        }
+
+        .extracted-info {
+            background: linear-gradient(135deg, #e3f2fd, #f3e5f5);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .quantity-input {
+            background: #fff;
+            border: 2px solid #007bff;
+            border-radius: 8px;
+            padding: 0.75rem;
+            font-size: 1.1rem;
+            text-align: center;
+            width: 120px;
+        }
+
+        @media (max-width: 768px) {
+            .scan-container {
+                margin: 0.5rem;
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="scan-container">
+            <!-- Header -->
+            <div class="text-center mb-4">
+                <i class="fas fa-book-reader" style="font-size: 3rem; color: #667eea;"></i>
+                <h2 class="mt-3">📖 Scan de Catálogo OCR</h2>
+                <p class="text-muted">Leia automaticamente nomes, códigos e medidas</p>
+            </div>
+
+            <!-- Step Indicator -->
+            <div class="step-indicator">
+                <div class="step active" id="step1">1</div>
+                <div class="step" id="step2">2</div>
+                <div class="step" id="step3">3</div>
+                <div class="step" id="step4">4</div>
+            </div>
+            
+            <div class="text-center mb-3">
+                <small class="text-muted">
+                    <span id="stepText">Passo 1: Fotografar página do catálogo</span>
+                </small>
+            </div>
+
+            <!-- Camera Area -->
+            <div class="camera-area position-relative" id="cameraArea">
+                <div id="cameraPlaceholder">
+                    <i class="fas fa-book-open fa-3x text-muted mb-3"></i>
+                    <h5>Fotografe uma página do catálogo</h5>
+                    <p class="text-muted">
+                        📋 Dicas para melhor OCR:<br>
+                        • Página bem iluminada e nítida<br>
+                        • Texto legível e sem sombras<br>
+                        • Enquadre bem a área com informações<br>
+                        • Evite reflexos e distorções
+                    </p>
+                </div>
+
+                <!-- Processing Overlay -->
+                <div id="processingOverlay" class="processing-overlay" style="display: none;">
+                    <div class="spinner-border mb-3" role="status"></div>
+                    <h6 id="processingText">Lendo texto da imagem...</h6>
+                    <p id="processingDetail">Reconhecimento óptico de caracteres (OCR)</p>
+                </div>
+            </div>
+
+            <!-- Control Buttons -->
+            <div class="text-center mb-4">
+                <button class="btn btn-scan" onclick="abrirCamera()" id="btnCamera">
+                    <i class="fas fa-camera me-2"></i>Tirar Foto
+                </button>
+                <button class="btn btn-scan" onclick="uploadFoto()" id="btnUpload">
+                    <i class="fas fa-upload me-2"></i>Enviar Foto
+                </button>
+                <button class="btn btn-primary btn-lg" onclick="processarOCR()" id="btnProcess" style="display: none;">
+                    <i class="fas fa-eye me-2"></i>⚡ Ler Texto
+                </button>
+                <button class="btn btn-scan" onclick="novaFoto()" id="btnNew" style="display: none;">
+                    <i class="fas fa-redo me-2"></i>Nova Foto
+                </button>
+            </div>
+
+            <!-- OCR Results -->
+            <div id="ocrResults" style="display: none;">
+                <div class="ocr-results">
+                    <h5><i class="fas fa-text-width me-2"></i>Texto Detectado</h5>
+                    
+                    <!-- Raw Text -->
+                    <div class="mt-3">
+                        <h6>📄 Texto Bruto Extraído:</h6>
+                        <div id="rawText" class="text-detected">
+                            <!-- Preenchido dinamicamente -->
+                        </div>
+                    </div>
+
+                    <!-- Extracted Info -->
+                    <div id="extractedInfo" class="extracted-info" style="display: none;">
+                        <h6><i class="fas fa-search me-2"></i>Informações Encontradas:</h6>
+                        <div id="foundItems">
+                            <!-- Preenchido dinamicamente -->
+                        </div>
+                    </div>
+
+                    <!-- Manual Input if needed -->
+                    <div id="manualInput" style="display: none;">
+                        <h6><i class="fas fa-edit me-2"></i>Edição Manual</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label>Nome/Descrição:</label>
+                                <input type="text" class="form-control" id="manualName" placeholder="Ex: Caixa Superior Radiador">
+                            </div>
+                            <div class="col-md-6">
+                                <label>Código:</label>
+                                <input type="text" class="form-control" id="manualCode" placeholder="Ex: FI-001">
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-4">
+                                <label>Largura (mm):</label>
+                                <input type="number" class="form-control" id="manualWidth" placeholder="480">
+                            </div>
+                            <div class="col-md-4">
+                                <label>Altura (mm):</label>
+                                <input type="number" class="form-control" id="manualHeight" placeholder="335">
+                            </div>
+                            <div class="col-md-4">
+                                <label>Profundidade (mm):</label>
+                                <input type="number" class="form-control" id="manualDepth" placeholder="26">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quantity Input -->
+                    <div id="quantitySection" style="display: none;">
+                        <div class="text-center mt-4 p-3" style="background: #e8f5e8; border-radius: 10px;">
+                            <h5><i class="fas fa-plus-circle me-2"></i>Confirmar Adição</h5>
+                            <div class="d-flex align-items-center justify-content-center mt-3">
+                                <label class="me-3"><strong>Quantidade:</strong></label>
+                                <input type="number" class="quantity-input" id="quantityInput" value="1" min="1" max="999">
+                                <button class="btn btn-success btn-lg ms-3" onclick="adicionarAoInventario()">
+                                    <i class="fas fa-check me-2"></i>Adicionar ao Inventário
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="text-center mt-4">
+                        <button class="btn btn-warning" onclick="editarManualmente()" id="btnEdit">
+                            <i class="fas fa-edit me-2"></i>Editar Dados
+                        </button>
+                        <button class="btn btn-info" onclick="tentarNovamente()" id="btnRetry">
+                            <i class="fas fa-redo me-2"></i>Tentar Novamente
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Help Section -->
+            <div class="info-card">
+                <h6><i class="fas fa-lightbulb me-2"></i>Como Funciona o OCR</h6>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>✅ Detecta Automaticamente:</h6>
+                        <ul>
+                            <li>Nomes de produtos</li>
+                            <li>Códigos de peças</li>
+                            <li>Dimensões (LxAxP)</li>
+                            <li>Preços e aplicações</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>📱 Dicas de Uso:</h6>
+                        <ul>
+                            <li>Use boa iluminação</li>
+                            <li>Mantenha câmera estável</li>
+                            <li>Enquadre bem o texto</li>
+                            <li>Evite sombras e reflexos</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- OCR Library -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
+    
+    <script>
+        let currentImage = null;
+        let currentStep = 1;
+        let ocrResult = null;
+        let extractedData = null;
+
+        // Initialize
+        window.addEventListener('load', () => {
+            console.log('📖 Scan de Catálogo OCR carregado');
+            atualizarPasso(1);
+        });
+
+        // Open camera
+        async function abrirCamera() {
+            try {
+                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                    const stream = await navigator.mediaDevices.getUserMedia({ 
+                        video: { 
+                            facingMode: 'environment',
+                            width: { ideal: 1920 },
+                            height: { ideal: 1080 }
+                        } 
+                    });
+                    
+                    const video = document.createElement('video');
+                    video.srcObject = stream;
+                    video.autoplay = true;
+                    video.playsInline = true;
+                    video.style.width = '100%';
+                    video.style.maxHeight = '400px';
+                    video.style.borderRadius = '10px';
+                    
+                    document.getElementById('cameraPlaceholder').style.display = 'none';
+                    document.getElementById('cameraArea').appendChild(video);
+                    
+                    // Capture button
+                    setTimeout(() => {
+                        const captureBtn = document.createElement('button');
+                        captureBtn.className = 'btn btn-success mt-3';
+                        captureBtn.innerHTML = '<i class="fas fa-camera"></i> Capturar';
+                        captureBtn.onclick = () => capturarFoto(video, stream);
+                        document.getElementById('cameraArea').appendChild(captureBtn);
+                    }, 1000);
+                    
+                } else {
+                    alert('Câmera não disponível. Use "Enviar Foto".');
+                }
+            } catch (error) {
+                console.error('Erro ao acessar câmera:', error);
+                alert('Erro ao acessar a câmera. Tente "Enviar Foto".');
+            }
+        }
+
+        // Capture photo from camera
+        function capturarFoto(video, stream) {
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0);
+            
+            // Stop stream
+            stream.getTracks().forEach(track => track.stop());
+            
+            // Convert to image
+            canvas.toBlob(blob => {
+                const imageUrl = URL.createObjectURL(blob);
+                mostrarImagemCapturada(imageUrl);
+                currentImage = blob;
+            }, 'image/jpeg', 0.9);
+        }
+
+        // Upload photo
+        function uploadFoto() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.capture = 'environment';
+            
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const imageUrl = URL.createObjectURL(file);
+                    mostrarImagemCapturada(imageUrl);
+                    currentImage = file;
+                }
+            };
+            
+            input.click();
+        }
+
+        // Show captured image
+        function mostrarImagemCapturada(imageUrl) {
+            document.getElementById('cameraArea').innerHTML = `
+                <div id="imagePreview">
+                    <img id="capturedImage" src="${imageUrl}" class="camera-preview" alt="Foto capturada">
+                </div>
+            `;
+            
+            // Update controls
+            document.getElementById('btnCamera').style.display = 'none';
+            document.getElementById('btnUpload').style.display = 'none';
+            document.getElementById('btnProcess').style.display = 'inline-block';
+            document.getElementById('btnNew').style.display = 'inline-block';
+            
+            atualizarPasso(2);
+            
+            showToast('📷 Foto capturada! Clique em "Ler Texto" para processar', 'success');
+        }
+
+        // Process OCR
+        async function processarOCR() {
+            if (!currentImage) {
+                alert('Nenhuma imagem selecionada!');
+                return;
+            }
+
+            atualizarPasso(3);
+            mostrarProcessamento('🔍 Lendo texto da imagem...', 'Processamento OCR em andamento');
+
+            try {
+                console.log('📖 Iniciando OCR...');
+                
+                // Use Tesseract.js for OCR
+                const { data: { text } } = await Tesseract.recognize(
+                    currentImage,
+                    'por+eng', // Portuguese + English
+                    {
+                        logger: m => {
+                            if (m.status === 'recognizing text') {
+                                const progress = Math.round(m.progress * 100);
+                                document.getElementById('processingDetail').textContent = 
+                                    `Reconhecendo texto... ${progress}%`;
+                            }
+                        }
+                    }
+                );
+
+                ocrResult = text;
+                console.log('✅ OCR completo:', text);
+
+                // Extract structured data
+                extractedData = extrairInformacoes(text);
+                
+                // Show results
+                mostrarResultadosOCR();
+                esconderProcessamento();
+                atualizarPasso(4);
+
+            } catch (error) {
+                console.error('❌ Erro no OCR:', error);
+                alert('Erro no processamento de texto. Tente uma foto mais nítida.');
+                esconderProcessamento();
+            }
+        }
+
+        // Extract information from OCR text
+        function extrairInformacoes(texto) {
+            const linhas = texto.split('\n').filter(linha => linha.trim().length > 0);
+            const itens = [];
+
+            console.log('📝 Processando texto:', texto);
+
+            // Patterns for detection
+            const padroes = {
+                codigo: /([A-Z]{1,3}[-\s]?\d{1,4}[A-Z]?)/gi,
+                dimensoes: /(\d{2,4})\s*[xX×]\s*(\d{2,4})\s*[xX×]\s*(\d{1,3})/g,
+                medidas: /(\d{2,4})\s*mm\s*[xX×]\s*(\d{2,4})\s*mm\s*[xX×]\s*(\d{1,3})\s*mm/g,
+                preco: /R\$\s*(\d+[,.]?\d*)/gi,
+                nome: /(caixa|radiador|superior|inferior|tanque)/gi
+            };
+
+            let itemAtual = {};
+            let itemsEncontrados = [];
+
+            for (let i = 0; i < linhas.length; i++) {
+                const linha = linhas[i].trim();
+                
+                // Skip very short lines
+                if (linha.length < 3) continue;
+
+                // Look for codes
+                const codigoMatch = linha.match(padroes.codigo);
+                if (codigoMatch) {
+                    // If we have a current item, save it
+                    if (Object.keys(itemAtual).length > 0) {
+                        itemsEncontrados.push({ ...itemAtual });
+                    }
+                    
+                    itemAtual = {
+                        codigo: codigoMatch[0].replace(/\s+/g, '-'),
+                        linha_original: linha,
+                        linha_numero: i + 1
+                    };
+                }
+
+                // Look for dimensions
+                const dimensoesMatch = linha.match(padroes.dimensoes) || linha.match(padroes.medidas);
+                if (dimensoesMatch && itemAtual.codigo) {
+                    const match = dimensoesMatch[0];
+                    const numeros = match.match(/\d+/g);
+                    if (numeros && numeros.length >= 3) {
+                        itemAtual.dimensoes = {
+                            largura: parseInt(numeros[0]),
+                            altura: parseInt(numeros[1]),
+                            profundidade: parseInt(numeros[2]),
+                            texto_original: match
+                        };
+                    }
+                }
+
+                // Look for product names/descriptions
+                if (padroes.nome.test(linha) && itemAtual.codigo) {
+                    itemAtual.nome = linha;
+                }
+
+                // Look for prices
+                const precoMatch = linha.match(padroes.preco);
+                if (precoMatch && itemAtual.codigo) {
+                    itemAtual.preco = precoMatch[0];
+                }
+
+                // If line seems to be a description and we have a code
+                if (itemAtual.codigo && !itemAtual.nome && linha.length > 10 && linha.length < 80) {
+                    // Check if it's a reasonable product description
+                    if (/[a-zA-Z]/.test(linha) && !/^\d+$/.test(linha)) {
+                        itemAtual.nome = linha;
+                    }
+                }
+            }
+
+            // Don't forget the last item
+            if (Object.keys(itemAtual).length > 0) {
+                itemsEncontrados.push(itemAtual);
+            }
+
+            console.log('🎯 Itens encontrados:', itemsEncontrados);
+
+            return {
+                texto_completo: texto,
+                itens: itemsEncontrados,
+                resumo: {
+                    total_linhas: linhas.length,
+                    itens_encontrados: itemsEncontrados.length,
+                    tem_dimensoes: itemsEncontrados.some(item => item.dimensoes),
+                    tem_precos: itemsEncontrados.some(item => item.preco)
+                }
+            };
+        }
+
+        // Show OCR results
+        function mostrarResultadosOCR() {
+            document.getElementById('rawText').textContent = ocrResult || 'Nenhum texto detectado';
+            
+            if (extractedData.itens.length > 0) {
+                // Show extracted items
+                let html = '';
+                extractedData.itens.forEach((item, index) => {
+                    html += `
+                        <div class="card mb-2">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <h6><strong>Item ${index + 1}:</strong></h6>
+                                        <p><strong>Código:</strong> ${item.codigo || 'Não detectado'}</p>
+                                        <p><strong>Nome:</strong> ${item.nome || 'Não detectado'}</p>
+                                        ${item.dimensoes ? `
+                                            <p><strong>Dimensões:</strong> ${item.dimensoes.largura}×${item.dimensoes.altura}×${item.dimensoes.profundidade}mm</p>
+                                        ` : '<p><strong>Dimensões:</strong> Não detectadas</p>'}
+                                        ${item.preco ? `<p><strong>Preço:</strong> ${item.preco}</p>` : ''}
+                                    </div>
+                                    <div class="col-md-4 text-end">
+                                        <button class="btn btn-primary btn-sm" onclick="selecionarItem(${index})">
+                                            <i class="fas fa-check me-1"></i>Selecionar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                document.getElementById('foundItems').innerHTML = html;
+                document.getElementById('extractedInfo').style.display = 'block';
+            } else {
+                // No items found - show manual input
+                document.getElementById('extractedInfo').style.display = 'none';
+                document.getElementById('manualInput').style.display = 'block';
+                showToast('⚠️ Nenhum item estruturado encontrado. Use edição manual.', 'warning');
+            }
+
+            document.getElementById('ocrResults').style.display = 'block';
+        }
+
+        // Select an extracted item
+        function selecionarItem(index) {
+            const item = extractedData.itens[index];
+            
+            // Fill manual fields with detected data
+            document.getElementById('manualName').value = item.nome || '';
+            document.getElementById('manualCode').value = item.codigo || '';
+            
+            if (item.dimensoes) {
+                document.getElementById('manualWidth').value = item.dimensoes.largura || '';
+                document.getElementById('manualHeight').value = item.dimensoes.altura || '';
+                document.getElementById('manualDepth').value = item.dimensoes.profundidade || '';
+            }
+
+            // Show quantity section
+            document.getElementById('quantitySection').style.display = 'block';
+            document.getElementById('quantityInput').focus();
+
+            showToast('✅ Item selecionado! Confirme a quantidade.', 'success');
+        }
+
+        // Manual edit
+        function editarManualmente() {
+            document.getElementById('manualInput').style.display = 'block';
+            document.getElementById('quantitySection').style.display = 'block';
+        }
+
+        // Add to inventory
+        function adicionarAoInventario() {
+            const nome = document.getElementById('manualName').value.trim();
+            const codigo = document.getElementById('manualCode').value.trim();
+            const largura = document.getElementById('manualWidth').value;
+            const altura = document.getElementById('manualHeight').value;
+            const profundidade = document.getElementById('manualDepth').value;
+            const quantidade = parseInt(document.getElementById('quantityInput').value) || 1;
+
+            if (!nome && !codigo) {
+                alert('❌ Preencha pelo menos o nome ou código do item!');
+                return;
+            }
+
+            // Create inventory item
+            const novoItem = {
+                id: Date.now(),
+                nome: nome || 'Item sem nome',
+                codigo: codigo || 'SEM-CODIGO',
+                dimensoes: {
+                    largura: parseInt(largura) || 0,
+                    altura: parseInt(altura) || 0,
+                    profundidade: parseInt(profundidade) || 0
+                },
+                quantidade: quantidade,
+                origem: 'ocr_catalogo',
+                data_adicao: new Date().toISOString(),
+                ocr_data: {
+                    texto_original: ocrResult,
+                    confianca: 'manual_confirmado'
+                }
+            };
+
+            // Save to localStorage
+            const inventario = JSON.parse(localStorage.getItem('inventario_ocr') || '{"itens":[]}');
+            inventario.itens.push(novoItem);
+            localStorage.setItem('inventario_ocr', JSON.stringify(inventario));
+
+            // Show success
+            const dimensoesStr = largura && altura && profundidade ? 
+                `\nDimensões: ${largura}×${altura}×${profundidade}mm` : '';
+                
+            alert(`✅ Item adicionado com sucesso!\n\nNome: ${nome}\nCódigo: ${codigo}${dimensoesStr}\nQuantidade: ${quantidade}`);
+
+            // Reset for next scan
+            novaFoto();
+        }
+
+        // Try again
+        function tentarNovamente() {
+            if (currentImage) {
+                processarOCR();
+            } else {
+                alert('Tire uma nova foto primeiro!');
+            }
+        }
+
+        // New photo
+        function novaFoto() {
+            // Reset state
+            currentImage = null;
+            ocrResult = null;
+            extractedData = null;
+            
+            // Reset interface
+            document.getElementById('cameraArea').innerHTML = `
+                <div id="cameraPlaceholder">
+                    <i class="fas fa-book-open fa-3x text-muted mb-3"></i>
+                    <h5>Fotografe uma página do catálogo</h5>
+                    <p class="text-muted">
+                        📋 Dicas para melhor OCR:<br>
+                        • Página bem iluminada e nítida<br>
+                        • Texto legível e sem sombras<br>
+                        • Enquadre bem a área com informações<br>
+                        • Evite reflexos e distorções
+                    </p>
+                </div>
+            `;
+            
+            // Reset buttons
+            document.getElementById('btnCamera').style.display = 'inline-block';
+            document.getElementById('btnUpload').style.display = 'inline-block';
+            document.getElementById('btnProcess').style.display = 'none';
+            document.getElementById('btnNew').style.display = 'none';
+            
+            // Hide results
+            document.getElementById('ocrResults').style.display = 'none';
+            
+            atualizarPasso(1);
+        }
+
+        // Show processing
+        function mostrarProcessamento(texto, detalhe) {
+            document.getElementById('processingText').textContent = texto;
+            document.getElementById('processingDetail').textContent = detalhe;
+            document.getElementById('processingOverlay').style.display = 'flex';
+        }
+
+        // Hide processing
+        function esconderProcessamento() {
+            document.getElementById('processingOverlay').style.display = 'none';
+        }
+
+        // Update step indicator
+        function atualizarPasso(passo) {
+            currentStep = passo;
+            
+            const steps = ['Fotografar', 'Processar', 'Extrair Dados', 'Confirmar'];
+            document.getElementById('stepText').textContent = `Passo ${passo}: ${steps[passo-1]}`;
+            
+            // Update step indicators
+            for (let i = 1; i <= 4; i++) {
+                const stepEl = document.getElementById(`step${i}`);
+                stepEl.classList.remove('active', 'completed');
+                
+                if (i < passo) {
+                    stepEl.classList.add('completed');
+                } else if (i === passo) {
+                    stepEl.classList.add('active');
+                }
+            }
+        }
+
+        // Show toast notification
+        function showToast(message, type = 'info') {
+            // Create simple toast notification
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? '#28a745' : type === 'warning' ? '#ffc107' : '#007bff'};
+                color: white;
+                padding: 1rem;
+                border-radius: 8px;
+                z-index: 1000;
+                max-width: 300px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            `;
+            toast.textContent = message;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

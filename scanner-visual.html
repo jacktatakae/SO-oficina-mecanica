@@ -259,6 +259,17 @@
             </button>
         </div>
 
+        <!-- Quick Access to OCR Scanner -->
+        <div class="text-center mb-3">
+            <div class="alert alert-info" style="background: linear-gradient(135deg, #e3f2fd, #f3e5f5); border: none;">
+                <p class="mb-2"><strong>🚀 Modo mais rápido disponível!</strong></p>
+                <button class="btn btn-success btn-lg" onclick="abrirScannerOCR()">
+                    <i class="fas fa-book-reader me-2"></i>📖 Scan de Catálogo OCR
+                </button>
+                <br><small class="text-muted mt-2 d-block">Leia texto automaticamente de páginas de catálogo</small>
+            </div>
+        </div>
+
         <!-- Resultados da Análise -->
         <div id="analysisResults" style="display: none;">
             <div class="analysis-results">
@@ -1316,6 +1327,12 @@
                     }, 300);
                 }
             }, duration);
+        }
+
+        // Abrir Scanner OCR
+        function abrirScannerOCR() {
+            // Redirect to OCR scanner
+            window.location.href = 'scan-catalogo-ocr.html';
         }
 
         // Inicializar
