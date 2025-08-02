@@ -288,6 +288,9 @@ Se ainda tiver problemas:
 3. **🔄 Para atualizar:**
    - Editar arquivos no GitHub
    - Celular recebe atualizações automaticamente
+   - **Netlify:** 1-3 minutos após commit
+   - **GitHub Pages:** 5-10 minutos após commit
+   - **No celular:** Puxe para baixo para forçar atualização
 
 ---
 
@@ -322,6 +325,8 @@ O VRS já está configurado como PWA com:
 - ✅ **Cache inteligente**
 - ✅ **Notificações** (quando necessário)
 - ✅ **Acesso total** às funcionalidades
+- ✅ **Atualizações automáticas** do repositório
+- ✅ **Sync em tempo real** com GitHub/Netlify
 
 ---
 
