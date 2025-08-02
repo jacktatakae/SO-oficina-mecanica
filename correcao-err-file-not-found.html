@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚨 Correção: ERR_FILE_NOT_FOUND</title>
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #dc3545 0%, #6f1318 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+        }
+
+        .error-container {
+            background: white;
+            color: #333;
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 1rem auto;
+            max-width: 600px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .error-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+            border-radius: 15px;
+        }
+
+        .solution-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-left: 5px solid #28a745;
+        }
+
+        .urgent-fix {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .btn-fix {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            margin: 0.5rem;
+            width: 100%;
+            font-size: 1.1rem;
+        }
+
+        .btn-fix:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.4);
+        }
+
+        .steps {
+            counter-reset: step-counter;
+        }
+
+        .step {
+            counter-increment: step-counter;
+            position: relative;
+            padding-left: 3rem;
+            margin: 1.5rem 0;
+        }
+
+        .step::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            background: #007bff;
+            color: white;
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .quick-fix {
+            background: linear-gradient(45deg, #17a2b8, #138496);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin: 1rem 0;
+        }
+
+        @media (max-width: 768px) {
+            .error-container {
+                margin: 0.5rem;
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="error-container">
+            <div class="error-header">
+                <h1><i class="fas fa-exclamation-triangle me-2"></i>ERR_FILE_NOT_FOUND</h1>
+                <p>Correção Imediata para Erro de Navegação Mobile</p>
+            </div>
+
+            <!-- Diagnóstico do Problema -->
+            <div class="alert alert-danger">
+                <h4><i class="fas fa-bug me-2"></i>Problema Identificado:</h4>
+                <p><strong>Erro:</strong> "Não foi possível acessar seu arquivo"<br>
+                <strong>Código:</strong> ERR_FILE_NOT_FOUND<br>
+                <strong>Causa:</strong> Navegação entre páginas usando protocolo file:// no celular</p>
+            </div>
+
+            <!-- Solução Imediata -->
+            <div class="urgent-fix">
+                <h4><i class="fas fa-bolt text-warning me-2"></i>SOLUÇÃO IMEDIATA</h4>
+                <p><strong>O problema é que você está abrindo arquivos locais (file://) no celular.</strong></p>
+                <p>Para corrigir, você precisa usar um dos métodos abaixo:</p>
+            </div>
+
+            <!-- Método 1: Hospedagem Online -->
+            <div class="solution-card">
+                <h5><i class="fas fa-cloud text-primary me-2"></i>Método 1: Usar Online (RECOMENDADO)</h5>
+                <div class="steps">
+                    <div class="step">
+                        <strong>Acesse uma versão online do VRS</strong><br>
+                        <small>Use GitHub Pages, Netlify ou servidor web</small>
+                    </div>
+                    <div class="step">
+                        <strong>Instale como PWA</strong><br>
+                        <small>Menu → "Instalar app" ou "Adicionar à tela inicial"</small>
+                    </div>
+                    <div class="step">
+                        <strong>Use normalmente</strong><br>
+                        <small>Navegação funcionará perfeitamente</small>
+                    </div>
+                </div>
+                <button class="btn btn-fix" onclick="showOnlineOptions()">
+                    <i class="fas fa-globe me-2"></i>Ver Opções Online
+                </button>
+            </div>
+
+            <!-- Método 2: Servidor Local -->
+            <div class="solution-card">
+                <h5><i class="fas fa-server text-success me-2"></i>Método 2: Servidor Local</h5>
+                <div class="steps">
+                    <div class="step">
+                        <strong>No seu computador, abra terminal/prompt</strong><br>
+                        <small>Na pasta onde estão os arquivos VRS</small>
+                    </div>
+                    <div class="step">
+                        <strong>Execute comando:</strong><br>
+                        <code>python -m http.server 8080</code><br>
+                        <small>Ou use Live Server no VS Code</small>
+                    </div>
+                    <div class="step">
+                        <strong>No celular, acesse:</strong><br>
+                        <code>http://192.168.1.XXX:8080</code><br>
+                        <small>Substitua XXX pelo IP do seu PC</small>
+                    </div>
+                </div>
+                <button class="btn btn-fix" onclick="showServerInstructions()">
+                    <i class="fas fa-terminal me-2"></i>Instruções Detalhadas
+                </button>
+            </div>
+
+            <!-- Método 3: App Móvel -->
+            <div class="solution-card">
+                <h5><i class="fas fa-mobile-alt text-info me-2"></i>Método 3: App Móvel Específico</h5>
+                <p>Use um navegador/app que suporte file:// melhor:</p>
+                <div class="row">
+                    <div class="col-6">
+                        <button class="btn btn-outline-primary w-100 mb-2" onclick="window.open('https://play.google.com/store/apps/details?id=com.android.htmlviewer')">
+                            📱 HTML Viewer
+                        </button>
+                    </div>
+                    <div class="col-6">
+                        <button class="btn btn-outline-primary w-100 mb-2" onclick="window.open('https://play.google.com/store/apps/details?id=ru.zdevs.zarchiver')">
+                            📂 File Manager
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Correção Rápida -->
+            <div class="quick-fix">
+                <h4><i class="fas fa-magic me-2"></i>Correção Automática</h4>
+                <p>Se você conseguiu abrir esta página, vamos corrigir automaticamente:</p>
+                <button class="btn btn-light btn-lg w-100 mb-2" onclick="quickFix()">
+                    <i class="fas fa-wrench me-2"></i>Aplicar Correção Automática
+                </button>
+                <button class="btn btn-outline-light btn-lg w-100" onclick="goToMainPage()">
+                    <i class="fas fa-home me-2"></i>Ir para Página Principal
+                </button>
+            </div>
+
+            <!-- Por que acontece -->
+            <div class="alert alert-info">
+                <h5><i class="fas fa-info-circle me-2"></i>Por que isso acontece?</h5>
+                <ul>
+                    <li><strong>Protocolo file://:</strong> Navegadores móveis restringem navegação local</li>
+                    <li><strong>Segurança:</strong> Android/iOS bloqueiam acesso a arquivos locais</li>
+                    <li><strong>CORS:</strong> Política de segurança impede carregamento cross-origin</li>
+                    <li><strong>PWA:</strong> Service Workers precisam de HTTPS ou localhost</li>
+                </ul>
+            </div>
+
+            <!-- Status do Sistema -->
+            <div id="systemStatus" class="alert alert-secondary">
+                <h5><i class="fas fa-cogs me-2"></i>Status do Sistema</h5>
+                <div id="statusDetails">Verificando configuração atual...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para opções online -->
+    <div class="modal fade" id="onlineModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">🌐 Opções Online para VRS</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <h6>📤 GitHub Pages (Gratuito)</h6>
+                    <ol>
+                        <li>Crie conta no <a href="https://github.com" target="_blank">GitHub</a></li>
+                        <li>Crie repositório público</li>
+                        <li>Faça upload dos arquivos VRS</li>
+                        <li>Ative GitHub Pages nas configurações</li>
+                        <li>Acesse: <code>https://seuusuario.github.io/repositorio</code></li>
+                    </ol>
+
+                    <h6>🚀 Netlify (Gratuito)</h6>
+                    <ol>
+                        <li>Acesse <a href="https://netlify.com" target="_blank">netlify.com</a></li>
+                        <li>Arraste pasta VRS para o site</li>
+                        <li>Receba URL automática</li>
+                        <li>Compartilhe com qualquer dispositivo</li>
+                    </ol>
+
+                    <h6>💾 Google Drive (Alternativa)</h6>
+                    <ol>
+                        <li>Faça upload dos arquivos VRS</li>
+                        <li>Torne a pasta pública</li>
+                        <li>Use visualizador HTML online</li>
+                    </ol>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                    <button type="button" class="btn btn-primary" onclick="window.open('https://github.com')">Ir para GitHub</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para servidor local -->
+    <div class="modal fade" id="serverModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">🖥️ Configurar Servidor Local</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="tab-content">
+                        <h6>💻 Windows</h6>
+                        <pre class="bg-dark text-light p-3 rounded">
+# Abrir PowerShell na pasta VRS
+cd "C:\Users\Vinicius Radiadores\Documents\front engine"
+
+# Iniciar servidor
+python -m http.server 8080
+
+# Ou se tiver Node.js
+npx http-server -p 8080</pre>
+
+                        <h6>🐧 Linux/Mac</h6>
+                        <pre class="bg-dark text-light p-3 rounded">
+# Navegar para pasta VRS
+cd /caminho/para/vrs
+
+# Iniciar servidor Python
+python3 -m http.server 8080
+
+# Ou usar PHP
+php -S localhost:8080</pre>
+
+                        <h6>📱 Descobrir IP para celular</h6>
+                        <pre class="bg-dark text-light p-3 rounded">
+# Windows
+ipconfig | findstr IPv4
+
+# Linux/Mac  
+ip addr show | grep inet
+
+# Resultado exemplo: 192.168.1.105</pre>
+
+                        <h6>📱 No celular</h6>
+                        <ol>
+                            <li>Conecte na mesma rede WiFi do computador</li>
+                            <li>Abra navegador e digite: <code>http://192.168.1.105:8080</code></li>
+                            <li>Substitua o IP pelo encontrado acima</li>
+                            <li>VRS abrirá normalmente com navegação funcionando</li>
+                        </ol>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                    <button type="button" class="btn btn-primary" onclick="testLocalServer()">Testar Conexão</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Verificar status do sistema
+        window.addEventListener('load', checkSystemStatus);
+
+        function checkSystemStatus() {
+            const statusDiv = document.getElementById('statusDetails');
+            const protocol = window.location.protocol;
+            const hostname = window.location.hostname;
+            
+            let status = '<div class="row">';
+            status += `<div class="col-md-6"><strong>Protocolo:</strong> ${protocol}</div>`;
+            status += `<div class="col-md-6"><strong>Host:</strong> ${hostname || 'arquivo local'}</div>`;
+            status += '</div><div class="row">';
+            status += `<div class="col-md-6"><strong>Navegador:</strong> ${getBrowserInfo()}</div>`;
+            status += `<div class="col-md-6"><strong>Plataforma:</strong> ${getPlatformInfo()}</div>`;
+            status += '</div>';
+
+            if (protocol === 'file:') {
+                status += '<div class="alert alert-danger mt-2 mb-0"><strong>⚠️ PROBLEMA:</strong> Você está usando protocolo file:// que causa o erro ERR_FILE_NOT_FOUND</div>';
+            } else if (protocol === 'http:' || protocol === 'https:') {
+                status += '<div class="alert alert-success mt-2 mb-0"><strong>✅ OK:</strong> Protocolo adequado para navegação</div>';
+            }
+
+            statusDiv.innerHTML = status;
+        }
+
+        function getBrowserInfo() {
+            const ua = navigator.userAgent;
+            if (ua.includes('Chrome')) return 'Chrome';
+            if (ua.includes('Safari') && !ua.includes('Chrome')) return 'Safari';
+            if (ua.includes('Firefox')) return 'Firefox';
+            if (ua.includes('Edge')) return 'Edge';
+            return 'Outro';
+        }
+
+        function getPlatformInfo() {
+            const ua = navigator.userAgent;
+            if (ua.includes('Android')) return 'Android';
+            if (ua.includes('iPhone') || ua.includes('iPad')) return 'iOS';
+            if (ua.includes('Windows')) return 'Windows';
+            if (ua.includes('Mac')) return 'macOS';
+            if (ua.includes('Linux')) return 'Linux';
+            return 'Desconhecido';
+        }
+
+        function showOnlineOptions() {
+            new bootstrap.Modal(document.getElementById('onlineModal')).show();
+        }
+
+        function showServerInstructions() {
+            new bootstrap.Modal(document.getElementById('serverModal')).show();
+        }
+
+        function quickFix() {
+            // Tentar detectar e corrigir problemas automaticamente
+            const currentUrl = window.location.href;
+            
+            if (currentUrl.startsWith('file://')) {
+                alert('🚨 DETECTADO: Protocolo file://\n\n' +
+                      'SOLUÇÃO: Você precisa usar um servidor web.\n\n' +
+                      '1. Configure servidor local (recomendado)\n' +
+                      '2. Use hospedagem online\n' +
+                      '3. Instale PWA quando disponível\n\n' +
+                      'Clique OK para ver instruções detalhadas.');
+                showServerInstructions();
+            } else {
+                // Tentar navegar para página principal
+                const basePath = currentUrl.substring(0, currentUrl.lastIndexOf('/') + 1);
+                const mainPageUrl = basePath + 'inventario-rapido.html';
+                
+                alert('✅ CORREÇÃO APLICADA!\n\n' +
+                      'Tentando navegar para página principal...\n\n' +
+                      'Se der erro novamente, use uma das soluções acima.');
+                      
+                window.location.href = mainPageUrl;
+            }
+        }
+
+        function goToMainPage() {
+            // Tentar diferentes estratégias para ir para página principal
+            const strategies = [
+                './inventario-rapido.html',
+                '../inventario-rapido.html',
+                'inventario-rapido.html',
+                './index.html',
+                '../index.html',
+                'index.html'
+            ];
+
+            let attempted = 0;
+            
+            function tryNext() {
+                if (attempted >= strategies.length) {
+                    alert('❌ Não foi possível encontrar página principal.\n\n' +
+                          'Use uma das soluções de hospedagem acima.');
+                    return;
+                }
+
+                const url = strategies[attempted];
+                attempted++;
+
+                // Tentar carregar a URL
+                const testFrame = document.createElement('iframe');
+                testFrame.style.display = 'none';
+                testFrame.onload = function() {
+                    // Sucesso - navegar
+                    document.body.removeChild(testFrame);
+                    window.location.href = url;
+                };
+                testFrame.onerror = function() {
+                    // Falhou - tentar próxima
+                    document.body.removeChild(testFrame);
+                    tryNext();
+                };
+                
+                testFrame.src = url;
+                document.body.appendChild(testFrame);
+                
+                // Timeout para próxima tentativa
+                setTimeout(() => {
+                    if (testFrame.parentNode) {
+                        document.body.removeChild(testFrame);
+                        tryNext();
+                    }
+                }, 2000);
+            }
+
+            tryNext();
+        }
+
+        function testLocalServer() {
+            const testUrls = [
+                'http://localhost:8080',
+                'http://127.0.0.1:8080',
+                'http://192.168.1.100:8080',
+                'http://192.168.0.100:8080'
+            ];
+
+            alert('🔍 TESTANDO SERVIDORES LOCAIS...\n\n' +
+                  'Vou tentar algumas URLs comuns.\n' +
+                  'Se alguma funcionar, você pode usar essa URL no celular.');
+
+            testUrls.forEach(url => {
+                setTimeout(() => {
+                    window.open(url, '_blank');
+                }, 500);
+            });
+        }
+
+        // Adicionar dicas baseadas na plataforma
+        if (navigator.userAgent.includes('Android')) {
+            setTimeout(() => {
+                const tip = document.createElement('div');
+                tip.className = 'alert alert-info';
+                tip.innerHTML = '<strong>💡 DICA ANDROID:</strong> Use Chrome ou instale "HTTP Server" da Play Store para servir arquivos localmente.';
+                document.querySelector('.error-container').appendChild(tip);
+            }, 2000);
+        }
+
+        if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPad')) {
+            setTimeout(() => {
+                const tip = document.createElement('div');
+                tip.className = 'alert alert-info';
+                tip.innerHTML = '<strong>💡 DICA iOS:</strong> Use Safari e considere apps como "Documents by Readdle" para arquivos locais.';
+                document.querySelector('.error-container').appendChild(tip);
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

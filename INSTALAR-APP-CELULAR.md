@@ -121,6 +121,35 @@ O VRS pode ser instalado como um aplicativo nativo no seu dispositivo móvel, fu
 - ✅ Verifique se todos os arquivos estão na mesma pasta
 - ✅ Configure um servidor local ou use hospedagem online
 
+### 🚨 **"ERR_FILE_NOT_FOUND" - ERRO CRÍTICO**
+**Se você vê esta tela de erro exata, o problema é protocolo file://**
+
+**🔴 Sintomas:**
+- Tela cinza com ícone de documento
+- Texto: "Não foi possível acessar seu arquivo"
+- Código: "ERR_FILE_NOT_FOUND"
+- URL começa com `content://media/exte` ou `file://`
+
+**✅ SOLUÇÃO DEFINITIVA:**
+1. **📥 Acesse:** `correcao-err-file-not-found.html`
+2. **🔧 Use correção automática** incluída na página
+3. **🌐 Configure hospedagem online** (GitHub Pages/Netlify)
+4. **🖥️ Ou use servidor local** com Python/Node.js
+
+**💡 CAUSA RAIZ:**
+- Navegadores móveis bloqueiam protocolo `file://`
+- Android/iOS restringem navegação entre arquivos locais
+- PWA requer `https://` ou `http://localhost`
+
+**⚡ CORREÇÃO RÁPIDA:**
+```bash
+# No computador (pasta VRS):
+python -m http.server 8080
+
+# No celular (mesma rede WiFi):
+http://192.168.1.XXX:8080
+```
+
 ### ❌ "App desapareceu da tela inicial"
 **Possíveis causas:**
 - Limpeza de cache
