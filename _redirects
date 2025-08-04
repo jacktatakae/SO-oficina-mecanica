@@ -1,0 +1,15 @@
+# Redirecionamentos para o Netlify
+
+# Página inicial sempre vai para login
+/index.html    /login.html    302
+/              /login.html    302
+
+# Páginas que precisam de autenticação redirecionam para login se não estiver logado
+/inventario-rapido.html    /login.html    302
+/scanner-visual.html       /login.html    302
+/scan-catalogo-ocr.html    /login.html    302
+/gerenciador-clientes.html /login.html    302
+/central-sistemas.html     /login.html    302
+
+# SPA fallback - qualquer rota não encontrada vai para login
+/*    /login.html   404

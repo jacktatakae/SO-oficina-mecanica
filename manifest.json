@@ -2,7 +2,7 @@
   "name": "VRS - Sistema de Inventário de Radiadores",
   "short_name": "VRS Inventário",
   "description": "Sistema completo de catalogação e inventário de tanques de radiador com IA visual e sincronização GitHub",
-  "start_url": "./inventario-rapido.html",
+  "start_url": "./login.html",
   "display": "standalone",
   "background_color": "#2196F3",
   "theme_color": "#1976D2",

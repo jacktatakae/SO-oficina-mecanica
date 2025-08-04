@@ -935,11 +935,49 @@
     <script src="python-bridge.js"></script>
     
     <script>
-        // Initialize AOS
-        AOS.init({
-            duration: 800,
-            easing: 'ease-out-cubic'
+        // 🔐 VERIFICAÇÃO DE LOGIN AUTOMÁTICA
+        document.addEventListener('DOMContentLoaded', function() {
+            // Verificar se usuário está logado
+            const usuarioLogado = localStorage.getItem('usuarioLogado');
+            const sessaoAtiva = localStorage.getItem('sessaoAtiva');
+            const ultimoLogin = localStorage.getItem('ultimoLogin');
+            
+            // Se não estiver logado ou sessão expirou, redirecionar para login
+            if (!usuarioLogado || !sessaoAtiva) {
+                console.log('👤 Usuário não logado - Redirecionando para login...');
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Verificar se sessão não expirou (24 horas)
+            if (ultimoLogin) {
+                const tempoLogin = new Date(ultimoLogin);
+                const agora = new Date();
+                const diferencaHoras = (agora - tempoLogin) / (1000 * 60 * 60);
+                
+                if (diferencaHoras > 24) {
+                    console.log('⏰ Sessão expirada - Redirecionando para login...');
+                    localStorage.removeItem('sessaoAtiva');
+                    window.location.href = 'login.html';
+                    return;
+                }
+            }
+            
+            console.log('✅ Usuário autenticado - Carregando sistema...');
+            // Continuar com o carregamento normal da página
+            
+            // Initialize AOS
+            AOS.init({
+                duration: 800,
+                easing: 'ease-out-cubic'
+            });
         });
+
+        // Initialize AOS (removido duplicado)
+        // AOS.init({
+        //     duration: 800,
+        //     easing: 'ease-out-cubic'
+        // });
 
         // Sample data for demonstration
         const sampleData = {
